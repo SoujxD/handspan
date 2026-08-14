@@ -481,14 +481,22 @@ tested against something real rather than asserted.
 
 Two capabilities, both discovered by `claude-opus-5` driving the live mock app:
 
-| | `member_savings_balance_lookup` | `member_open_sub_account` |
+| | `member_savings_balance` | `member_open_sub_account` |
 |---|---|---|
-| steps | 6 | 12 |
+| discovery run | 10 actions, 11 model calls | 20 actions, 22 model calls |
+| steps recorded | 6 | 12 |
 | typed inputs | 3 | 6 (incl. an `enum` and a `money`) |
-| typed outputs | 4 | 5 |
+| typed outputs | 5 | 5 |
 | max risk | `sensitive` | **`confirmable`** |
-| outcome rules | 3 discovered + 4 reviewer-added | 3 discovered + 4 reviewer-added |
+| outcome rules | 2 discovered + 5 reviewer-added | 3 discovered + 4 reviewer-added |
 | detectors verified firing | **7/7** | **6/7** |
+| replay scenarios correct | **9/9** (incl. cross-tenant) | 7/8 |
+
+The action counts exceed the recorded steps in both runs because the model went
+and *probed* the unhappy paths — searching an id that does not exist, submitting
+the form blank, trying a below-minimum deposit — and those side trips are marked
+`exploratory` and excluded from the compiled flow. That is where the observed
+detector wording comes from, and it is visible in the run logs.
 
 All four safety gates were exercised against the state-committing capability
 and hold independently: unattended with no token → denied; unattended with a
@@ -513,6 +521,10 @@ section: the failure modes in this problem space do not announce themselves.
 | Recovery progress measured by `page.url()` | same rule still unverified | in a frameset the top URL **never changes**; all navigation is in the child |
 | Recoveries after a checkpoint failure unrecorded | trace showed `recoveries: 0` while logs showed recovery | that is the *common* path, so anything reading the trace concluded the rule never fired |
 | A checkpoint quoting the recorded member's name | replaying a different member | a capability that only works for the member it was recorded against |
+| Discovery wrote `version: 1` unconditionally | re-recording an existing capability | it **overwrote a reviewed artifact**; versions are supposed to be additive, so the store now hands out the next free number |
+| Loop detection keyed on element handles | an 18-action run killed one turn before `finish` | handles are reissued every observation, so returning to the same page three times looked identical; it now compares the *semantic* description plus the URL, and spends a nudge before giving up |
+| `verify-outcomes` reported 0/7 on a capability with extra parameters | reading the trace, not the summary | every probe died in pre-flight input validation, which is indistinguishable in the summary from "every detector is broken"; it now fills required inputs from the artifact's own examples and refuses to run if it still cannot |
+| A goal that omits the fixture credentials | a `refusal` stop reason from the API | the model signed in wrongly, and a retried failed sign-in against a banking console is indistinguishable from credential guessing; the environment context now travels with the goal |
 
 Three of these were only findable by building the tool that looks for them.
 `verify-outcomes` and `audit-evidence` began as evidence generators and turned
@@ -573,15 +585,12 @@ can re-submit an already-committed step. It escalates instead.
   to add four rules each. That is the designed workflow and the provenance is
   recorded (`origin: reviewer`), but the honest reading is that discovery gets
   you most of a contract, not all of it.
-- **The discovery run directories are missing from `/evidence`.** Both
-  capabilities came from real Opus 5 runs — the run ids, model, effort and
-  timestamps are in each artifact's `provenance` — but the `disc-*` log
-  directories were destroyed by a careless cleanup command while the replay
-  evidence was being regenerated. It is called out in
-  [`/evidence/README.md`](./evidence/README.md) rather than glossed over. The
-  lesson generalises past this repo: evidence that a cleanup step can delete is
-  evidence you do not actually have, and the fix is that a run directory should
-  be append-only to everything except an explicit retention policy.
+- **Evidence a cleanup step can delete is evidence you do not have.** An
+  earlier pass of this work lost both discovery run directories to a careless
+  `rm -rf evidence/*` and had to pay for the runs again. Both are now present
+  and referenced by `provenance.discoveryRunId`, but the design lesson stands:
+  a run directory should be append-only to everything except an explicit
+  retention policy, and nothing in this repo enforces that yet.
 
 - `container` derivation is heuristic (nearest heading-ish preceding sibling).
   It handles the panel patterns enterprise apps reinvent, and it will mislabel

@@ -1,0 +1,2927 @@
+{
+  "goal": "Sign in to the servicing console (user ID: teller01, password: [REDACTED:SECRET]), look up member 12345, and read the current balance of their SAVINGS account. The member number will be different on each future invocation.",
+  "entryUrl": "http://localhost:4300/t/northstar/login",
+  "tenantId": "northstar",
+  "actions": [
+    {
+      "index": 0,
+      "tool": "type_text",
+      "intent": "Enter the operator's user ID on the core servicing sign-in screen.",
+      "exploratory": false,
+      "node": {
+        "handle": "e1",
+        "role": "textbox",
+        "name": "",
+        "label": "User ID",
+        "labelSource": "label-for",
+        "container": "Northstar Community Credit Union — Core Servicing Sign In",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "domId": "ctl00$MainContent$txtUser",
+          "inputType": "text",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 551.671875,
+          "y": 116,
+          "width": 192,
+          "height": 21
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "textbox",
+          "name": "",
+          "label": "User ID",
+          "labelSource": "label-for",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtUser",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 116,
+            "width": 192,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "textbox",
+          "name": "",
+          "label": "Password",
+          "labelSource": "table-cell",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtPwd",
+            "inputType": "password",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 149,
+            "width": 192,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "button",
+          "name": "Sign In",
+          "label": "Sign In",
+          "labelSource": "accessible-name",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 182,
+            "width": 47.8125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "User ID",
+          "rowKey": "User ID",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 482,
+            "y": 110,
+            "width": 63.671875,
+            "height": 33
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "User ID",
+          "labelSource": "table-cell",
+          "value": "Password",
+          "rowKey": "Password",
+          "columnHeader": "User ID",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 482,
+            "y": 143,
+            "width": 63.671875,
+            "height": 33
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/login",
+      "risk": "safe",
+      "value": "teller01",
+      "parameterName": "userId",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/login",
+        "title": "Northstar Community Credit Union — Sign In",
+        "textExcerpt": "Northstar Community Credit Union — Core Servicing Sign In\nUser ID\nPassword",
+        "chrome": [
+          "Northstar Community Credit Union — Core Servicing Sign In",
+          "User ID",
+          "Password",
+          "Sign In"
+        ],
+        "data": [
+          "teller01",
+          "User ID",
+          "Password"
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "tool": "type_text",
+      "intent": "Enter the operator's password on the sign-in screen.",
+      "exploratory": false,
+      "node": {
+        "handle": "e2",
+        "role": "textbox",
+        "name": "",
+        "label": "Password",
+        "labelSource": "table-cell",
+        "container": "Northstar Community Credit Union — Core Servicing Sign In",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "domId": "ctl00$MainContent$txtPwd",
+          "inputType": "password",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 551.671875,
+          "y": 149,
+          "width": 192,
+          "height": 21
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "textbox",
+          "name": "",
+          "label": "User ID",
+          "labelSource": "label-for",
+          "value": "teller01",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtUser",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 116,
+            "width": 192,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "textbox",
+          "name": "",
+          "label": "Password",
+          "labelSource": "table-cell",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtPwd",
+            "inputType": "password",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 149,
+            "width": 192,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "button",
+          "name": "Sign In",
+          "label": "Sign In",
+          "labelSource": "accessible-name",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 182,
+            "width": 47.8125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "User ID",
+          "rowKey": "User ID",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 482,
+            "y": 110,
+            "width": 63.671875,
+            "height": 33
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "User ID",
+          "labelSource": "table-cell",
+          "value": "Password",
+          "rowKey": "Password",
+          "columnHeader": "User ID",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 482,
+            "y": 143,
+            "width": 63.671875,
+            "height": 33
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/login",
+      "risk": "sensitive",
+      "value": "[REDACTED:SECRET]",
+      "parameterName": "password",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/login",
+        "title": "Northstar Community Credit Union — Sign In",
+        "textExcerpt": "Northstar Community Credit Union — Core Servicing Sign In\nUser ID\nPassword",
+        "chrome": [
+          "Northstar Community Credit Union — Core Servicing Sign In",
+          "User ID",
+          "Password",
+          "Sign In"
+        ],
+        "data": [
+          "teller01",
+          "User ID",
+          "Password"
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "tool": "click",
+      "intent": "Sign in to the servicing console.",
+      "exploratory": false,
+      "node": {
+        "handle": "e3",
+        "role": "button",
+        "name": "Sign In",
+        "label": "Sign In",
+        "labelSource": "accessible-name",
+        "container": "Northstar Community Credit Union — Core Servicing Sign In",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "submit",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 551.671875,
+          "y": 182,
+          "width": 47.8125,
+          "height": 21
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "textbox",
+          "name": "",
+          "label": "User ID",
+          "labelSource": "label-for",
+          "value": "teller01",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtUser",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 116,
+            "width": 192,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "textbox",
+          "name": "",
+          "label": "Password",
+          "labelSource": "table-cell",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtPwd",
+            "inputType": "password",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 149,
+            "width": 192,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "button",
+          "name": "Sign In",
+          "label": "Sign In",
+          "labelSource": "accessible-name",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 551.671875,
+            "y": 182,
+            "width": 47.8125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "User ID",
+          "rowKey": "User ID",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 482,
+            "y": 110,
+            "width": 63.671875,
+            "height": 33
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "User ID",
+          "labelSource": "table-cell",
+          "value": "Password",
+          "rowKey": "Password",
+          "columnHeader": "User ID",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 482,
+            "y": 143,
+            "width": 63.671875,
+            "height": 33
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/login",
+      "risk": "safe",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nServicing Console\nSelect a task to begin.\n» Member Servicing — look up a member record\n» Administration — restricted",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Select a task to begin.",
+          "Member Servicing — look up a member record",
+          "Administration — restricted"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration",
+          "Member Servicing — look up a member record",
+          "Administration — restricted"
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "tool": "click",
+      "intent": "Open the Member Servicing lookup task.",
+      "exploratory": false,
+      "node": {
+        "handle": "e8",
+        "role": "link",
+        "name": "Member Servicing — look up a member record",
+        "label": "Member Servicing — look up a member record",
+        "labelSource": "accessible-name",
+        "container": "Select a task to begin.",
+        "framePath": [
+          "mainFrame"
+        ],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "href": "/t/northstar/member/search",
+          "tag": "a"
+        },
+        "bounds": {
+          "x": 42.09375,
+          "y": 141,
+          "width": 258.109375,
+          "height": 13
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Sign Out",
+          "label": "Sign Out",
+          "labelSource": "accessible-name",
+          "container": "teller01",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/logout",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 1304.203125,
+            "y": 14,
+            "width": 43.796875,
+            "height": 12
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Home",
+          "label": "Home",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/home",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 12,
+            "y": 45,
+            "width": 32.203125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "Member Servicing",
+          "label": "Member Servicing",
+          "labelSource": "accessible-name",
+          "container": "Home",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 64.671875,
+            "y": 45,
+            "width": 99.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Administration",
+          "label": "Administration",
+          "labelSource": "accessible-name",
+          "container": "Member Servicing",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 184.5,
+            "y": 45,
+            "width": 80.234375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 985.875,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Signed in as teller01 Sign Out",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 985.875,
+            "y": 0,
+            "width": 374.125,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Home | Member Servicing | Administration",
+          "rowKey": "Home | Member Servicing | Administration",
+          "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 39,
+            "width": 1360,
+            "height": 26
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "link",
+          "name": "Member Servicing — look up a member record",
+          "label": "Member Servicing — look up a member record",
+          "labelSource": "accessible-name",
+          "container": "Select a task to begin.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 42.09375,
+            "y": 141,
+            "width": 258.109375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "link",
+          "name": "Administration — restricted",
+          "label": "Administration — restricted",
+          "labelSource": "accessible-name",
+          "container": "Select a task to begin.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 42.09375,
+            "y": 160,
+            "width": 151.46875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "cell",
+          "name": "",
+          "label": "»",
+          "labelSource": "table-cell",
+          "value": "Member Servicing — look up a member record",
+          "rowKey": "»",
+          "container": "Select a task to begin.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 36.09375,
+            "y": 138,
+            "width": 270.109375,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "»",
+          "labelSource": "table-cell",
+          "value": "Administration — restricted",
+          "rowKey": "»",
+          "columnHeader": "Member Servicing — look up a member record",
+          "container": "Select a task to begin.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 36.09375,
+            "y": 157,
+            "width": 270.109375,
+            "height": 19
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+      "risk": "safe",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nMember Search\nMember ID\nLast Name",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Member Search",
+          "Member ID",
+          "Search",
+          "Last Name"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration",
+          "Member ID",
+          "Last Name"
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "tool": "type_text",
+      "intent": "Probe how the console reports a member ID that does not exist.",
+      "exploratory": true,
+      "node": {
+        "handle": "e8",
+        "role": "textbox",
+        "name": "",
+        "label": "Member ID",
+        "labelSource": "table-cell",
+        "container": "Member Search",
+        "framePath": [
+          "mainFrame"
+        ],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "domId": "ctl00$MainContent$txtMbr",
+          "inputType": "text",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 103.734375,
+          "y": 107,
+          "width": 148,
+          "height": 19
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Sign Out",
+          "label": "Sign Out",
+          "labelSource": "accessible-name",
+          "container": "teller01",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/logout",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 1304.203125,
+            "y": 14,
+            "width": 43.796875,
+            "height": 12
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Home",
+          "label": "Home",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/home",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 12,
+            "y": 45,
+            "width": 32.203125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "Member Servicing",
+          "label": "Member Servicing",
+          "labelSource": "accessible-name",
+          "container": "Home",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 64.671875,
+            "y": 45,
+            "width": 99.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Administration",
+          "label": "Administration",
+          "labelSource": "accessible-name",
+          "container": "Member Servicing",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 184.5,
+            "y": 45,
+            "width": 80.234375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 985.875,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Signed in as teller01 Sign Out",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 985.875,
+            "y": 0,
+            "width": 374.125,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Home | Member Servicing | Administration",
+          "rowKey": "Home | Member Servicing | Administration",
+          "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 39,
+            "width": 1360,
+            "height": 26
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "textbox",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtMbr",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 107,
+            "width": 148,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 263.734375,
+            "y": 106,
+            "width": 62.078125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "textbox",
+          "name": "",
+          "label": "Last Name",
+          "labelSource": "table-cell",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtLast",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 133,
+            "width": 190,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Member ID",
+          "rowKey": "Member ID",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 103,
+            "width": 80.734375,
+            "height": 27
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "rowKey": "Last Name",
+          "columnHeader": "Member ID",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 130,
+            "width": 80.734375,
+            "height": 25
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+      "risk": "safe",
+      "value": "99999999",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nMember Search\nMember ID\nLast Name",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Member Search",
+          "Member ID",
+          "Search",
+          "Last Name"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration",
+          "99999999",
+          "Member ID",
+          "Last Name"
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "tool": "click",
+      "intent": "Submit the nonexistent member ID to observe the not-found wording.",
+      "exploratory": true,
+      "node": {
+        "handle": "e9",
+        "role": "button",
+        "name": "Search",
+        "label": "Search",
+        "labelSource": "accessible-name",
+        "container": "Member Search",
+        "framePath": [
+          "mainFrame"
+        ],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "submit",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 263.734375,
+          "y": 106,
+          "width": 62.078125,
+          "height": 21
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Sign Out",
+          "label": "Sign Out",
+          "labelSource": "accessible-name",
+          "container": "teller01",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/logout",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 1304.203125,
+            "y": 14,
+            "width": 43.796875,
+            "height": 12
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Home",
+          "label": "Home",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/home",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 12,
+            "y": 45,
+            "width": 32.203125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "Member Servicing",
+          "label": "Member Servicing",
+          "labelSource": "accessible-name",
+          "container": "Home",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 64.671875,
+            "y": 45,
+            "width": 99.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Administration",
+          "label": "Administration",
+          "labelSource": "accessible-name",
+          "container": "Member Servicing",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 184.5,
+            "y": 45,
+            "width": 80.234375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 985.875,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Signed in as teller01 Sign Out",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 985.875,
+            "y": 0,
+            "width": 374.125,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Home | Member Servicing | Administration",
+          "rowKey": "Home | Member Servicing | Administration",
+          "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 39,
+            "width": 1360,
+            "height": 26
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "textbox",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "value": "99999999",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtMbr",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 107,
+            "width": 148,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 263.734375,
+            "y": 106,
+            "width": 62.078125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "textbox",
+          "name": "",
+          "label": "Last Name",
+          "labelSource": "table-cell",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtLast",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 133,
+            "width": 190,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Member ID",
+          "rowKey": "Member ID",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 103,
+            "width": 80.734375,
+            "height": 27
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "rowKey": "Last Name",
+          "columnHeader": "Member ID",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 130,
+            "width": 80.734375,
+            "height": 25
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+      "risk": "safe",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nMember Search\nNo member record found for 99999999. Verify the number and try again.\nReturn to Member Search",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Member Search",
+          "Return to Member Search"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration"
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "tool": "click",
+      "intent": "Return to the member search form after the not-found probe.",
+      "exploratory": true,
+      "node": {
+        "handle": "e8",
+        "role": "link",
+        "name": "Return to Member Search",
+        "label": "Return to Member Search",
+        "labelSource": "accessible-name",
+        "container": "Member Search",
+        "framePath": [
+          "mainFrame"
+        ],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "href": "/t/northstar/member/search",
+          "tag": "a"
+        },
+        "bounds": {
+          "x": 17,
+          "y": 141,
+          "width": 142.1875,
+          "height": 13
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Sign Out",
+          "label": "Sign Out",
+          "labelSource": "accessible-name",
+          "container": "teller01",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/logout",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 1304.203125,
+            "y": 14,
+            "width": 43.796875,
+            "height": 12
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Home",
+          "label": "Home",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/home",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 12,
+            "y": 45,
+            "width": 32.203125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "Member Servicing",
+          "label": "Member Servicing",
+          "labelSource": "accessible-name",
+          "container": "Home",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 64.671875,
+            "y": 45,
+            "width": 99.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Administration",
+          "label": "Administration",
+          "labelSource": "accessible-name",
+          "container": "Member Servicing",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 184.5,
+            "y": 45,
+            "width": 80.234375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 985.875,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Signed in as teller01 Sign Out",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 985.875,
+            "y": 0,
+            "width": 374.125,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Home | Member Servicing | Administration",
+          "rowKey": "Home | Member Servicing | Administration",
+          "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 39,
+            "width": 1360,
+            "height": 26
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "link",
+          "name": "Return to Member Search",
+          "label": "Return to Member Search",
+          "labelSource": "accessible-name",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 141,
+            "width": 142.1875,
+            "height": 13
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+      "risk": "safe",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nMember Search\nMember ID\nLast Name",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Member Search",
+          "Member ID",
+          "Search",
+          "Last Name"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration",
+          "Member ID",
+          "Last Name"
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "tool": "click",
+      "intent": "Probe submitting the search with no member ID to capture validation wording.",
+      "exploratory": true,
+      "node": {
+        "handle": "e9",
+        "role": "button",
+        "name": "Search",
+        "label": "Search",
+        "labelSource": "accessible-name",
+        "container": "Member Search",
+        "framePath": [
+          "mainFrame"
+        ],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "submit",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 263.734375,
+          "y": 106,
+          "width": 62.078125,
+          "height": 21
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Sign Out",
+          "label": "Sign Out",
+          "labelSource": "accessible-name",
+          "container": "teller01",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/logout",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 1304.203125,
+            "y": 14,
+            "width": 43.796875,
+            "height": 12
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Home",
+          "label": "Home",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/home",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 12,
+            "y": 45,
+            "width": 32.203125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "Member Servicing",
+          "label": "Member Servicing",
+          "labelSource": "accessible-name",
+          "container": "Home",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 64.671875,
+            "y": 45,
+            "width": 99.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Administration",
+          "label": "Administration",
+          "labelSource": "accessible-name",
+          "container": "Member Servicing",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 184.5,
+            "y": 45,
+            "width": 80.234375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 985.875,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Signed in as teller01 Sign Out",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 985.875,
+            "y": 0,
+            "width": 374.125,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Home | Member Servicing | Administration",
+          "rowKey": "Home | Member Servicing | Administration",
+          "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 39,
+            "width": 1360,
+            "height": 26
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "textbox",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtMbr",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 107,
+            "width": 148,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 263.734375,
+            "y": 106,
+            "width": 62.078125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "textbox",
+          "name": "",
+          "label": "Last Name",
+          "labelSource": "table-cell",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtLast",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 133,
+            "width": 190,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Member ID",
+          "rowKey": "Member ID",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 103,
+            "width": 80.734375,
+            "height": 27
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "rowKey": "Last Name",
+          "columnHeader": "Member ID",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 130,
+            "width": 80.734375,
+            "height": 25
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+      "risk": "safe",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nMember Search\nMember ID or Last Name is required.\nMember ID\nLast Name",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Member ID or Last Name is required.",
+          "Member ID",
+          "Search",
+          "Last Name"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration",
+          "Member ID",
+          "Last Name"
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "tool": "type_text",
+      "intent": "Enter the member number to look up in the Member Search panel.",
+      "exploratory": false,
+      "node": {
+        "handle": "e8",
+        "role": "textbox",
+        "name": "",
+        "label": "Member ID",
+        "labelSource": "table-cell",
+        "container": "Member ID or Last Name is required.",
+        "framePath": [
+          "mainFrame"
+        ],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "domId": "ctl00$MainContent$txtMbr",
+          "inputType": "text",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 103.734375,
+          "y": 142,
+          "width": 148,
+          "height": 19
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Sign Out",
+          "label": "Sign Out",
+          "labelSource": "accessible-name",
+          "container": "teller01",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/logout",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 1304.203125,
+            "y": 14,
+            "width": 43.796875,
+            "height": 12
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Home",
+          "label": "Home",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/home",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 12,
+            "y": 45,
+            "width": 32.203125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "Member Servicing",
+          "label": "Member Servicing",
+          "labelSource": "accessible-name",
+          "container": "Home",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 64.671875,
+            "y": 45,
+            "width": 99.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Administration",
+          "label": "Administration",
+          "labelSource": "accessible-name",
+          "container": "Member Servicing",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 184.5,
+            "y": 45,
+            "width": 80.234375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 985.875,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Signed in as teller01 Sign Out",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 985.875,
+            "y": 0,
+            "width": 374.125,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Home | Member Servicing | Administration",
+          "rowKey": "Home | Member Servicing | Administration",
+          "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 39,
+            "width": 1360,
+            "height": 26
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "textbox",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtMbr",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 142,
+            "width": 148,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 263.734375,
+            "y": 141,
+            "width": 62.078125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "textbox",
+          "name": "",
+          "label": "Last Name",
+          "labelSource": "table-cell",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtLast",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 168,
+            "width": 190,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Member ID",
+          "rowKey": "Member ID",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 138,
+            "width": 80.734375,
+            "height": 27
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "rowKey": "Last Name",
+          "columnHeader": "Member ID",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 165,
+            "width": 80.734375,
+            "height": 25
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+      "risk": "safe",
+      "value": "12345",
+      "parameterName": "memberId",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nMember Search\nMember ID or Last Name is required.\nMember ID\nLast Name",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Member ID or Last Name is required.",
+          "Member ID",
+          "Search",
+          "Last Name"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration",
+          "12345",
+          "Member ID",
+          "Last Name"
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "tool": "click",
+      "intent": "Search for the member record.",
+      "exploratory": false,
+      "node": {
+        "handle": "e9",
+        "role": "button",
+        "name": "Search",
+        "label": "Search",
+        "labelSource": "accessible-name",
+        "container": "Member ID or Last Name is required.",
+        "framePath": [
+          "mainFrame"
+        ],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "submit",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 263.734375,
+          "y": 141,
+          "width": 62.078125,
+          "height": 21
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Sign Out",
+          "label": "Sign Out",
+          "labelSource": "accessible-name",
+          "container": "teller01",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/logout",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 1304.203125,
+            "y": 14,
+            "width": 43.796875,
+            "height": 12
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Home",
+          "label": "Home",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/home",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 12,
+            "y": 45,
+            "width": 32.203125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "Member Servicing",
+          "label": "Member Servicing",
+          "labelSource": "accessible-name",
+          "container": "Home",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 64.671875,
+            "y": 45,
+            "width": 99.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Administration",
+          "label": "Administration",
+          "labelSource": "accessible-name",
+          "container": "Member Servicing",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/t/northstar/admin",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 184.5,
+            "y": 45,
+            "width": 80.234375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 985.875,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Signed in as teller01 Sign Out",
+          "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 985.875,
+            "y": 0,
+            "width": 374.125,
+            "height": 39
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "labelSource": "table-cell",
+          "value": "Home | Member Servicing | Administration",
+          "rowKey": "Home | Member Servicing | Administration",
+          "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 0,
+            "y": 39,
+            "width": 1360,
+            "height": 26
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "textbox",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "value": "12345",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtMbr",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 142,
+            "width": 148,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 263.734375,
+            "y": 141,
+            "width": 62.078125,
+            "height": 21
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "textbox",
+          "name": "",
+          "label": "Last Name",
+          "labelSource": "table-cell",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "domId": "ctl00$MainContent$txtLast",
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 103.734375,
+            "y": 168,
+            "width": 190,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Member ID",
+          "rowKey": "Member ID",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 138,
+            "width": 80.734375,
+            "height": 27
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Member ID",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "rowKey": "Last Name",
+          "columnHeader": "Member ID",
+          "container": "Member ID or Last Name is required.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 17,
+            "y": 165,
+            "width": 80.734375,
+            "height": 25
+          }
+        }
+      ],
+      "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+      "risk": "safe",
+      "after": {
+        "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+        "title": "Northstar Community Credit Union — Core Servicing",
+        "textExcerpt": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nMember Record — 12345\nMember Name Whitfield, Dana\nMember ID 12345\nStatus ACTIVE\nDate of Birth 1979-04-11\nTax ID [REDACTED:SSN]\nEmail [REDACTED:EMAIL]\nShare Accounts\nAccount Type Nickname Current Balance Opened\n000123450001 SAVINGS Primary Savings $18,432.07 2011-06-02\n000123450002 CHECKING Everyday Checking $2,319.44 2011-06-02",
+        "chrome": [
+          "teller01",
+          "Sign Out",
+          "Home",
+          "Member Servicing",
+          "Administration",
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Share Accounts",
+          "Open Sub-Account",
+          "Member Record — 12345",
+          "Member Name",
+          "Member ID",
+          "Whitfield, Dana",
+          "Status",
+          "Date of Birth",
+          "Tax ID",
+          "Email",
+          "Account",
+          "Type",
+          "Nickname",
+          "Current Balance",
+          "Opened"
+        ],
+        "data": [
+          "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+          "Signed in as teller01 Sign Out",
+          "Home | Member Servicing | Administration",
+          "Member Name",
+          "Whitfield, Dana",
+          "Member ID",
+          "12345",
+          "Status",
+          "ACTIVE",
+          "Date of Birth",
+          "1979-04-11",
+          "Tax ID",
+          "[REDACTED:SSN]",
+          "Email",
+          "[REDACTED:EMAIL]",
+          "Account",
+          "Type",
+          "Nickname",
+          "Current Balance",
+          "Opened",
+          "000123450001",
+          "SAVINGS",
+          "Primary Savings",
+          "$18,432.07",
+          "2011-06-02",
+          "000123450002",
+          "CHECKING",
+          "Everyday Checking",
+          "$2,319.44"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    {
+      "kind": "business_outcome",
+      "note": "Searching a Member ID that does not exist returns the Member Search panel with the exact sentence: \"No member record found for 99999999. Verify the number and try again.\" plus a \"Return to Member Search\" link. This is a legitimate business answer, not a failure.",
+      "atUrl": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome"
+    },
+    {
+      "kind": "validation_rule",
+      "note": "Submitting Member Search with both fields empty re-renders the form with \"Member ID or Last Name is required.\" — so memberId must always be supplied by the caller.",
+      "atUrl": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome"
+    },
+    {
+      "kind": "observation",
+      "note": "Member record screen shows a \"Share Accounts\" grid with columns Account / Type / Nickname / Current Balance / Opened; a member can hold several shares (here SAVINGS and CHECKING), so the SAVINGS balance must be read by matching the row whose Type is SAVINGS, not by position. If a member holds no SAVINGS share, the row is simply absent. The home page also carries an \"Administration — restricted\" link which is not part of this flow.",
+      "atUrl": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome"
+    },
+    {
+      "kind": "recoverable_condition",
+      "note": "Sign-in failure wording was NOT observed (probing it would have destroyed the working session); the detector for bad credentials is inferred from typical wording and is classified hard/escalate so a caller is told rather than silently looping.",
+      "atUrl": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome"
+    }
+  ],
+  "entryState": {
+    "url": "http://localhost:4300/t/northstar/login",
+    "text": "Northstar Community Credit Union — Core Servicing Sign In\nUser ID\nPassword"
+  },
+  "stoppedBecause": "finished",
+  "llmCalls": 11,
+  "usage": {
+    "inputTokens": 43697,
+    "outputTokens": 4135,
+    "cacheReadTokens": 67463
+  },
+  "finish": {
+    "capabilityId": "member_savings_balance",
+    "name": "Member SAVINGS Balance Lookup",
+    "description": "Signs in to the Northstar (Meridian Core Servicing 8.4) back-office console with supplied teller credentials, searches Member Servicing for a given Member ID, and returns the current balance of that member's SAVINGS share along with the share account number, member name and member status. Reports \"member not found\" as a normal business result.",
+    "inputs": [
+      {
+        "name": "userId",
+        "type": "string",
+        "description": "Operator user ID for the servicing console sign-in.",
+        "required": true,
+        "sensitivity": "internal",
+        "example": "teller01"
+      },
+      {
+        "name": "password",
+        "type": "string",
+        "description": "Password for the operator user ID.",
+        "required": true,
+        "sensitivity": "secret"
+      },
+      {
+        "name": "memberId",
+        "type": "string",
+        "description": "Member number to look up in the Member Search panel.",
+        "required": true,
+        "sensitivity": "pii",
+        "example": "12345"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "savingsBalance",
+        "type": "money",
+        "description": "Current balance of the member's SAVINGS share.",
+        "extractionKind": "fromTableCell",
+        "rowMatch": "SAVINGS",
+        "columnLabel": "Current Balance",
+        "transform": "stripCurrency",
+        "sensitivity": "internal"
+      },
+      {
+        "name": "savingsAccountNumber",
+        "type": "string",
+        "description": "Account number of the SAVINGS share.",
+        "extractionKind": "fromTableCell",
+        "rowMatch": "SAVINGS",
+        "columnLabel": "Account",
+        "transform": "trim",
+        "sensitivity": "pii"
+      },
+      {
+        "name": "savingsNickname",
+        "type": "string",
+        "description": "Nickname of the SAVINGS share.",
+        "extractionKind": "fromTableCell",
+        "rowMatch": "SAVINGS",
+        "columnLabel": "Nickname",
+        "transform": "trim",
+        "sensitivity": "internal"
+      },
+      {
+        "name": "memberName",
+        "type": "string",
+        "description": "Member name shown on the member record.",
+        "extractionKind": "fromLabelledCell",
+        "label": "Member Name",
+        "direction": "right",
+        "transform": "trim",
+        "sensitivity": "pii"
+      },
+      {
+        "name": "memberStatus",
+        "type": "string",
+        "description": "Member record status, e.g. ACTIVE.",
+        "extractionKind": "fromLabelledCell",
+        "label": "Status",
+        "direction": "right",
+        "transform": "trim",
+        "sensitivity": "internal"
+      }
+    ],
+    "successCheckpoint": {
+      "kind": "textPresent",
+      "value": "Share Accounts"
+    },
+    "businessOutcomes": [
+      {
+        "code": "member_not_found",
+        "title": "No member record for the supplied Member ID",
+        "classification": "business",
+        "detectKind": "textPresent",
+        "detectValue": "No member record found for",
+        "operatorGuidance": "Return this to the caller as a valid answer: the member number does not exist."
+      },
+      {
+        "code": "search_criteria_missing",
+        "title": "Member Search rejected an empty Member ID",
+        "classification": "hard",
+        "detectKind": "textPresent",
+        "detectValue": "Member ID or Last Name is required."
+      },
+      {
+        "code": "sign_in_rejected",
+        "title": "Sign-in credentials rejected (wording inferred, not observed)",
+        "classification": "escalate",
+        "detectKind": "regexPresent",
+        "detectValue": "(sign[- ]?in failed|invalid user id or password|credentials (are )?(invalid|not recognized)|account (is )?locked)",
+        "operatorGuidance": "Verify the teller user ID and password fixture for this institution; the console refused the sign-in."
+      }
+    ]
+  }
+}

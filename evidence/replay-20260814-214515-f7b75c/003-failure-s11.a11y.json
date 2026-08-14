@@ -1,0 +1,167 @@
+{
+  "capturedAt": "2026-08-14T21:47:10.937Z",
+  "url": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+  "frameUrls": [
+    "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+    "http://localhost:4300/t/northstar/member/12345/subaccount/review?ack=1"
+  ],
+  "title": "Northstar Community Credit Union — Core Servicing",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "link",
+      "name": "Sign Out",
+      "label": "Sign Out",
+      "labelSource": "accessible-name",
+      "container": "teller01",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/t/northstar/logout",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 1304.203125,
+        "y": 14,
+        "width": 43.796875,
+        "height": 12
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "link",
+      "name": "Home",
+      "label": "Home",
+      "labelSource": "accessible-name",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/t/northstar/home",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 12,
+        "y": 45,
+        "width": 32.203125,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "link",
+      "name": "Member Servicing",
+      "label": "Member Servicing",
+      "labelSource": "accessible-name",
+      "container": "Home",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/t/northstar/member/search",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 64.671875,
+        "y": 45,
+        "width": 99.359375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "link",
+      "name": "Administration",
+      "label": "Administration",
+      "labelSource": "accessible-name",
+      "container": "Member Servicing",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/t/northstar/admin",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 184.5,
+        "y": 45,
+        "width": 80.234375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+      "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 985.875,
+        "height": 39
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "cell",
+      "name": "",
+      "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+      "labelSource": "table-cell",
+      "value": "Signed in as teller01 Sign Out",
+      "rowKey": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 985.875,
+        "y": 0,
+        "width": 374.125,
+        "height": 39
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "cell",
+      "name": "",
+      "label": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+      "labelSource": "table-cell",
+      "value": "Home | Member Servicing | Administration",
+      "rowKey": "Home | Member Servicing | Administration",
+      "columnHeader": "Northstar Community Credit Union | Meridian Core Servicing 8.4",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 0,
+        "y": 39,
+        "width": 1360,
+        "height": 26
+      }
+    }
+  ],
+  "text": "Northstar Community Credit Union | Meridian Core Servicing 8.4 Signed in as teller01 Sign Out\nHome | Member Servicing | Administration\nCannot GET /t/northstar/member/12345/subaccount/review",
+  "lastStatus": 200
+}

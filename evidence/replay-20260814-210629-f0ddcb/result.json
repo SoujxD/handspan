@@ -1,0 +1,80 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-f0ddcb",
+    "capabilityId": "member_savings_balance",
+    "capabilityVersion": 8,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-08-14T21:06:52.573Z",
+    "finishedAt": "2026-08-14T21:06:52.573Z",
+    "durationMs": 0,
+    "stepsAttempted": 2,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-f0ddcb",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "surface_error",
+    "outcomeCode": "core_application_error",
+    "message": "The core application returned a server error (core_application_error)",
+    "atStepId": "s03",
+    "stepIntent": "Sign in to the servicing console.",
+    "expected": "the application to respond normally",
+    "observed": "The core application returned a server error",
+    "remediation": "This is an application fault, not an automation fault. Check the target system."
+  },
+  "partialOutputs": {},
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator's user ID on the core servicing sign-in screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:06:30.368Z",
+      "durationMs": 499,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator's password on the sign-in screen.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-08-14T21:06:30.867Z",
+      "durationMs": 529,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-f0ddcb/run.jsonl",
+      "capturedAt": "2026-08-14T21:06:29.259Z"
+    }
+  ]
+}

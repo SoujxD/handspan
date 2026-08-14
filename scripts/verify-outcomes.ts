@@ -79,6 +79,20 @@ for (const probe of PROBES) {
     if (inputs[p.name] !== undefined) continue;
     if (/user|login/i.test(p.name)) inputs[p.name] = process.env['DEMO_USERNAME'] ?? 'teller01';
     else if (/pass|pwd|secret/i.test(p.name)) inputs[p.name] = process.env['DEMO_PASSWORD'] ?? 'demo-pass-1234';
+    // Fall back to the artifact's own examples. Without this, a capability
+    // with parameters beyond the member id fails pre-flight on every probe and
+    // reports 0/N — which reads as "every detector is broken" when the truth is
+    // "the browser was never opened". A verification pass that can fail in a
+    // way indistinguishable from the thing it verifies is worse than none.
+    else if (p.example !== undefined) inputs[p.name] = String(p.example);
+    else if (p.enumValues?.[0] !== undefined) inputs[p.name] = p.enumValues[0];
+  }
+
+  const missing = cap.inputs.filter((p) => p.required && inputs[p.name] === undefined).map((p) => p.name);
+  if (missing.length) {
+    console.error(`\n  Cannot probe: no value for required input(s) ${missing.join(', ')}.`);
+    console.error(`  Pass them on the command line, e.g. \`${missing[0]}=<value>\`.\n`);
+    process.exit(2);
   }
 
   const surface = await PlaywrightSurface.launch({

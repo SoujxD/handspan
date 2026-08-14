@@ -1,0 +1,34 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-8037db",
+    "capabilityId": "member_open_sub_account",
+    "capabilityVersion": 5,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-08-14T21:48:48.125Z",
+    "finishedAt": "2026-08-14T21:48:48.126Z",
+    "durationMs": 1,
+    "stepsAttempted": 0,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-8037db",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "invalid_input",
+    "message": "Missing required input(s): userId, password, memberId, accountType, nickname, openingDeposit",
+    "atStepId": null,
+    "stepIntent": null,
+    "expected": null,
+    "observed": null,
+    "remediation": "Supply them, e.g. --input userId=<value>"
+  },
+  "partialOutputs": {},
+  "trace": [],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-8037db/run.jsonl",
+      "capturedAt": "2026-08-14T21:48:47.104Z"
+    }
+  ]
+}

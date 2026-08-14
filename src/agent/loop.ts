@@ -150,10 +150,29 @@ export async function runDiscovery(
   evidence.saveSnapshot('entry', snapshot);
   evidence.saveScreenshot('entry', await surface.screenshot());
 
+  /**
+   * The environment header travels with the goal, not just in the system
+   * prompt.
+   *
+   * A goal like "log in as teller01 and read a member's balance" describes,
+   * out of context, something a model should refuse: signing in to a financial
+   * institution's console and reading a customer's account. The context that
+   * makes it ordinary — a mock app on localhost, synthetic records, fixture
+   * credentials the caller already holds — belongs next to the request itself,
+   * which is where a human reviewer would expect to find it too.
+   */
+  const environment =
+    `## Environment\n\n` +
+    `Target: ${entryUrl}\n` +
+    `A mock back-office servicing console running locally as part of this project. ` +
+    `Every member record is a synthetic fixture and the sign-in credentials are test ` +
+    `values declared as parameters of the capability being recorded. No real institution, ` +
+    `customer, or credential is involved.\n\n`;
+
   const messages: Anthropic.MessageParam[] = [
     {
       role: 'user',
-      content: `## Goal\n\n${goal}\n\n## Institution\n\n${tenantId}\n\n${renderObservation(
+      content: `${environment}## Goal\n\n${goal}\n\n## Institution\n\n${tenantId}\n\n${renderObservation(
         toObservation(snapshot, maxSteps),
       )}`,
     },
@@ -163,6 +182,10 @@ export async function runDiscovery(
   let noProgress = 0;
   /** Counts consecutive identical actions — a real loop. */
   let repeatedAction = 0;
+  /** One warning is spent before a suspected loop ends the run. */
+  let loopNudged = false;
+  /** Text to append to the next tool-result turn, if the loop guard fired. */
+  let pendingNudge = '';
   let lastActionSignature = '';
   let lastUrl = snapshot.url;
 
@@ -181,22 +204,27 @@ export async function runDiscovery(
       // omitted: on Opus 5 omitting `thinking` happens to run adaptive anyway,
       // but on Opus 4.8 it means *no* thinking — and this model id is
       // configurable, so relying on a per-model default would be a latent bug.
-      response = await client.messages.create({
-        model: deps.model,
-        max_tokens: 16000,
-        thinking: { type: 'adaptive' },
-        output_config: { effort: deps.effort },
-        system: [
-          {
-            type: 'text',
-            text: systemPrompt(),
-            // Stable prefix; everything volatile lives after it in `messages`.
-            cache_control: { type: 'ephemeral' },
-          },
-        ],
-        tools: TOOLS,
-        messages,
-      } as unknown as Anthropic.MessageCreateParamsNonStreaming);
+      response = await withTransientRetry(
+        () =>
+          client.messages.create({
+            model: deps.model,
+            max_tokens: 16000,
+            thinking: { type: 'adaptive' },
+            output_config: { effort: deps.effort },
+            system: [
+              {
+                type: 'text',
+                text: systemPrompt(),
+                // Stable prefix; everything volatile lives after it in `messages`.
+                cache_control: { type: 'ephemeral' },
+              },
+            ],
+            tools: TOOLS,
+            messages,
+          } as unknown as Anthropic.MessageCreateParamsNonStreaming),
+        (attempt, waitMs, reason) =>
+          evidence.warn('model_call_retrying', { step, attempt, waitMs, reason }),
+      );
     } catch (e) {
       const err = e as Error;
       evidence.error('model_call_failed', { error: err.message, step });
@@ -457,17 +485,53 @@ export async function runDiscovery(
     // the same target with the same value, over and over. That is checked
     // below. The real bounds on a runaway run are the step budget and the wall
     // clock, both of which are hard.
-    const signature = trace.actions
-      .slice(-1)
-      .map((a) => `${a.tool}|${a.node?.handle ?? a.navigateUrl ?? ''}|${a.value ?? ''}`)
-      .join();
+    /**
+     * Identify a repeat semantically, and only where the screen agrees.
+     *
+     * The obvious signature — tool plus element handle — is wrong in both
+     * directions, because handles are reissued on every observation. The same
+     * handle on two different screens looks like a repeat when it is not, and
+     * this cost a completed 18-action run: the model returned to the home page
+     * after each of three probes, drew `e11` for the nav link every time, and
+     * was killed for looping one turn before it called `finish`. Conversely a
+     * genuine loop can renumber and slip past.
+     *
+     * So the signature is the semantic description of what was acted on, and
+     * the URL is part of it. A repeat that moves the app somewhere new is
+     * progress, whatever it looks like.
+     */
+    const last = trace.actions[trace.actions.length - 1];
+    const signature = last
+      ? [
+          last.tool,
+          last.node ? `${last.node.role}:${last.node.label || last.node.name}@${last.node.container ?? ''}` : '',
+          last.navigateUrl ?? '',
+          last.value ?? '',
+          snapshot.url,
+        ].join('|')
+      : '';
 
     if (signature && signature === lastActionSignature) {
       repeatedAction++;
       if (repeatedAction >= policy.limits.maxConsecutiveNoProgress) {
         evidence.warn('discovery_looping', { signature, consecutive: repeatedAction, url: snapshot.url });
-        trace.stoppedBecause = 'no_progress';
-        break;
+
+        // Nudge before killing. A run that has done the work and is circling
+        // is worth one sentence; killing it throws away every turn before it.
+        if (loopNudged) {
+          trace.stoppedBecause = 'no_progress';
+          break;
+        }
+        loopNudged = true;
+        repeatedAction = 0;
+        // Carried into the turn that delivers this step's tool results. It
+        // cannot be pushed as its own message: the assistant's `tool_use`
+        // blocks are still unanswered at this point, and a bare user turn
+        // between them and their results is a malformed request.
+        pendingNudge =
+          'You have repeated the same action on the same screen several times with no change. ' +
+          'If the goal state is already on screen, call `finish` now with the contract. ' +
+          'If you are stuck, call `escalate`. Do not repeat that action again.';
       }
     } else {
       repeatedAction = 0;
@@ -482,8 +546,10 @@ export async function runDiscovery(
       content: [
         ...results,
         { type: 'text', text: renderObservation(toObservation(snapshot, maxSteps - step - 1)) },
+        ...(pendingNudge ? [{ type: 'text' as const, text: pendingNudge }] : []),
       ],
     });
+    pendingNudge = '';
   }
 
   if (trace.stoppedBecause === 'error' && trace.actions.length > 0) {
@@ -545,4 +611,62 @@ function toPolicyKind(tool: string): 'navigate' | 'click' | 'type' | 'select' | 
     default:
       return 'read';
   }
+}
+
+/**
+ * Retry a model call through transient infrastructure failures.
+ *
+ * A discovery run is a long conversation, and losing it to a single 529
+ * "overloaded" on turn nine throws away every turn before it — the run is not
+ * resumable, so the cost of one transient failure is the whole run, not one
+ * request. That asymmetry is what justifies retrying here and nowhere else in
+ * the system.
+ *
+ * Deliberately narrow. Only status codes that mean "try again" are retried:
+ * 408, 409, 429 and 5xx. A 400 is a malformed request and a 401 is a bad key —
+ * both will fail identically forever, and retrying them just burns wall clock
+ * on the way to the same error message. A `refusal` never reaches here at all,
+ * because it arrives as a successful response with a stop reason, and retrying
+ * it would be asking the same question again hoping for a different answer.
+ *
+ * Failed requests are not billed, so the retries are free; the backoff exists
+ * to be a good citizen of a service that has just said it is overloaded.
+ */
+export async function withTransientRetry<T>(
+  call: () => Promise<T>,
+  onRetry: (attempt: number, waitMs: number, reason: string) => void,
+  // Six attempts spans roughly half a minute of backoff. Tuned for the cost
+  // asymmetry: half a minute of waiting is cheap, and a discovery run thrown
+  // away nine turns in is not.
+  maxAttempts = 6,
+): Promise<T> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await call();
+    } catch (e) {
+      lastError = e;
+      if (attempt === maxAttempts || !isTransient(e)) throw e;
+
+      // Exponential backoff with jitter: 1s, 2s, 4s ± 25%. Jitter matters
+      // because an overload is usually shared — synchronized retries from
+      // every client are what turn a blip into an outage.
+      const base = 1000 * 2 ** (attempt - 1);
+      const waitMs = Math.round(base * (0.75 + Math.random() * 0.5));
+      onRetry(attempt, waitMs, (e as Error).message.slice(0, 120));
+      await new Promise((r) => setTimeout(r, waitMs));
+    }
+  }
+
+  throw lastError;
+}
+
+function isTransient(e: unknown): boolean {
+  const status = (e as { status?: number }).status;
+  if (typeof status === 'number') return status === 408 || status === 409 || status === 429 || status >= 500;
+
+  // No status: a socket-level failure that never reached the service.
+  const code = (e as { code?: string }).code ?? '';
+  return ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'EPIPE', 'ENOTFOUND', 'EAI_AGAIN'].includes(code);
 }

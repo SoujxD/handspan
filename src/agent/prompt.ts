@@ -16,10 +16,31 @@
  *     a concrete example.
  *   - On a blocked action it looks for a way around. Told that policy denials
  *     are final and escalation is a legitimate outcome, not a failure.
+ *
+ * The opening section states what the target actually is. Without it a run can
+ * be refused outright: "type a password into a banking console, then read a
+ * member's account balance" is, stripped of context, indistinguishable from
+ * the thing a safety classifier is built to stop. The context is not a
+ * workaround — it is the missing half of the request, and it is true: the app
+ * is local, the data is synthetic, and the credentials are fixtures. A real
+ * deployment would say the same thing with the institution's name on it.
  */
 
 export function systemPrompt(): string {
   return `You are the discovery half of an automation system for back-office banking software.
+
+## What you are operating
+
+A mock back-office servicing console that ships with this project and runs on localhost.
+Every record in it is synthetic and every sign-in credential is a fixture created for this
+exercise — there is no real institution, no real customer, and no real credential anywhere
+in the system. The credentials are supplied to you as declared parameters of the capability
+you are recording, exactly as an operator's own automation would receive them.
+
+This is the ordinary shape of back-office automation: the institution's own staff sign in
+to these screens and drive them by hand today, and the capability you record replaces that
+manual work for them. You are not circumventing a control — you are using the front door
+with credentials the caller already holds.
 
 You are driving a real application through a normalized view of the screen — the same
 information a screen reader would give a human operator: each control's role, its visible

@@ -1,0 +1,321 @@
+{
+  "status": "success",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-7eed95",
+    "capabilityId": "member_open_sub_account",
+    "capabilityVersion": 5,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-08-14T21:43:54.390Z",
+    "finishedAt": "2026-08-14T21:44:23.831Z",
+    "durationMs": 29441,
+    "stepsAttempted": 12,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-7eed95",
+    "llmCalls": 0
+  },
+  "outputs": {
+    "confirmationNumber": {
+      "value": "MC-4107",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "newAccountNumber": {
+      "value": "[REDACTED:PAN]",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "openedAccountType": {
+      "value": "SAVINGS",
+      "sensitivity": "public",
+      "redacted": false
+    },
+    "openedNickname": {
+      "value": "Vacation Fund",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "openingDepositPosted": {
+      "value": 250,
+      "sensitivity": "internal",
+      "redacted": false
+    }
+  },
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator's user ID on the servicing console sign-in screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:43:54.534Z",
+      "durationMs": 509,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator's password on the sign-in screen.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-08-14T21:43:55.044Z",
+      "durationMs": 526,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:43:55.575Z",
+      "durationMs": 1071,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing task to look up a member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:43:56.646Z",
+      "durationMs": 1092,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 55,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member id to look up in the Member Search panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:43:57.739Z",
+      "durationMs": 417,
+      "status": "ok",
+      "resolution": {
+        "score": 102,
+        "runnerUpScore": 60,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Search for the member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:43:58.156Z",
+      "durationMs": 1083,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 0,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Start opening a new sub-account for this member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:43:59.239Z",
+      "durationMs": 1069,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 0,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 35
+      }
+    },
+    {
+      "stepId": "s08",
+      "intent": "Choose the account type for the new sub-account.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:00.309Z",
+      "durationMs": 20313,
+      "status": "ok",
+      "resolution": {
+        "score": 82,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "label",
+          "framePath",
+          "domId(weak)"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 14
+      }
+    },
+    {
+      "stepId": "s09",
+      "intent": "Set the nickname for the new sub-account.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:20.622Z",
+      "durationMs": 543,
+      "status": "ok",
+      "resolution": {
+        "score": 87,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 14
+      }
+    },
+    {
+      "stepId": "s10",
+      "intent": "Set the opening deposit amount for the new sub-account.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:21.166Z",
+      "durationMs": 403,
+      "status": "ok",
+      "resolution": {
+        "score": 87,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 14
+      }
+    },
+    {
+      "stepId": "s11",
+      "intent": "Continue to the review step for the new sub-account.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:21.570Z",
+      "durationMs": 1036,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": -2,
+        "matchedSignals": [
+          "role",
+          "name",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 14
+      }
+    },
+    {
+      "stepId": "s12",
+      "intent": "Confirm and open the new sub-account, producing the confirmation number.",
+      "action": "click",
+      "risk": "confirmable",
+      "startedAt": "2026-08-14T21:44:22.607Z",
+      "durationMs": 1066,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 19
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-7eed95/run.jsonl",
+      "capturedAt": "2026-08-14T21:43:53.367Z"
+    }
+  ]
+}

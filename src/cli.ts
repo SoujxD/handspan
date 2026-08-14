@@ -127,6 +127,11 @@ program
       });
 
       const store = new CapabilityStore(PATHS.artifacts);
+      // Never land on top of an existing recording of the same flow. A second
+      // discovery is a candidate to diff against the approved one, not a
+      // replacement for it.
+      cap.version = store.nextVersion(cap.id);
+      cap.provenance.contentHash = hashCapability(cap);
       const path = store.save(cap);
 
       console.log(`\n  Capability written: ${path}`);
@@ -432,7 +437,12 @@ program
     '--class <classification>',
     'business | recoverable | hard | escalate',
   )
-  .requiredOption('--detect <text>', 'Text that appears on that screen and nowhere earlier.')
+  .option('--detect <text>', 'Text that appears on that screen and nowhere earlier.')
+  .option(
+    '--detect-regex <pattern>',
+    'Regex alternative to --detect, compiled case-insensitively with dot-matches-newline. ' +
+      'Needed for rules about what is ABSENT from a section, e.g. a Share Accounts grid with no SAVINGS row.',
+  )
   .requiredOption('-r, --reviewer <name>', 'Who is asserting this rule.')
   .option('--dismiss <buttonLabel>', 'For `recoverable`: the button that clears the state.')
   .option('--guidance <text>', 'For `escalate`: what the operator should do.')
@@ -446,11 +456,36 @@ program
       process.exit(2);
     }
 
+    const literal = o['detect'] === undefined ? undefined : String(o['detect']);
+    const pattern = o['detectRegex'] === undefined ? undefined : String(o['detectRegex']);
+
+    if ((literal === undefined) === (pattern === undefined)) {
+      console.error('Give exactly one of --detect or --detect-regex.');
+      process.exit(2);
+    }
+
+    // Compile it here rather than letting a broken pattern reach the artifact.
+    // `validateCapability` would catch it on save, but the error is far more
+    // useful pointing at the flag the reviewer just typed.
+    if (pattern !== undefined) {
+      try {
+        new RegExp(pattern, 'is');
+      } catch (e) {
+        console.error(`--detect-regex does not compile: ${(e as Error).message}`);
+        process.exit(2);
+      }
+    }
+
+    const detect =
+      pattern !== undefined
+        ? ({ kind: 'regexPresent', pattern } as const)
+        : ({ kind: 'textPresent', text: literal as string, caseSensitive: false } as const);
+
     const rule = {
       code: String(o['code']).toLowerCase().replace(/[^a-z0-9_]/g, '_'),
       title: String(o['title']),
       classification,
-      detect: { kind: 'textPresent' as const, text: String(o['detect']), caseSensitive: false },
+      detect,
       scope: 'global' as const,
       extract: [],
       origin: 'reviewer' as const,

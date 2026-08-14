@@ -1,0 +1,127 @@
+{
+  "capturedAt": "2026-08-14T21:30:02.855Z",
+  "url": "http://localhost:4300/t/northstar/login",
+  "frameUrls": [
+    "http://localhost:4300/t/northstar/login"
+  ],
+  "title": "Northstar Community Credit Union — Sign In",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "textbox",
+      "name": "",
+      "label": "User ID",
+      "labelSource": "label-for",
+      "container": "Northstar Community Credit Union — Core Servicing Sign In",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "domId": "ctl00$MainContent$txtUser",
+        "inputType": "text",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 551.671875,
+        "y": 116,
+        "width": 192,
+        "height": 21
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "textbox",
+      "name": "",
+      "label": "Password",
+      "labelSource": "table-cell",
+      "container": "Northstar Community Credit Union — Core Servicing Sign In",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "domId": "ctl00$MainContent$txtPwd",
+        "inputType": "password",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 551.671875,
+        "y": 149,
+        "width": 192,
+        "height": 21
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "button",
+      "name": "Sign In",
+      "label": "Sign In",
+      "labelSource": "accessible-name",
+      "container": "Northstar Community Credit Union — Core Servicing Sign In",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "inputType": "submit",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 551.671875,
+        "y": 182,
+        "width": 47.8125,
+        "height": 21
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "User ID",
+      "rowKey": "User ID",
+      "container": "Northstar Community Credit Union — Core Servicing Sign In",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 482,
+        "y": 110,
+        "width": 63.671875,
+        "height": 33
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "cell",
+      "name": "",
+      "label": "User ID",
+      "labelSource": "table-cell",
+      "value": "Password",
+      "rowKey": "Password",
+      "columnHeader": "User ID",
+      "container": "Northstar Community Credit Union — Core Servicing Sign In",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 482,
+        "y": 143,
+        "width": 63.671875,
+        "height": 33
+      }
+    }
+  ],
+  "text": "Northstar Community Credit Union — Core Servicing Sign In\nUser ID\nPassword",
+  "lastStatus": 200
+}

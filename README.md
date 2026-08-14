@@ -89,15 +89,19 @@ Leave it running. In a second terminal:
 ### 1. Discovery — an LLM drives the real UI *(needs the API key)*
 
 ```bash
-npm run discover -- \
-  --goal "Log in as teller01, look up member 12345, and read their current savings account balance" \
-  --tenant northstar
+npm run discover -- --tenant northstar \
+  --goal "Sign in to the servicing console (user ID: teller01, password: demo-pass-1234), look up member 12345, and read the current balance of their SAVINGS account. The member number will be different on each future invocation."
 ```
+
+The goal carries the fixture credentials because the model has no other way to
+get them — there is no credential store in this system by design, and a goal
+that omits them produces a failed sign-in, which the model then correctly
+declines to keep retrying.
 
 A browser window opens and Claude drives it. You will see each action, its risk
 classification, and the resulting page. It writes:
 
-- `artifacts/member_savings_balance_lookup.v<n>.json` — the capability, **`approval: draft`**
+- `artifacts/member_savings_balance.v<n>.json` — the capability, **`approval: draft`**
   (versions are immutable and additive; re-discovering writes `v<n+1>` rather
   than overwriting what a reviewer already signed off)
 - `evidence/disc-<timestamp>/` — JSONL log, per-step screenshots, a11y snapshots
@@ -107,27 +111,27 @@ state-committing one (`member_open_sub_account`, step 7 below) discovered with:
 
 ```bash
 npm run discover -- --tenant northstar \
-  --goal "Log in as teller01, open member 12345, and open a new SAVINGS sub-account for them with an initial deposit of 100 dollars, through to the confirmation screen"
+  --goal "Sign in to the servicing console (user ID: teller01, password: demo-pass-1234), look up member 12345, and open a new sub-account for them: account type Savings, nickname 'Vacation Fund', opening deposit 250.00. Continue through to the confirmation screen and read the confirmation number. The member, account type, nickname and deposit amount will all be different on each future invocation."
 ```
 
 ### 2. Inspect what it produced
 
 ```bash
 npm run capabilities                          # agent-facing tool definitions
-npx tsx src/cli.ts codegen -c member_savings_balance_lookup    # human-readable review document
+npx tsx src/cli.ts codegen -c member_savings_balance    # human-readable review document
 ```
 
 ### 3. Replay it — deterministically, no model
 
 ```bash
-npm run replay -- -c member_savings_balance_lookup -i memberId=12345
+npm run replay -- -c member_savings_balance -i memberId=12345
 ```
 
 Then prove it is not memorising the recording — a different member, whose
 balance was never seen during discovery:
 
 ```bash
-npm run replay -- -c member_savings_balance_lookup -i memberId=20881
+npm run replay -- -c member_savings_balance -i memberId=20881
 ```
 
 ### 4. Replay into the interesting failures
@@ -136,22 +140,22 @@ This is the part that matters. Each returns a **different result shape**:
 
 ```bash
 # A business outcome — a valid answer, NOT an error. Exits 0.
-npm run replay -- -c member_savings_balance_lookup -i memberId=99999
+npm run replay -- -c member_savings_balance -i memberId=99999
 
 # A permission denial — also a business outcome, not a crash.
-npm run replay -- -c member_savings_balance_lookup -i memberId=33417
+npm run replay -- -c member_savings_balance -i memberId=33417
 
 # A recoverable interstitial: the engine dismisses it and carries on.
 curl -X POST "http://localhost:4300/__control/fault?mode=unexpected_dialog"
-npm run replay -- -c member_savings_balance_lookup -i memberId=12345
+npm run replay -- -c member_savings_balance -i memberId=12345
 
 # A slow app: condition-based waiting rides it out where a fixed sleep would fail.
 curl -X POST "http://localhost:4300/__control/fault?mode=slow_load"
-npm run replay -- -c member_savings_balance_lookup -i memberId=12345
+npm run replay -- -c member_savings_balance -i memberId=12345
 
 # A hard failure: structured, with expected vs observed and evidence pointers.
 curl -X POST "http://localhost:4300/__control/fault?mode=server_error"
-npm run replay -- -c member_savings_balance_lookup -i memberId=12345
+npm run replay -- -c member_savings_balance -i memberId=12345
 
 curl -X POST "http://localhost:4300/__control/fault?mode=none"   # reset
 ```
@@ -163,13 +167,16 @@ Lakeshore runs the *same vendor product* as Northstar, but calls the field
 interstitial after login.
 
 ```bash
-npx tsx src/cli.ts bind-tenant -c member_savings_balance_lookup -t lakeshore \
-  --label "Member ID=Member Number" --label "Search=Find Member"
+npx tsx src/cli.ts bind-tenant -c member_savings_balance -t lakeshore \
+  --label "Member ID=Member Number" --label "Search=Find Member" \
+  --dismiss "Scheduled maintenance window=Acknowledge"
 
-npm run replay -- -c member_savings_balance_lookup -t lakeshore -i memberId=12345
+npm run replay -- -c member_savings_balance -t lakeshore -i memberId=12345
 ```
 
-One artifact, two institutions, no second discovery run.
+One artifact, two institutions, no second discovery run. The binding carries
+both halves of the per-tenant delta: what this institution *calls* things, and
+what extra screens its configuration interposes.
 
 ### 6. Human-in-the-loop escalation
 
@@ -213,8 +220,8 @@ npm run replay -- -c member_open_sub_account \
 Two checks that found real defects in this repo, not decoration:
 
 ```bash
-npx tsx scripts/verify-artifact.ts member_savings_balance_lookup   # 14 safety invariants
-npx tsx scripts/verify-outcomes.ts member_savings_balance_lookup   # do the detectors actually fire?
+npx tsx scripts/verify-artifact.ts member_savings_balance   # 14 safety invariants
+npx tsx scripts/verify-outcomes.ts member_savings_balance   # do the detectors actually fire?
 npx tsx scripts/audit-evidence.ts                                  # no PII survived into /evidence
 ```
 
@@ -231,7 +238,7 @@ unverified is called out as unverified rather than quietly counted.
 npm run catalog         # http://localhost:4500
 
 curl -s localhost:4500/capabilities | jq '.tools[0]'
-curl -s -X POST localhost:4500/capabilities/member_savings_balance_lookup/invoke \
+curl -s -X POST localhost:4500/capabilities/member_savings_balance/invoke \
   -H 'content-type: application/json' \
   -d '{"tenantId":"northstar","memberId":"12345"}' | jq
 ```
@@ -240,7 +247,7 @@ Or watch a caller do the whole thing — discover the catalog, build a valid cal
 from the published schema, and switch on the result shape:
 
 ```bash
-npx tsx scripts/agent-invoke-demo.ts member_savings_balance_lookup 12345
+npx tsx scripts/agent-invoke-demo.ts member_savings_balance 12345
 ```
 
 `GET /capabilities` returns tool definitions an agent can drop straight into its

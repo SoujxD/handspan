@@ -1,0 +1,187 @@
+{
+  "status": "success",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-c0ecfb",
+    "capabilityId": "member_savings_balance",
+    "capabilityVersion": 8,
+    "tenantId": "lakeshore",
+    "mode": "replay",
+    "startedAt": "2026-08-14T21:06:54.829Z",
+    "finishedAt": "2026-08-14T21:07:20.922Z",
+    "durationMs": 26093,
+    "stepsAttempted": 7,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-c0ecfb",
+    "llmCalls": 0
+  },
+  "outputs": {
+    "savingsBalance": {
+      "value": 18432.07,
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "savingsAccountNumber": {
+      "value": "000[REDACTED:SECRET]0001",
+      "sensitivity": "pii",
+      "redacted": true
+    },
+    "savingsNickname": {
+      "value": "Primary Savings",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "memberName": {
+      "value": "[REDACTED:SECRET]",
+      "sensitivity": "pii",
+      "redacted": true
+    },
+    "memberStatus": {
+      "value": "ACTIVE",
+      "sensitivity": "internal",
+      "redacted": false
+    }
+  },
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator's user ID on the core servicing sign-in screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:06:54.971Z",
+      "durationMs": 467,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "label",
+          "inputType"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator's password on the sign-in screen.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-08-14T21:06:55.444Z",
+      "durationMs": 521,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "label",
+          "inputType"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:06:55.965Z",
+      "durationMs": 22008,
+      "status": "recovered",
+      "recovery": {
+        "outcomeCode": "tenant_interstitial_1",
+        "action": "click button \"Acknowledge\" dismissing this tenant's interstitial",
+        "attempt": 1
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:06:55.965Z",
+      "durationMs": 22299,
+      "status": "ok",
+      "note": "checkpoint already satisfied after recovery"
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing lookup task.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:07:18.264Z",
+      "durationMs": 1058,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 55,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member number to look up in the Member Search panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:07:19.323Z",
+      "durationMs": 405,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 12
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Search for the member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:07:19.728Z",
+      "durationMs": 1038,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": -2,
+        "matchedSignals": [
+          "role",
+          "name",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 12
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-c0ecfb/run.jsonl",
+      "capturedAt": "2026-08-14T21:06:53.844Z"
+    }
+  ]
+}

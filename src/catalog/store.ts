@@ -32,6 +32,21 @@ export class CapabilityStore {
   }
 
   /**
+   * The next free version number for an id.
+   *
+   * The compiler has no idea whether this flow has been recorded before, so it
+   * always emits `version: 1` — which quietly overwrote an existing v1, taking
+   * a reviewed artifact with it. Versions are supposed to be immutable and
+   * additive: a re-recording is a new version to compare against the old one,
+   * never a replacement for it. Asking the store, which is the thing that knows
+   * what exists, is the fix.
+   */
+  nextVersion(id: string): number {
+    const existing = this.list().filter((c) => c.id === id);
+    return existing.reduce((max, c) => Math.max(max, c.version), 0) + 1;
+  }
+
+  /**
    * Load and re-validate.
    *
    * Both checks matter. `parseCapability` re-runs the structural invariants, so

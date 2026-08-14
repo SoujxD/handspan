@@ -2,8 +2,8 @@
   "schemaVersion": "1.0.0",
   "id": "member_open_sub_account",
   "version": 1,
-  "name": "Open Member Sub-Account",
-  "description": "Signs in to the Meridian core servicing console, looks up a member by member ID, and opens a new share sub-account with the given account type, nickname and opening deposit, confirming through the review screen. Returns the confirmation number, new account number, account type, nickname and opening deposit from the confirmation screen. If the member ID does not exist, returns the no_member_found business outcome instead.",
+  "name": "Open member sub-account",
+  "description": "Signs in to the Meridian core servicing console, looks up a member by Member ID, and opens a new share sub-account with the given account type, nickname and opening deposit, confirming through the review step. Returns the confirmation number, the new account number and the recorded type/nickname/deposit. If the member id does not exist, or the deposit is below the institution minimum, that is reported as a business outcome instead of an account being opened. Note: confirming is an irreversible change to the member record.",
   "surface": {
     "kind": "legacy_web",
     "product": "meridian-core",
@@ -15,7 +15,7 @@
     {
       "name": "userId",
       "type": "string",
-      "description": "Servicing console user ID of the teller.",
+      "description": "Operator user ID for the servicing console.",
       "required": true,
       "sensitivity": "internal",
       "example": "teller01"
@@ -23,16 +23,16 @@
     {
       "name": "password",
       "type": "string",
-      "description": "Password for the servicing console user.",
+      "description": "Password for the operator user ID.",
       "required": true,
       "sensitivity": "secret"
     },
     {
       "name": "memberId",
       "type": "string",
-      "description": "Member number to look up in Member Search.",
+      "description": "Member ID to look up in the Member Search panel.",
       "required": true,
-      "sensitivity": "pii",
+      "sensitivity": "internal",
       "example": "12345"
     },
     {
@@ -52,7 +52,7 @@
     {
       "name": "nickname",
       "type": "string",
-      "description": "Account nickname for the new sub-account.",
+      "description": "Account Nickname for the new sub-account.",
       "required": true,
       "sensitivity": "internal",
       "example": "Vacation Fund"
@@ -73,11 +73,11 @@
       "description": "Confirmation number for the completed sub-account opening.",
       "sensitivity": "internal",
       "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Confirmation Number",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
+        "via": "fromTableCell",
+        "rowMatch": "Confirmation Number",
+        "columnLabel": "Value",
+        "matchMode": "contains",
+        "framePath": []
       },
       "transform": "trim",
       "required": true
@@ -85,44 +85,44 @@
     {
       "name": "newAccountNumber",
       "type": "string",
-      "description": "Account number of the newly opened sub-account.",
-      "sensitivity": "pii",
-      "extraction": {
-        "via": "fromLabelledCell",
-        "label": "New Account Number",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
-      },
-      "transform": "trim",
-      "required": true
-    },
-    {
-      "name": "accountTypeOpened",
-      "type": "string",
-      "description": "Account type recorded on the new account (uppercase, e.g. SAVINGS).",
-      "sensitivity": "public",
-      "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Account Type",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
-      },
-      "transform": "trim",
-      "required": true
-    },
-    {
-      "name": "nicknameOpened",
-      "type": "string",
-      "description": "Account nickname recorded on the new account.",
+      "description": "Account number assigned to the newly opened sub-account.",
       "sensitivity": "internal",
       "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Account Nickname",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
+        "via": "fromTableCell",
+        "rowMatch": "New Account Number",
+        "columnLabel": "Value",
+        "matchMode": "contains",
+        "framePath": []
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "openedAccountType",
+      "type": "string",
+      "description": "Account type as recorded on the confirmation screen.",
+      "sensitivity": "public",
+      "extraction": {
+        "via": "fromTableCell",
+        "rowMatch": "Account Type",
+        "columnLabel": "Value",
+        "matchMode": "contains",
+        "framePath": []
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "openedNickname",
+      "type": "string",
+      "description": "Account nickname as recorded on the confirmation screen.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromTableCell",
+        "rowMatch": "Account Nickname",
+        "columnLabel": "Value",
+        "matchMode": "contains",
+        "framePath": []
       },
       "transform": "trim",
       "required": true
@@ -130,14 +130,14 @@
     {
       "name": "openingDepositPosted",
       "type": "money",
-      "description": "Opening deposit posted to the new account.",
+      "description": "Opening deposit as recorded on the confirmation screen.",
       "sensitivity": "internal",
       "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Opening Deposit",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
+        "via": "fromTableCell",
+        "rowMatch": "Opening Deposit",
+        "columnLabel": "Value",
+        "matchMode": "contains",
+        "framePath": []
       },
       "transform": "stripCurrency",
       "required": true
@@ -146,7 +146,7 @@
   "steps": [
     {
       "id": "s01",
-      "intent": "Enter the teller's user ID to sign in to the servicing console.",
+      "intent": "Enter the operator's user ID on the servicing console sign-in screen.",
       "act": {
         "action": "type",
         "target": {
@@ -177,7 +177,7 @@
     },
     {
       "id": "s02",
-      "intent": "Enter the teller's password.",
+      "intent": "Enter the operator's password on the sign-in screen.",
       "act": {
         "action": "type",
         "target": {
@@ -247,7 +247,7 @@
     },
     {
       "id": "s04",
-      "intent": "Open the Member Servicing lookup screen.",
+      "intent": "Open the Member Servicing task to look up a member record.",
       "act": {
         "action": "click",
         "target": {
@@ -279,7 +279,7 @@
     },
     {
       "id": "s05",
-      "intent": "Enter the member number to look up.",
+      "intent": "Enter the member id to look up in the Member Search panel.",
       "act": {
         "action": "type",
         "target": {
@@ -299,8 +299,8 @@
           }
         },
         "value": {
-          "from": "secret",
-          "ref": "memberId"
+          "from": "param",
+          "name": "memberId"
         },
         "clearFirst": true
       },
@@ -344,7 +344,7 @@
     },
     {
       "id": "s07",
-      "intent": "Start opening a new sub-account for the member.",
+      "intent": "Start opening a new sub-account for this member.",
       "act": {
         "action": "click",
         "target": {
@@ -376,7 +376,7 @@
     },
     {
       "id": "s08",
-      "intent": "Select the account type for the new sub-account.",
+      "intent": "Choose the account type for the new sub-account.",
       "act": {
         "action": "select",
         "target": {
@@ -407,7 +407,7 @@
     },
     {
       "id": "s09",
-      "intent": "Enter the nickname for the new sub-account.",
+      "intent": "Set the nickname for the new sub-account.",
       "act": {
         "action": "type",
         "target": {
@@ -440,7 +440,7 @@
     },
     {
       "id": "s10",
-      "intent": "Enter the opening deposit amount.",
+      "intent": "Set the opening deposit amount for the new sub-account.",
       "act": {
         "action": "type",
         "target": {
@@ -473,7 +473,7 @@
     },
     {
       "id": "s11",
-      "intent": "Continue to the review screen for the new sub-account.",
+      "intent": "Continue to the review step for the new sub-account.",
       "act": {
         "action": "click",
         "target": {
@@ -505,7 +505,7 @@
     },
     {
       "id": "s12",
-      "intent": "Confirm and open the new sub-account.",
+      "intent": "Confirm and open the new sub-account, producing the confirmation number.",
       "act": {
         "action": "click",
         "target": {
@@ -543,8 +543,8 @@
   },
   "outcomes": [
     {
-      "code": "no_member_found",
-      "title": "No member record for the supplied member ID",
+      "code": "member_not_found",
+      "title": "No member record for the supplied Member ID",
       "classification": "business",
       "detect": {
         "kind": "textPresent",
@@ -557,7 +557,7 @@
     },
     {
       "code": "required_field_missing",
-      "title": "Required sub-account field left blank",
+      "title": "Sub-account form rejected for a missing field",
       "classification": "hard",
       "detect": {
         "kind": "regexPresent",
@@ -569,15 +569,15 @@
     },
     {
       "code": "sign_in_failed",
-      "title": "Sign-in rejected (wording inferred, not observed)",
+      "title": "Console sign-in rejected the credentials",
       "classification": "escalate",
       "detect": {
         "kind": "regexPresent",
-        "pattern": "(invalid user id or password|sign[- ]in failed|credentials were not recognized)"
+        "pattern": "(invalid user id or password|sign-?in failed|credentials were not recognis?zed)"
       },
       "scope": "global",
       "extract": [],
-      "operatorGuidance": "Check the servicing console credentials and whether the teller account is locked, then re-run.",
+      "operatorGuidance": "Wording INFERRED, not observed. Have an operator verify the servicing console credentials / check for a locked user before retrying.",
       "origin": "discovered"
     }
   ],
@@ -604,20 +604,18 @@
     ]
   },
   "governance": {
-    "approval": "approved",
+    "approval": "draft",
     "stability": {
-      "runs": 2,
-      "successes": 1
-    },
-    "reviewedBy": "s.chavan",
-    "notes": "State-committing. Confirmable step and confirmation gate reviewed."
+      "runs": 0,
+      "successes": 0
+    }
   },
   "provenance": {
-    "discoveredAt": "2026-08-14T07:37:00.951Z",
+    "discoveredAt": "2026-08-14T21:32:35.672Z",
     "model": "claude-opus-5",
     "effort": "high",
-    "discoveryRunId": "disc-20260814-073435-418498",
-    "contentHash": "aa326cc88ebf12f871d99faf0dc8378e",
+    "discoveryRunId": "disc-20260814-213001-926de7",
+    "contentHash": "5157401ba717c0ca71018dcab5fac239",
     "generator": "handspan"
   }
 }

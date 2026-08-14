@@ -1,0 +1,139 @@
+{
+  "status": "outcome",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-b4aea1",
+    "capabilityId": "member_open_sub_account",
+    "capabilityVersion": 5,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-08-14T21:45:15.715Z",
+    "finishedAt": "2026-08-14T21:45:15.715Z",
+    "durationMs": 0,
+    "stepsAttempted": 5,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-b4aea1",
+    "llmCalls": 0
+  },
+  "outcome": "member_access_restricted",
+  "outcomeTitle": "Member record is flagged RESTRICTED and this role may not open accounts on it",
+  "classification": "business",
+  "details": {},
+  "atStepId": "s06",
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator's user ID on the servicing console sign-in screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:50.980Z",
+      "durationMs": 501,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator's password on the sign-in screen.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-08-14T21:44:51.482Z",
+      "durationMs": 533,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:52.020Z",
+      "durationMs": 1050,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing task to look up a member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:53.071Z",
+      "durationMs": 1122,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 55,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member id to look up in the Member Search panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T21:44:54.193Z",
+      "durationMs": 439,
+      "status": "ok",
+      "resolution": {
+        "score": 102,
+        "runnerUpScore": 60,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-b4aea1/run.jsonl",
+      "capturedAt": "2026-08-14T21:44:49.847Z"
+    }
+  ]
+}

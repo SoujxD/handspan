@@ -3,18 +3,13 @@
 Two capabilities, both discovered by a real LLM run against the live mock
 application, then replayed across every result class the contract can produce.
 
-| Capability | Index | Discovery run id |
+| Capability | Index | Discovery run |
 |---|---|---|
-| `member_savings_balance_lookup` — read a member's SAVINGS balance (read-only) | [INDEX](./INDEX-member_savings_balance_lookup.md) | `disc-20260814-064328-08afad` |
-| `member_open_sub_account` — open a sub-account through to confirmation (**state-committing**) | [INDEX](./INDEX-member_open_sub_account.md) | `disc-20260814-073435-418498` |
+| `member_savings_balance` — read a member's SAVINGS balance (read-only) | [INDEX](./INDEX-member_savings_balance.md) | [disc-20260814-203551-eb30cf](./disc-20260814-203551-eb30cf) — 10 actions, 11 model calls |
+| `member_open_sub_account` — open a sub-account through to confirmation (**state-committing**) | [INDEX](./INDEX-member_open_sub_account.md) | [disc-20260814-213001-926de7](./disc-20260814-213001-926de7) — 20 actions, 22 model calls |
 
-> **Missing: the discovery run directories.** Both capabilities came out of real
-> `claude-opus-5` runs against the live application — the run ids above are
-> recorded in each artifact's `provenance`, along with the model, effort setting
-> and timestamp — but the `disc-*` directories themselves were destroyed by a
-> careless `rm -rf evidence/*` while regenerating the replay set, and restoring
-> them means paying for another discovery run. They are noted here rather than
-> quietly omitted. Everything below describes evidence that is present.
+Each artifact's `provenance.discoveryRunId` names the directory it came out of,
+so any claim in the artifact can be traced back to the turn that produced it.
 
 ## What is in each directory
 
@@ -26,11 +21,12 @@ application, then replayed across every result class the contract can produce.
 ## The two claims this evidence is meant to settle
 
 **1. Discovery was real.** `disc-*/run.jsonl` records each model call, the tool
-it chose, the intent it gave, the policy decision, and the resulting screen —
-see the note above on why those directories are absent from this snapshot.
-What remains in evidence: each artifact's `provenance` block (model, effort,
-run id, timestamp, content hash), and the fact that the artifacts contain
-observed page text nobody wrote by hand.
+it chose, the intent it gave, the policy decision, and the resulting screen.
+Model id, effort, token counts and stop reason are in `discovery_complete`, and
+the per-step screenshots show the application actually moving. Both runs also
+contain probes the model chose to take — searching an id that does not exist,
+submitting the form blank — which is where the observed detector wording in the
+artifacts comes from.
 
 **2. Replay uses no model.** Every `result.json` carries `meta.llmCalls`, and
 it is `0` in all of them — asserted in code before any result is returned, not
@@ -61,7 +57,7 @@ untouched.
 against inputs and fault modes chosen to provoke its declared outcomes, and
 reports which detectors actually fire:
 
-- `member_savings_balance_lookup` — **7/7 verified**
+- `member_savings_balance` — **7/7 verified**
 - `member_open_sub_account` — **6/7 verified**; `required_field_missing` is
   honestly unverified, because provoking it needs a blank required field and
   the typed input contract rejects that before the browser is touched.
@@ -79,7 +75,7 @@ prove a point would contradict the point. It is one command to reproduce:
 
 ```bash
 npm run target & npm run catalog &
-npx tsx scripts/agent-invoke-demo.ts member_savings_balance_lookup 12345
+npx tsx scripts/agent-invoke-demo.ts member_savings_balance 12345
 ```
 
 It prints the published tool definitions, then two invocations — one returning
