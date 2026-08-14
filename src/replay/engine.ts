@@ -439,6 +439,25 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
             });
             if (outcome.kind === 'recovered') {
               recoveryAttempts++;
+              // Record it, exactly as the pre-step guard path does.
+              //
+              // Omitting this made recoveries triggered *after* a checkpoint
+              // failure invisible in the trace — and that path is the common
+              // one, because an interstitial usually announces itself by
+              // making the previous step's checkpoint fail. The run recovered
+              // correctly and reported no recoveries, so anything reading the
+              // trace concluded the rule had never fired. It is the reason a
+              // working `recoverable` detector kept showing up as UNVERIFIED.
+              trace.push({
+                stepId: step.id,
+                intent: step.intent,
+                action: step.act.action,
+                risk: step.risk,
+                startedAt: new Date(stepStarted).toISOString(),
+                durationMs: Date.now() - stepStarted,
+                status: 'recovered',
+                recovery: { outcomeCode: guard.code, action: outcome.action, attempt: recoveryAttempts },
+              });
               continue;
             }
             if (outcome.kind === 'terminal') return outcome.result;
@@ -478,15 +497,81 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
   // Success checkpoint + extraction
   // -------------------------------------------------------------------------
   snapshot = await surface.snapshot();
-  const ctx = { snapshot, resolveOptions };
+  // Reassigned as recoveries re-observe the final screen.
+  let ctx = { snapshot, resolveOptions };
 
-  if (!evaluateCondition(cap.successCheckpoint, ctx)) {
-    // Same reasoning as the per-step case: a declared outcome beats a generic
-    // failure, and it is the last chance to classify correctly.
+  /**
+   * Terminal guards are evaluated BEFORE the success checkpoint.
+   *
+   * A declared outcome is a more specific answer than "the flow finished", and
+   * the two can both be true: a member who exists but holds no savings share
+   * still renders the "Share Accounts" panel, so a success checkpoint keyed to
+   * that panel passes while `no_savings_account` is also true. Checking
+   * success first meant that outcome could never fire — the caller was told
+   * the lookup succeeded, and then handed no balance.
+   *
+   * Ordering guards first is only safe because the compiler already refuses to
+   * ship a detector that matches a screen the happy path passes through
+   * (see `compile`), so a well-formed capability cannot have an outcome that
+   * shadows its own success state.
+   */
+  const terminalGuard = firstMatchingGuard(guards, null, ctx);
+  if (terminalGuard && terminalGuard.classification === 'business') {
+    return businessOutcome(terminalGuard, cap, snapshot, ctx, opts, trace, null);
+  }
+
+  /**
+   * The success checkpoint gets the same guard treatment every step gets.
+   *
+   * An earlier version only honoured `business` guards here, which left an
+   * inconsistency with a real consequence: an interstitial that fires on every
+   * request is still on screen when the last step finishes, so the success
+   * checkpoint fails, and a `recoverable` rule that had been dismissing that
+   * interstitial happily all run was suddenly ignored. The run failed on the
+   * final screen for a condition it already knew how to clear.
+   *
+   * Bounded, because a guard that never clears must not loop forever — it
+   * becomes `recovery_exhausted`, which is the honest answer.
+   */
+  const lastStep = cap.steps[cap.steps.length - 1]!;
+  let finalRecoveries = 0;
+
+  while (!evaluateCondition(cap.successCheckpoint, ctx)) {
     const guard = firstMatchingGuard(guards, null, ctx);
-    if (guard && guard.classification === 'business') {
-      return businessOutcome(guard, cap, snapshot, ctx, opts, trace, null);
+
+    if (guard && finalRecoveries < 4) {
+      const outcome = await handleGuard({
+        rule: guard,
+        step: lastStep,
+        snapshot,
+        opts,
+        trace,
+        outputs,
+        resolveOptions,
+        recoveryAttempts: finalRecoveries,
+        maxRecoveries: 4,
+      });
+
+      if (outcome.kind === 'terminal') return outcome.result;
+
+      if (outcome.kind === 'recovered') {
+        finalRecoveries++;
+        trace.push({
+          stepId: 'final',
+          intent: 'reach the declared success state',
+          action: 'verify',
+          risk: 'safe',
+          startedAt: new Date().toISOString(),
+          durationMs: 0,
+          status: 'recovered',
+          recovery: { outcomeCode: guard.code, action: outcome.action, attempt: finalRecoveries },
+        });
+        snapshot = await surface.snapshot();
+        ctx = { snapshot, resolveOptions };
+        continue;
+      }
     }
+
     return await finishFailure(
       fail(
         'checkpoint_failed',
@@ -519,13 +604,30 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
       continue;
     }
 
-    const sensitive = field.sensitivity === 'pii' || field.sensitivity === 'secret';
+    // Redaction applies to PERSISTENCE, not to the return channel.
+    //
+    // The caller is the institution's own agent, acting on a member record it
+    // just asked about — withholding the balance from it makes the capability
+    // useless, which is what an earlier version did. The actual risk is the
+    // value coming to rest somewhere it should not: a JSONL log shipped to an
+    // aggregator, an artifact in git, a screenshot in a ticket.
+    //
+    // So the value goes back to the caller in full, and is registered with the
+    // redactor at the same moment — which scrubs it from this run's evidence,
+    // including the result document written after replay returns.
+    // Register BOTH forms: the raw string as scraped ("$55,023.10") and the
+    // coerced value as stored (55023.1). They are different strings, and
+    // registering only the raw one leaves the stored form unscrubbed.
+    if (field.sensitivity === 'pii') {
+      if (r.raw) redactor.registerSecret(String(r.raw));
+      if (r.value !== undefined && r.value !== null) redactor.registerSecret(String(r.value));
+    }
+
     outputs[field.name] = {
-      // PII is extracted so the flow can complete, then redacted on the way
-      // out. The caller learns the shape, not the datum.
-      value: sensitive ? '[REDACTED]' : (r.value ?? null),
+      value: r.value ?? null,
       sensitivity: field.sensitivity,
-      redacted: sensitive,
+      // "was scrubbed from persisted evidence", not "was withheld from you".
+      redacted: field.sensitivity === 'pii',
     };
   }
 
@@ -682,6 +784,7 @@ async function handleGuard(args: {
             meta: metaFor(opts, trace.length),
             failure: {
               kind: 'recovery_exhausted',
+              outcomeCode: rule.code,
               message: `Recoverable condition "${rule.code}" kept recurring after ${args.recoveryAttempts} recovery attempts.`,
               atStepId: step.id,
               stepIntent: step.intent,
@@ -719,7 +822,9 @@ async function handleGuard(args: {
        * recovery, while a recovery that genuinely does nothing still fails
        * here because neither the URL nor the content moves.
        */
-      const fingerprint = (s: SurfaceSnapshot): string => `${s.url}|${s.text.slice(0, 400)}`;
+      // Frame URLs, not just the top document's — see SurfaceSnapshot.frameUrls.
+      const fingerprint = (s: SurfaceSnapshot): string =>
+        `${s.frameUrls.join('|')}|${s.text.slice(0, 400)}`;
       const before = fingerprint(snapshot);
 
       const recoveryMadeProgress = async (ms: number): Promise<boolean> => {
@@ -788,6 +893,11 @@ async function handleGuard(args: {
               expected: 'a state the automation can handle',
               observed: rule.title,
               remediation: 'Re-run with escalation enabled, or handle this state in the artifact.',
+              // Name the rule that stopped the run. Without it, a verification
+              // pass (which deliberately disables escalation so it never parks
+              // on a human) cannot tell that the detector fired correctly, and
+              // reports a working `escalate` rule as never having matched.
+              outcomeCode: rule.code,
             },
             partialOutputs: outputs,
             trace,
@@ -804,6 +914,7 @@ async function handleGuard(args: {
         reason: `${rule.title} — ${rule.code}`,
         guidance: rule.operatorGuidance ?? 'Resolve this state manually, then hand control back.',
         trigger: 'declared_outcome',
+        outcomeCode: rule.code,
       });
       if (esc.kind === 'resumed') return { kind: 'recovered', action: 'operator intervention' };
       return { kind: 'terminal', result: esc.result };
@@ -817,6 +928,7 @@ async function handleGuard(args: {
           meta: metaFor(opts, trace.length),
           failure: {
             kind: 'surface_error',
+            outcomeCode: rule.code,
             message: `${rule.title} (${rule.code})`,
             atStepId: step.id,
             stepIntent: step.intent,
@@ -846,11 +958,16 @@ function businessOutcome(
   for (const field of rule.extract) {
     const r = extract(field, ctx);
     if (r.ok) {
-      const sensitive = field.sensitivity === 'pii' || field.sensitivity === 'secret';
+      // Same rule as the success path: returned to the caller, scrubbed from
+      // anything written to disk — in both its raw and coerced forms.
+      if (field.sensitivity === 'pii') {
+        if (r.raw) opts.redactor.registerSecret(String(r.raw));
+        if (r.value !== undefined && r.value !== null) opts.redactor.registerSecret(String(r.value));
+      }
       details[field.name] = {
-        value: sensitive ? '[REDACTED]' : (r.value ?? null),
+        value: r.value ?? null,
         sensitivity: field.sensitivity,
-        redacted: sensitive,
+        redacted: field.sensitivity === 'pii',
       };
     }
   }
@@ -884,6 +1001,7 @@ async function escalate(args: {
   reason: string;
   guidance: string;
   trigger: 'declared_outcome' | 'policy_blocked_irreversible' | 'recovery_exhausted' | 'no_progress';
+  outcomeCode?: string;
 }): Promise<{ kind: 'resumed' } | { kind: 'terminal'; result: ReplayResult }> {
   const { opts, step, snapshot, trace, reason, guidance, trigger } = args;
   const { evidence, surface, lease, capability: cap } = opts;
@@ -962,6 +1080,7 @@ async function escalate(args: {
     status: 'escalated',
     meta: metaFor(opts, trace.length),
     interventionId: intervention.id,
+    outcomeCode: args.outcomeCode,
     reason,
     guidance,
     atStepId: step?.id ?? 'final',

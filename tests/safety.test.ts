@@ -166,6 +166,23 @@ describe('redaction', () => {
     expect(r.text('Tax ID 412-88-7301')).toBe('Tax ID [REDACTED:SSN]');
   });
 
+  it('redacts an SSN with no separator before it', () => {
+    // Regression, and a real leak. Legacy screens concatenate a label and its
+    // value ("Tax ID412-88-7301"), and a `\b`-anchored pattern cannot match
+    // between "D" and "4" — there is no word boundary there. The digit-boundary
+    // form catches it.
+    const r = new Redactor(policy.file.redaction.patterns);
+    expect(r.text('Tax ID412-88-7301')).not.toContain('412-88-7301');
+    expect(r.text('DOB1979-04-11 Tax ID412-88-7301')).toContain('[REDACTED:SSN]');
+  });
+
+  it('still does not match an SSN shape inside a longer digit run', () => {
+    // The digit-boundary anchors have to keep this from over-matching an
+    // account number that merely contains the shape.
+    const r = new Redactor(policy.file.redaction.patterns);
+    expect(r.text('ref 9412-88-73011')).toContain('9412-88-73011');
+  });
+
   it('redacts a field by key name regardless of its value', () => {
     const r = new Redactor(policy.file.redaction.patterns);
     const out = r.value({ password: 'zzz', note: 'fine' });
@@ -195,5 +212,24 @@ describe('redaction', () => {
     const r = new Redactor(policy.file.redaction.patterns);
     const once = r.text('Tax ID 412-88-7301');
     expect(r.text(once)).toBe(once);
+  });
+
+  it('scrubs a registered secret that is stored as a NUMBER', () => {
+    // Regression. An extracted balance is registered as the string it was
+    // scraped from and stored as a coerced number, and `value()` originally
+    // passed numbers through untouched — so a regulated figure survived in a
+    // saved result document while every string form of it was scrubbed.
+    const r = new Redactor(policy.file.redaction.patterns);
+    r.registerSecret('55023.1');
+    const out = r.value({ outputs: { savingsBalance: { value: 55023.1, sensitivity: 'pii' } } });
+    expect(JSON.stringify(out)).not.toContain('55023.1');
+  });
+
+  it('leaves unrelated numbers alone', () => {
+    const r = new Redactor(policy.file.redaction.patterns);
+    r.registerSecret('55023.1');
+    const out = r.value({ durationMs: 5220, steps: 6 });
+    expect(out.durationMs).toBe(5220);
+    expect(out.steps).toBe(6);
   });
 });

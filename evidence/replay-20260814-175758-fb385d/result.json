@@ -1,0 +1,34 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-fb385d",
+    "capabilityId": "member_open_sub_account",
+    "capabilityVersion": 5,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-08-14T17:57:59.576Z",
+    "finishedAt": "2026-08-14T17:57:59.576Z",
+    "durationMs": 0,
+    "stepsAttempted": 0,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-fb385d",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "invalid_input",
+    "message": "Missing required input(s): userId, password, memberId, accountType, nickname, openingDeposit",
+    "atStepId": null,
+    "stepIntent": null,
+    "expected": null,
+    "observed": null,
+    "remediation": "Supply them, e.g. --input userId=<value>"
+  },
+  "partialOutputs": {},
+  "trace": [],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-fb385d/run.jsonl",
+      "capturedAt": "2026-08-14T17:57:58.543Z"
+    }
+  ]
+}

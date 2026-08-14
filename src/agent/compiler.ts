@@ -68,7 +68,33 @@ export function compile(trace: DiscoveryTrace, opts: CompileOptions): Capability
   const outputs = buildOutputs(finish);
 
   const steps = buildSteps(trace, opts, inputs, paramByValue);
-  const outcomes = buildOutcomes(finish);
+  /**
+   * Every screen the recorded flow legitimately passes through.
+   *
+   * Exploratory probes are excluded on purpose — the whole point of a probe is
+   * to visit an unhappy-path screen so its wording can be quoted, and a
+   * detector matching the screen it was written from is correct, not a
+   * collision.
+   */
+  const observedStates: ObservedState[] = [
+    { label: 'the entry screen', url: trace.entryState.url, text: trace.entryState.text },
+    ...trace.actions
+      .filter((a) => !a.exploratory && !a.denied && a.after)
+      .map((a) => ({
+        label: `after "${a.intent}"`,
+        url: a.after!.url,
+        text: a.after!.textExcerpt,
+      })),
+  ];
+
+  const rejectedOutcomes: Array<{ code: string; why: string }> = [];
+  const outcomes = buildOutcomes(finish, observedStates, (code, why) =>
+    rejectedOutcomes.push({ code, why }),
+  );
+  for (const r of rejectedOutcomes) {
+    // eslint-disable-next-line no-console
+    console.warn(`  ! dropped outcome rule "${r.code}": ${r.why}`);
+  }
   const successCheckpoint = buildSuccessCheckpoint(finish, trace, opts.baseUrl);
 
   const maxRisk: RiskClass = highestRisk(steps.map((s) => s.risk));
@@ -261,6 +287,10 @@ function buildSteps(
     const a = trace.actions[i]!;
     // A denied or failed action is history, not a step.
     if (a.denied) continue;
+    // Nor is a side trip. The model is asked to go and look at the unhappy
+    // paths so its detectors quote observed text rather than remembered
+    // phrasing; those probes must not become part of the flow that replays.
+    if (a.exploratory) continue;
 
     const act = toStepAction(a, opts, paramByValue, sensitiveParams);
     if (!act) continue;
@@ -274,8 +304,23 @@ function buildSteps(
       fieldLabel: a.node?.label,
     });
 
-    const prevText = i > 0 ? (trace.actions[i - 1]?.after?.textExcerpt ?? '') : '';
-    const checkpoint = synthesiseCheckpoint(a, prevText, opts.baseUrl, paramByValue);
+    // Baseline for novelty. For the first action this is the ENTRY screen —
+    // without it every phrase on the opening page counts as new and the
+    // synthesiser picks the first short line it finds, which produced a
+    // checkpoint of `textPresent "Password"` on a step that types a user id.
+    const prevText =
+      i > 0 ? (trace.actions[i - 1]?.after?.textExcerpt ?? '') : trace.entryState.text;
+
+    // Checkpoints are synthesised only for state-changing actions. The schema
+    // requires them there and nowhere else, and a weak auto-generated
+    // checkpoint on a `type` step is worse than none: it is trivially true, it
+    // adds a failure mode, and — because the engine may skip a step whose
+    // checkpoint already holds — it can cause a required step to be skipped
+    // entirely.
+    const stateChanging = act.action === 'click' || act.action === 'navigate' || act.action === 'press';
+    const checkpoint = stateChanging
+      ? synthesiseCheckpoint(a, prevText, opts.baseUrl, paramByValue, inputs)
+      : undefined;
 
     const step: Step = {
       id,
@@ -379,6 +424,7 @@ function synthesiseCheckpoint(
   previousText: string,
   baseUrl: string,
   paramByValue: Map<string, string>,
+  inputs: InputParam[],
 ): Condition | undefined {
   if (!a.after) return undefined;
 
@@ -389,9 +435,34 @@ function synthesiseCheckpoint(
     conditions.push({ kind: 'urlMatches', pattern: urlPattern(a.after.url, baseUrl, paramByValue) });
   }
 
-  const novel = firstNovelPhrase(a.after.textExcerpt, previousText);
+  const novel = firstNovelPhrase(a.after.textExcerpt, previousText, {
+    chrome: a.after.chrome,
+    data: a.after.data,
+    forbidden: [...paramByValue.keys()],
+  });
   if (novel) {
     conditions.push({ kind: 'textPresent', text: novel, caseSensitive: false });
+  }
+  void inputs;
+
+  // Fallback: nothing new appeared, but something may have *gone*. Clicking a
+  // form's submit button makes that form's heading disappear, and "the screen
+  // I was on is no longer here" is a real post-condition.
+  //
+  // This matters more than it looks. Inside a frameset the top-level URL does
+  // not change when a frame navigates, so a URL check is unavailable exactly
+  // where these apps spend most of their time — and a step with no checkpoint
+  // is rejected outright by the schema, which would throw away an otherwise
+  // good recording.
+  if (conditions.length === 0) {
+    const vanished = firstNovelPhrase(previousText, a.after.textExcerpt, {
+      chrome: a.after.chrome,
+      data: a.after.data,
+      forbidden: [...paramByValue.keys()],
+    });
+    if (vanished) {
+      conditions.push({ kind: 'textAbsent', text: vanished, caseSensitive: false });
+    }
   }
 
   if (conditions.length === 0) return undefined;
@@ -400,23 +471,54 @@ function synthesiseCheckpoint(
 }
 
 /**
- * Text present after the action that was not present before.
+ * Pick text that marks the new screen — and only text that will still be there
+ * for a different record.
  *
- * Values are excluded on purpose: "$18,432.07" is novel every time and would
- * make the checkpoint fail for a different member. We want the *label* that
- * marks the screen ("Confirmation Number"), not the datum on it.
+ * This is the difference between a capability and a recording of one run. The
+ * naive version of this function chose `"Member NameWhitfield, Dana"` as the
+ * checkpoint for a member lookup: perfectly novel, perfectly specific, and
+ * guaranteed to fail the first time a caller passes a different member id.
+ *
+ * So candidates are ranked, not just filtered:
+ *
+ *   PREFER   structural chrome — a panel title, a field label, a column
+ *            header. These are the same on every record, which is exactly the
+ *            property a checkpoint needs.
+ *   REJECT   anything containing an observed data value, or a value that was
+ *            supplied as an input during the recording. Those vary per call.
+ *   REJECT   digit runs and currency, which are data by another name.
  */
-function firstNovelPhrase(after: string, before: string): string | undefined {
+function firstNovelPhrase(
+  after: string,
+  before: string,
+  ctx: { chrome: string[]; data: string[]; forbidden: string[] } = { chrome: [], data: [], forbidden: [] },
+): string | undefined {
   const beforeNorm = before.toLowerCase();
+
+  // Data values worth guarding against. Short ones are skipped — a two-letter
+  // value would veto half the page for no benefit.
+  const dataValues = [...ctx.data, ...ctx.forbidden]
+    .map((d) => d.trim().toLowerCase())
+    .filter((d) => d.length >= 4);
+
+  const chromeSet = new Set(ctx.chrome.map((c) => c.trim().toLowerCase()));
+
   const candidates = after
     .split(/[\n\r]+|(?<=\.)\s+|\s{2,}/)
     .map((s) => s.trim())
     .filter((s) => s.length >= 8 && s.length <= 55)
-    .filter((s) => !/\d{3,}/.test(s)) // reject id- and amount-like strings
+    .filter((s) => !/\d{3,}/.test(s)) // id- and amount-like strings
     .filter((s) => !/[$£€]/.test(s))
-    .filter((s) => !beforeNorm.includes(s.toLowerCase()));
+    .filter((s) => !beforeNorm.includes(s.toLowerCase()))
+    // The load-bearing filter: nothing that embeds a value from this run.
+    .filter((s) => {
+      const low = s.toLowerCase();
+      return !dataValues.some((d) => low.includes(d));
+    });
 
-  return candidates[0];
+  // Structural chrome first, free text only as a fallback.
+  const structural = candidates.find((s) => chromeSet.has(s.toLowerCase()));
+  return structural ?? candidates[0];
 }
 
 /**
@@ -462,7 +564,17 @@ function buildSuccessCheckpoint(
 // Outcomes
 // ---------------------------------------------------------------------------
 
-function buildOutcomes(finish: Record<string, unknown>): OutcomeRule[] {
+interface ObservedState {
+  label: string;
+  url: string;
+  text: string;
+}
+
+function buildOutcomes(
+  finish: Record<string, unknown>,
+  observedStates: ObservedState[],
+  onRejected: (code: string, why: string) => void,
+): OutcomeRule[] {
   const declared = Array.isArray(finish['businessOutcomes'])
     ? (finish['businessOutcomes'] as Record<string, unknown>[])
     : [];
@@ -474,8 +586,38 @@ function buildOutcomes(finish: Record<string, unknown>): OutcomeRule[] {
       'business') as OutcomeRule['classification'];
 
     const detectKind = String(d['detectKind'] ?? 'textPresent');
-    const detectValue = String(d['detectValue'] ?? '');
-    if (!detectValue) continue;
+    const rawDetectValue = String(d['detectValue'] ?? '');
+    if (!rawDetectValue) continue;
+
+    /**
+     * Sanitise and VALIDATE model-supplied regular expressions.
+     *
+     * Models reach for POSIX-style inline flags — `(?i)`, `(?s)` — which
+     * ECMAScript does not support. The pattern then throws at construction,
+     * and because condition evaluation has to fail closed, the guard silently
+     * evaluates false. The result is the worst possible failure mode: an
+     * artifact that looks like it declares six business outcomes and in fact
+     * declares none, discovered only when a "no such member" lookup is
+     * reported as a checkpoint failure.
+     *
+     * So inline flags are stripped here (the evaluator already compiles with
+     * `i` and `s`), and a pattern that still will not compile drops its rule
+     * with a named warning rather than shipping dead.
+     */
+    const detectValue = detectKind === 'textPresent' ? rawDetectValue : stripInlineFlags(rawDetectValue);
+
+    if (detectKind !== 'textPresent') {
+      if (detectValue !== rawDetectValue) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `  ! rewrote detector for "${d['code']}": removed an inline flag group, which ECMAScript cannot compile`,
+        );
+      }
+      if (!compiles(detectValue)) {
+        onRejected(String(d['code'] ?? 'outcome'), `its detector is not a valid regular expression: /${detectValue}/`);
+        continue;
+      }
+    }
 
     const detect: Condition =
       detectKind === 'urlMatches'
@@ -484,13 +626,53 @@ function buildOutcomes(finish: Record<string, unknown>): OutcomeRule[] {
           ? { kind: 'regexPresent', pattern: detectValue }
           : { kind: 'textPresent', text: detectValue, caseSensitive: false };
 
+    const code = String(d['code'] ?? 'outcome').toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+    /**
+     * Reject any detector that matches a screen the HAPPY PATH passes through.
+     *
+     * Outcome rules are global guards, evaluated before every step. A detector
+     * that is true on any screen the flow legitimately visits fires on every
+     * run — so the capability never completes, and what it does instead
+     * depends on the classification: a `business` rule short-circuits into a
+     * wrong answer, an `escalate` rule wakes a human every time, a
+     * `recoverable` rule burns its budget and can skip a required step.
+     *
+     * Every one of those was produced by a real discovery run here:
+     *   - `session_expired` detecting a URL containing "login" — true at the
+     *     entry point, since the flow starts on the sign-in page.
+     *   - `member_record_found` detecting "Share Accounts" — true on the
+     *     success page, so every success became an outcome.
+     *   - `access_restricted` detecting the bare word "restricted" — true on
+     *     the home page, which carries a link reading
+     *     "Administration — restricted". Every run escalated to a human at
+     *     step four.
+     *
+     * The model cannot see this: it is reasoning about one screen at a time,
+     * while the property is about the whole traversal. The compiler holds the
+     * whole traversal, so the check belongs here. Dropping the rule is the
+     * right response rather than repairing it — a detector this loose needs a
+     * person to rewrite, and the run log names it and says why.
+     */
+    const collision = observedStates.find((st) => matchesObservedState(detect, st));
+    if (collision) {
+      onRejected(
+        code,
+        `its detector is already true on a screen the flow legitimately passes through (${collision.label}), so it would fire on a normal run`,
+      );
+      continue;
+    }
+
     const rule: OutcomeRule = {
-      code: String(d['code'] ?? 'outcome').toLowerCase().replace(/[^a-z0-9_]/g, '_'),
+      code,
       title: String(d['title'] ?? d['code'] ?? 'Outcome'),
       classification,
       detect,
       scope: 'global',
       extract: [],
+      // Everything the compiler emits came from the discovery model. Rules a
+      // human adds later are tagged `reviewer` by the CLI.
+      origin: 'discovered',
     };
 
     // The schema requires a recovery on `recoverable` and forbids one
@@ -523,6 +705,35 @@ function buildOutcomes(finish: Record<string, unknown>): OutcomeRule[] {
   }
 
   return rules;
+}
+
+/**
+ * Is this detector already satisfied by the entry screen?
+ *
+ * Evaluated structurally rather than by running the replay evaluator, to keep
+ * the compiler free of a dependency on the engine. Only the detector shapes the
+ * model can emit are handled — url, text, regex — which is all `buildOutcomes`
+ * ever produces.
+ */
+function matchesObservedState(detect: Condition, state: { url: string; text: string }): boolean {
+  // Same flags the replay evaluator uses, so a match here means a match there.
+  const safeRe = (p: string): RegExp | undefined => {
+    try {
+      return new RegExp(p, 'is');
+    } catch {
+      return undefined;
+    }
+  };
+  switch (detect.kind) {
+    case 'urlMatches':
+      return safeRe(detect.pattern)?.test(state.url) ?? false;
+    case 'regexPresent':
+      return safeRe(detect.pattern)?.test(state.text) ?? false;
+    case 'textPresent':
+      return state.text.toLowerCase().includes(detect.text.toLowerCase());
+    default:
+      return false;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -565,6 +776,29 @@ function toPolicyKind(tool: string): 'navigate' | 'click' | 'type' | 'select' | 
       return 'select';
     default:
       return 'read';
+  }
+}
+
+/**
+ * Remove POSIX-style inline flag groups from a regular expression.
+ *
+ * `(?i)`, `(?s)`, `(?im)` and friends are valid in Python and Go and are a
+ * syntax error in JavaScript. They are stripped rather than translated because
+ * the evaluator already compiles every pattern with `i` and `s` — which is
+ * what the model was asking for in the first place.
+ */
+export function stripInlineFlags(pattern: string): string {
+  return pattern.replace(/\(\?[imsxu]+\)/g, '');
+}
+
+/** Does this compile as a JavaScript regular expression? */
+export function compiles(pattern: string): boolean {
+  try {
+    // Same flags the evaluator uses, so "compiles here" means "compiles there".
+    new RegExp(pattern, 'is');
+    return true;
+  } catch {
+    return false;
   }
 }
 

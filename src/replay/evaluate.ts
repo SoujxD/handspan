@@ -141,11 +141,37 @@ function readRaw(ex: Extraction, ctx: EvalContext): string | undefined {
     case 'fromLabelledCell': {
       // The perception layer already derived each cell's label from its
       // structural neighbour, so this is a lookup rather than a DOM walk.
-      const candidates = snapshot.nodes.filter(
+      const byLabel = snapshot.nodes.filter(
         (n) => n.role === 'cell' && matchStrength(ex.label, n.label, ex.labelMatch) > 0,
       );
-      const hit = candidates.find((n) => (n.value ?? '').trim().length > 0);
-      return hit?.value;
+      const hit = byLabel.find((n) => (n.value ?? '').trim().length > 0);
+      if (hit?.value) return hit.value;
+
+      /**
+       * Fallback: match the ROW key instead of the cell label.
+       *
+       * Confirmation and summary screens are routinely built as a two-column
+       * `Field | Value` table — which has a header row, so the perception layer
+       * correctly treats it as a data grid and labels the value cell with its
+       * column header ("Value") rather than with the field name. The label
+       * lookup then misses, even though a human reads the screen exactly the
+       * way the extraction rule is written.
+       *
+       * Matching on `rowKey` recovers it: the row whose first cell says
+       * "Confirmation Number" holds the confirmation number. This is a
+       * key/value table wearing a grid's clothes, and both readings have to
+       * work for the rule to mean what its author intended.
+       */
+      const byRow = snapshot.nodes.filter(
+        (n) =>
+          n.role === 'cell' &&
+          n.rowKey !== undefined &&
+          matchStrength(ex.label, n.rowKey, ex.labelMatch) > 0 &&
+          (n.value ?? '').trim().length > 0 &&
+          // Skip the key cell itself; we want its neighbour's value.
+          normalizeText(n.value) !== normalizeText(n.rowKey),
+      );
+      return byRow[0]?.value;
     }
 
     case 'fromTableCell': {
@@ -240,11 +266,22 @@ function coerce(v: string, type: OutputField['type']): string | number | boolean
 }
 
 /**
- * A malformed pattern in an artifact must not crash the run — it should fail
- * the condition and be reported as such, so a bad recording surfaces as a
- * debuggable checkpoint failure instead of a stack trace.
+ * Compile a pattern from an artifact.
+ *
+ * Flags are `i` and `s` by design. Case-insensitivity is what anyone writing a
+ * page-text matcher expects, and `s` (dot matches newline) matters because the
+ * page text this runs against is multi-line — a pattern like `Account.*SAVINGS`
+ * would otherwise fail purely because the two words are on different lines.
+ *
+ * Compiling with the same flags the compiler validates against is deliberate:
+ * "it compiled at build time" then actually means "it compiles at run time".
+ *
+ * A malformed pattern still fails closed rather than throwing, so one bad
+ * recording surfaces as a debuggable checkpoint failure instead of a crash —
+ * but it can no longer reach production silently, because `validateCapability`
+ * rejects an artifact containing one.
  */
-function safeRegex(pattern: string, flags = 'i'): RegExp | undefined {
+function safeRegex(pattern: string, flags = 'is'): RegExp | undefined {
   try {
     return new RegExp(pattern, flags);
   } catch {

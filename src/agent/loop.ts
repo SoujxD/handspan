@@ -39,9 +39,31 @@ export interface DiscoveryAction {
   /** Set when the model bound this value to a named input parameter. */
   parameterName?: string;
   navigateUrl?: string;
+  /**
+   * A side trip taken to observe an alternative outcome screen, not part of
+   * the task. Executed and kept in the trace as evidence, but excluded from
+   * the compiled steps — otherwise asking the model to go and look at the
+   * "no such member" page bakes that detour into the capability.
+   */
+  exploratory?: boolean;
   risk: RiskClass;
-  /** Post-action page state, used to synthesise checkpoints. */
-  after?: { url: string; title: string; textExcerpt: string };
+  /**
+   * Post-action page state, used to synthesise checkpoints.
+   *
+   * `chrome` and `data` are separated deliberately. Chrome is structural — the
+   * panel titles and field labels that are the same for every record. Data is
+   * the record itself. A checkpoint built from chrome ("Share Accounts")
+   * survives a different member; one built from data ("Whitfield, Dana") is a
+   * recording of one run masquerading as a reusable capability, and fails the
+   * first time a caller passes a different id.
+   */
+  after?: {
+    url: string;
+    title: string;
+    textExcerpt: string;
+    chrome: string[];
+    data: string[];
+  };
   denied?: { reason: string; remediation: string };
 }
 
@@ -58,6 +80,17 @@ export interface DiscoveryTrace {
   goal: string;
   entryUrl: string;
   tenantId: string;
+  /**
+   * The screen as it was before any step ran.
+   *
+   * Two uses, both of which turned out to matter. It is the text baseline for
+   * the FIRST action — without it every phrase on the opening screen looks
+   * "novel" and the compiler builds a nonsense checkpoint out of the first
+   * short line it sees. And it is what lets the compiler reject an outcome rule
+   * whose detector is already true at the entry point, which would otherwise
+   * fire on every single run.
+   */
+  entryState: { url: string; text: string };
   actions: DiscoveryAction[];
   notes: DiscoveryNote[];
   finish?: FinishPayload;
@@ -93,6 +126,7 @@ export async function runDiscovery(
     tenantId,
     actions: [],
     notes: [],
+    entryState: { url: '', text: '' },
     stoppedBecause: 'error',
     llmCalls: 0,
     usage: { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0 },
@@ -112,6 +146,7 @@ export async function runDiscovery(
   await surface.act({ kind: 'navigate', url: entryUrl });
 
   let snapshot = await surface.snapshot();
+  trace.entryState = { url: snapshot.url, text: snapshot.text };
   evidence.saveSnapshot('entry', snapshot);
   evidence.saveScreenshot('entry', await surface.screenshot());
 
@@ -124,7 +159,11 @@ export async function runDiscovery(
     },
   ];
 
+  /** Counts turns where the model produced no tool call at all — a real stall. */
   let noProgress = 0;
+  /** Counts consecutive identical actions — a real loop. */
+  let repeatedAction = 0;
+  let lastActionSignature = '';
   let lastUrl = snapshot.url;
 
   for (let step = 0; step < maxSteps; step++) {
@@ -285,6 +324,7 @@ export async function runDiscovery(
         index: trace.actions.length,
         tool: use.name,
         intent,
+        exploratory: input['exploratory'] === true,
         node,
         siblings: snapshot.nodes,
         url: snapshot.url,
@@ -370,17 +410,31 @@ export async function runDiscovery(
         url: snapshot.url,
         title: snapshot.title,
         textExcerpt: snapshot.text.slice(0, 1500),
+        chrome: uniqueStrings(
+          snapshot.nodes.flatMap((n) => [n.container ?? '', n.label ?? '', n.columnHeader ?? '']),
+        ),
+        data: uniqueStrings(snapshot.nodes.map((n) => n.value ?? '')),
       };
       trace.actions.push(action);
 
       evidence.info('action_executed', {
         tool: use.name,
         intent,
+        exploratory: action.exploratory ?? false,
         risk: decision.risk,
         target: node ? `${node.role} "${node.label || node.name}"` : action.navigateUrl,
         url: snapshot.url,
       });
-      evidence.saveScreenshot(`step-${action.index}-${use.name}`, await surface.screenshot());
+      // Evidence capture must never be able to end a run. A screenshot can
+      // fail for reasons that have nothing to do with the flow — a frame
+      // detaching mid-capture, or the browser window being closed — and losing
+      // a whole discovery run because one PNG could not be written would be an
+      // expensive way to find that out.
+      try {
+        evidence.saveScreenshot(`step-${action.index}-${use.name}`, await surface.screenshot());
+      } catch (e) {
+        evidence.warn('screenshot_failed', { step: action.index, error: (e as Error).message });
+      }
 
       results.push({ type: 'tool_result', tool_use_id: use.id, content: 'Done. Fresh observation below.' });
     }
@@ -390,17 +444,36 @@ export async function runDiscovery(
       break;
     }
 
-    // Progress heuristic: a run that has not changed URL for several actions is
-    // circling. This is one of the four escalation triggers.
-    if (snapshot.url === lastUrl) noProgress++;
-    else noProgress = 0;
-    lastUrl = snapshot.url;
+    // Progress heuristic.
+    //
+    // NOT "the URL stopped changing" — that punishes the model for doing the
+    // things this system most wants it to do. Typing into a field never
+    // changes the URL, and neither does `record_note`, which is how the
+    // unhappy paths get captured at all. An early version used the URL and
+    // killed a run that had completed the whole flow and was part-way through
+    // documenting its business outcomes.
+    //
+    // What actually indicates a stuck run is repetition: the same tool against
+    // the same target with the same value, over and over. That is checked
+    // below. The real bounds on a runaway run are the step budget and the wall
+    // clock, both of which are hard.
+    const signature = trace.actions
+      .slice(-1)
+      .map((a) => `${a.tool}|${a.node?.handle ?? a.navigateUrl ?? ''}|${a.value ?? ''}`)
+      .join();
 
-    if (noProgress >= policy.limits.maxConsecutiveNoProgress + 2) {
-      evidence.warn('discovery_no_progress', { url: snapshot.url, consecutive: noProgress });
-      trace.stoppedBecause = 'no_progress';
-      break;
+    if (signature && signature === lastActionSignature) {
+      repeatedAction++;
+      if (repeatedAction >= policy.limits.maxConsecutiveNoProgress) {
+        evidence.warn('discovery_looping', { signature, consecutive: repeatedAction, url: snapshot.url });
+        trace.stoppedBecause = 'no_progress';
+        break;
+      }
+    } else {
+      repeatedAction = 0;
     }
+    lastActionSignature = signature;
+    lastUrl = snapshot.url;
 
     // Tool results and the fresh observation go back in a single user turn, so
     // the model always decides against the screen as it is *now*.
@@ -426,6 +499,17 @@ export async function runDiscovery(
   });
 
   return trace;
+}
+
+/** Short, de-duplicated, non-empty strings. Bounded so a trace stays small. */
+function uniqueStrings(values: string[]): string[] {
+  const out = new Set<string>();
+  for (const v of values) {
+    const t = v.trim();
+    if (t.length >= 3 && t.length <= 80) out.add(t);
+    if (out.size >= 250) break;
+  }
+  return [...out];
 }
 
 function toObservation(snapshot: SurfaceSnapshot, budget: number) {

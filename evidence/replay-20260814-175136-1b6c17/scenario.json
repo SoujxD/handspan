@@ -1,0 +1,7 @@
+{
+  "slug": "07-hard-failure-server-error",
+  "title": "Hard failure: application server error",
+  "why": "Classified as an application fault, with expected/observed and evidence pointers for debugging.",
+  "fault": "server_error",
+  "tenant": "northstar"
+}

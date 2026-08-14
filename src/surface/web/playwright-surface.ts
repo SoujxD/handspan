@@ -353,6 +353,22 @@ export class PlaywrightSurface implements Surface {
     // reason.
     await this.page.waitForTimeout(120);
     await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+
+    // Wait for CHILD FRAMES too, not just the page.
+    //
+    // A page-level load state says nothing about whether an iframe has finished
+    // loading, and in a frameset app the content that matters is always in the
+    // child. Without this the whole system is racy in a way that is very hard
+    // to see: an interstitial rendered inside the frame is present for one
+    // snapshot and absent for the next, so a global guard fires on some runs
+    // and not others. It presented as "this recoverable outcome is unverified"
+    // while a manual run of the identical scenario recovered perfectly.
+    await Promise.all(
+      this.page
+        .frames()
+        .map((f) => (f.isDetached() ? Promise.resolve() : f.waitForLoadState('domcontentloaded').catch(() => undefined))),
+    );
+
     await this.page.waitForLoadState('networkidle', { timeout: 2500 }).catch(() => undefined);
   }
 }

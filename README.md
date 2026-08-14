@@ -60,14 +60,15 @@ cp .env.example .env        # then add your key (see below)
 Everything except `discover` runs with **no API key and no network**:
 
 ```bash
-npm test                              # 73 tests — resolver, policy, redaction,
+npm test                              # 81 tests — resolver, policy, redaction,
                                       # schema invariants, control-transfer FSM
 npx tsx tests/smoke-perception.ts     # see exactly what the model would see
 npm run replay -- ...                 # deterministic replay: zero model calls
 ```
 
-The committed artifact in [`/artifacts`](./artifacts) means you can exercise the
-entire replay path — including every error class — without spending a token.
+The two committed artifacts in [`/artifacts`](./artifacts) — both produced by
+real Opus 5 runs against the live app — mean you can exercise the entire replay
+path, including every error class, without spending a token.
 
 ---
 
@@ -96,27 +97,37 @@ npm run discover -- \
 A browser window opens and Claude drives it. You will see each action, its risk
 classification, and the resulting page. It writes:
 
-- `artifacts/<capability>.v1.json` — the capability, **`approval: draft`**
+- `artifacts/member_savings_balance_lookup.v<n>.json` — the capability, **`approval: draft`**
+  (versions are immutable and additive; re-discovering writes `v<n+1>` rather
+  than overwriting what a reviewer already signed off)
 - `evidence/disc-<timestamp>/` — JSONL log, per-step screenshots, a11y snapshots
+
+The repo already contains the output of two such runs — this one, and a
+state-committing one (`member_open_sub_account`, step 7 below) discovered with:
+
+```bash
+npm run discover -- --tenant northstar \
+  --goal "Log in as teller01, open member 12345, and open a new SAVINGS sub-account for them with an initial deposit of 100 dollars, through to the confirmation screen"
+```
 
 ### 2. Inspect what it produced
 
 ```bash
 npm run capabilities                          # agent-facing tool definitions
-npx tsx src/cli.ts codegen -c <capability>    # human-readable review document
+npx tsx src/cli.ts codegen -c member_savings_balance_lookup    # human-readable review document
 ```
 
 ### 3. Replay it — deterministically, no model
 
 ```bash
-npm run replay -- -c <capability> -i memberId=12345
+npm run replay -- -c member_savings_balance_lookup -i memberId=12345
 ```
 
 Then prove it is not memorising the recording — a different member, whose
 balance was never seen during discovery:
 
 ```bash
-npm run replay -- -c <capability> -i memberId=20881
+npm run replay -- -c member_savings_balance_lookup -i memberId=20881
 ```
 
 ### 4. Replay into the interesting failures
@@ -125,22 +136,22 @@ This is the part that matters. Each returns a **different result shape**:
 
 ```bash
 # A business outcome — a valid answer, NOT an error. Exits 0.
-npm run replay -- -c <capability> -i memberId=99999
+npm run replay -- -c member_savings_balance_lookup -i memberId=99999
 
 # A permission denial — also a business outcome, not a crash.
-npm run replay -- -c <capability> -i memberId=33417
+npm run replay -- -c member_savings_balance_lookup -i memberId=33417
 
 # A recoverable interstitial: the engine dismisses it and carries on.
 curl -X POST "http://localhost:4300/__control/fault?mode=unexpected_dialog"
-npm run replay -- -c <capability> -i memberId=12345
+npm run replay -- -c member_savings_balance_lookup -i memberId=12345
 
 # A slow app: condition-based waiting rides it out where a fixed sleep would fail.
 curl -X POST "http://localhost:4300/__control/fault?mode=slow_load"
-npm run replay -- -c <capability> -i memberId=12345
+npm run replay -- -c member_savings_balance_lookup -i memberId=12345
 
 # A hard failure: structured, with expected vs observed and evidence pointers.
 curl -X POST "http://localhost:4300/__control/fault?mode=server_error"
-npm run replay -- -c <capability> -i memberId=12345
+npm run replay -- -c member_savings_balance_lookup -i memberId=12345
 
 curl -X POST "http://localhost:4300/__control/fault?mode=none"   # reset
 ```
@@ -152,10 +163,10 @@ Lakeshore runs the *same vendor product* as Northstar, but calls the field
 interstitial after login.
 
 ```bash
-npx tsx src/cli.ts bind-tenant -c <capability> -t lakeshore \
+npx tsx src/cli.ts bind-tenant -c member_savings_balance_lookup -t lakeshore \
   --label "Member ID=Member Number" --label "Search=Find Member"
 
-npm run replay -- -c <capability> -t lakeshore -i memberId=12345
+npm run replay -- -c member_savings_balance_lookup -t lakeshore -i memberId=12345
 ```
 
 One artifact, two institutions, no second discovery run.
@@ -171,15 +182,65 @@ then in the console: **Take control** → drive the *same live browser window* �
 **Hand control back**. The automation is blocked at the surface the whole time
 the operator holds the lease, and every action the human takes is recorded.
 
-### 7. The agent-facing surface
+### 7. The second capability — one that changes state
+
+Reading a balance is the easy half. The interesting half is a flow that
+*commits* something, because that is where risk classification, checkpoints and
+confirmation screens have to earn their keep.
+
+```bash
+npm run replay -- -c member_open_sub_account \
+  -i memberId=12345 -i accountType=Savings \
+  -i nickname="Vacation Fund" -i openingDeposit=250.00
+```
+
+Twelve steps, ending on a confirmation screen, extracting the confirmation
+number and the new account number. `maxRisk: confirmable` and
+`requiresConfirmation: true`, so it is **blocked unattended** until a human has
+approved the artifact — and the confirm step can never be auto-retried, which
+the schema enforces rather than the engine remembering to.
+
+```bash
+# a member who does not exist — a business outcome on a state-committing flow,
+# reached before anything is committed. Exits 0.
+npm run replay -- -c member_open_sub_account \
+  -i memberId=99999 -i accountType=Savings \
+  -i nickname="Vacation Fund" -i openingDeposit=250.00
+```
+
+### 8. Verify the artifacts rather than trusting them
+
+Two checks that found real defects in this repo, not decoration:
+
+```bash
+npx tsx scripts/verify-artifact.ts member_savings_balance_lookup   # 14 safety invariants
+npx tsx scripts/verify-outcomes.ts member_savings_balance_lookup   # do the detectors actually fire?
+npx tsx scripts/audit-evidence.ts                                  # no PII survived into /evidence
+```
+
+`verify-outcomes` replays a capability against inputs and fault modes chosen to
+provoke each declared outcome, and reports which detectors *actually fire*. The
+first time it ran it reported **0/8** — the model had written detector patterns
+with inline `(?i)` flags, which JavaScript does not support, so every declared
+outcome was silently dead. It now reports 7/7 and 6/7. The one that remains
+unverified is called out as unverified rather than quietly counted.
+
+### 9. The agent-facing surface
 
 ```bash
 npm run catalog         # http://localhost:4500
 
 curl -s localhost:4500/capabilities | jq '.tools[0]'
-curl -s -X POST localhost:4500/capabilities/<capability>/invoke \
+curl -s -X POST localhost:4500/capabilities/member_savings_balance_lookup/invoke \
   -H 'content-type: application/json' \
   -d '{"tenantId":"northstar","memberId":"12345"}' | jq
+```
+
+Or watch a caller do the whole thing — discover the catalog, build a valid call
+from the published schema, and switch on the result shape:
+
+```bash
+npx tsx scripts/agent-invoke-demo.ts member_savings_balance_lookup 12345
 ```
 
 `GET /capabilities` returns tool definitions an agent can drop straight into its
@@ -202,7 +263,12 @@ must not retry it forever.
 | `npx tsx src/cli.ts bind-tenant` | Bind a capability to another institution |
 | `npx tsx src/cli.ts approve` | Mark a capability approved for unattended runs |
 | `npx tsx src/cli.ts codegen -c <id>` | Emit a human-readable review document |
-| `npm test` / `npm run typecheck` | 73 tests / strict TypeScript |
+| `npx tsx src/cli.ts declare-outcome` | Add a reviewer-authored outcome rule (recorded with `origin: reviewer`) |
+| `npx tsx scripts/verify-artifact.ts <id>` | Audit an artifact: structural invariants, no baked-in credentials or PII, no id-based matching, approval traceable to a reviewer |
+| `npx tsx scripts/verify-outcomes.ts <id>` | Replay each declared outcome and report which detectors actually fire |
+| `npx tsx scripts/audit-evidence.ts` | Fail if any seeded PII or credential survived into `/evidence` |
+| `npm test` / `npm run typecheck` | 81 tests / strict TypeScript |
+| `npm run test:replay` / `npm run test:escalation` | Integration: 8 replay scenarios (0 model calls) and the full control-transfer cycle |
 
 ---
 

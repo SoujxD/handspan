@@ -116,7 +116,24 @@ export class Redactor {
     if (input == null) return input;
 
     if (typeof input === 'string') return this.text(input) as unknown as T;
-    if (typeof input === 'number' || typeof input === 'boolean') return input;
+
+    if (typeof input === 'number') {
+      // Numbers need checking too, and it is easy to miss.
+      //
+      // An extracted balance is registered as the string it was scraped from
+      // ("$55,023.10") but is *stored* as the coerced number 55023.1. Passing
+      // numbers through untouched let a regulated value land in a saved result
+      // document while every string form of it was correctly scrubbed —
+      // caught only because the evidence was grepped for it afterwards.
+      const asText = String(input);
+      if (this.secrets.has(asText)) {
+        this.bump('runtime_secret');
+        return '[REDACTED:SECRET]' as unknown as T;
+      }
+      return input;
+    }
+
+    if (typeof input === 'boolean') return input;
 
     if (Array.isArray(input)) {
       return input.map((v) => this.value(v, depth + 1)) as unknown as T;

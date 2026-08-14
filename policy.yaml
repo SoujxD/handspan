@@ -95,15 +95,24 @@ redaction:
   # Applied to every log record, every artifact write, and every extracted
   # output before it leaves the process. Order matters: structural rules run
   # before pattern rules so a labelled field wins over a lucky regex match.
+  # Deliberately anchored on DIGIT boundaries, not word boundaries.
+  #
+  # `\b` requires a word/non-word transition, so `\b\d{3}-\d{2}-\d{4}` does not
+  # match inside "Tax ID412-88-7301" — there is no boundary between "D" and
+  # "4". Legacy screens concatenate a label and its value exactly like that, and
+  # a real SSN reached a persisted evidence file because of it.
+  #
+  # A redaction pattern should fail toward over-matching: an over-redacted log
+  # line costs a moment of confusion, a missed one is a reportable incident.
   patterns:
     - name: ssn
-      regex: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+      regex: "(?<!\\d)\\d{3}-\\d{2}-\\d{4}(?!\\d)"
       replacement: "[REDACTED:SSN]"
     - name: pan
-      regex: "\\b(?:\\d[ -]*?){13,19}\\b"
+      regex: "(?<!\\d)(?:\\d[ -]*?){13,19}(?!\\d)"
       replacement: "[REDACTED:PAN]"
     - name: email
-      regex: "\\b[\\w.%+-]+@[\\w.-]+\\.[A-Za-z]{2,}\\b"
+      regex: "[\\w.%+-]+@[\\w.-]+\\.[A-Za-z]{2,}"
       replacement: "[REDACTED:EMAIL]"
     - name: bearer
       regex: "\\b(bearer|api[_-]?key|authorization)\\s*[:=]\\s*\\S+"

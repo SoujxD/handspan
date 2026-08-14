@@ -1,0 +1,7 @@
+{
+  "slug": "04-business-outcome-restricted",
+  "title": "Business outcome: permission denied",
+  "why": "A RESTRICTED record. Also an answer, not a crash.",
+  "fault": "none",
+  "tenant": "northstar"
+}

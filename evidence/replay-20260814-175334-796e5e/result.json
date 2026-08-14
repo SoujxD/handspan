@@ -1,0 +1,139 @@
+{
+  "status": "outcome",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-796e5e",
+    "capabilityId": "member_open_sub_account",
+    "capabilityVersion": 5,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-08-14T17:54:00.473Z",
+    "finishedAt": "2026-08-14T17:54:00.473Z",
+    "durationMs": 0,
+    "stepsAttempted": 5,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-796e5e",
+    "llmCalls": 0
+  },
+  "outcome": "no_member_found",
+  "outcomeTitle": "No member record for the supplied member ID",
+  "classification": "business",
+  "details": {},
+  "atStepId": "s06",
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the teller's user ID to sign in to the servicing console.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:53:35.628Z",
+      "durationMs": 507,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the teller's password.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-08-14T17:53:36.135Z",
+      "durationMs": 515,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:53:36.655Z",
+      "durationMs": 1073,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing lookup screen.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:53:37.729Z",
+      "durationMs": 1088,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 55,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member number to look up.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:53:38.817Z",
+      "durationMs": 431,
+      "status": "ok",
+      "resolution": {
+        "score": 102,
+        "runnerUpScore": 60,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-796e5e/run.jsonl",
+      "capturedAt": "2026-08-14T17:53:34.508Z"
+    }
+  ]
+}

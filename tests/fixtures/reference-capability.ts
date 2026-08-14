@@ -243,6 +243,7 @@ export function referenceCapability(baseUrl: string, tenantId = 'northstar'): Ca
         code: 'member_not_found',
         title: 'No member record exists for that number',
         classification: 'business',
+        origin: 'discovered' as const,
         detect: { kind: 'textPresent', text: 'No member record found', caseSensitive: false },
         scope: 'global',
         extract: [],
@@ -251,6 +252,7 @@ export function referenceCapability(baseUrl: string, tenantId = 'northstar'): Ca
         code: 'member_access_restricted',
         title: 'Member record is flagged RESTRICTED and this role may not view it',
         classification: 'business',
+        origin: 'discovered' as const,
         detect: { kind: 'textPresent', text: 'Authorization required', caseSensitive: false },
         scope: 'global',
         extract: [],
@@ -259,6 +261,7 @@ export function referenceCapability(baseUrl: string, tenantId = 'northstar'): Ca
         code: 'workstation_advisory',
         title: 'Interstitial system advisory',
         classification: 'recoverable',
+        origin: 'discovered' as const,
         detect: { kind: 'textPresent', text: 'Session advisory', caseSensitive: false },
         scope: 'global',
         recovery: {
@@ -279,6 +282,7 @@ export function referenceCapability(baseUrl: string, tenantId = 'northstar'): Ca
         code: 'session_expired',
         title: 'The servicing session timed out',
         classification: 'escalate',
+        origin: 'discovered' as const,
         detect: { kind: 'textPresent', text: 'Your session has timed out', caseSensitive: false },
         scope: 'global',
         operatorGuidance:
@@ -289,6 +293,7 @@ export function referenceCapability(baseUrl: string, tenantId = 'northstar'): Ca
         code: 'application_error',
         title: 'The core application returned a server error',
         classification: 'hard',
+        origin: 'discovered' as const,
         detect: { kind: 'textPresent', text: 'Server Error', caseSensitive: false },
         scope: 'global',
         extract: [],
@@ -350,6 +355,7 @@ export function lakeshoreBinding(baseUrl: string): Capability['tenants'][number]
         code: 'daily_notice',
         title: 'Lakeshore daily maintenance notice',
         classification: 'recoverable',
+        origin: 'discovered' as const,
         detect: { kind: 'textPresent', text: 'Scheduled maintenance window', caseSensitive: false },
         scope: 'global',
         recovery: {

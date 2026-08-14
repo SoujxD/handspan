@@ -1,0 +1,7 @@
+{
+  "slug": "03-business-outcome-not-found",
+  "title": "Business outcome: no such member",
+  "why": "A legitimate answer the caller needs. Reported as an outcome, exit code 0 — NOT a failure.",
+  "fault": "none",
+  "tenant": "northstar"
+}

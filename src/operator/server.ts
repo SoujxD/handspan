@@ -131,15 +131,35 @@ export async function startOperatorConsole(port = Number(process.env['OPERATOR_P
     }
   });
 
-  await new Promise<void>((resolve) => {
-    server = app.listen(port, () => {
+  // `listen` reports failure via an async 'error' event, not a rejected
+  // promise. Without this handler an EADDRINUSE — a console already running
+  // from a previous command, which is the normal case during a demo — becomes
+  // an unhandled 'error' event that takes down the whole replay. A run must
+  // not die because an auxiliary console was already up.
+  const started = await new Promise<boolean>((resolve) => {
+    const srv = app.listen(port, () => {
       boundPort = port;
-      resolve();
+      resolve(true);
     });
+    srv.once('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        // Something is already serving this port; assume it is a console and
+        // reuse it rather than fighting over the socket.
+        boundPort = port;
+        resolve(false);
+        return;
+      }
+      // eslint-disable-next-line no-console
+      console.warn(`  [operator] console unavailable: ${err.message}`);
+      resolve(false);
+    });
+    server = srv;
   });
 
+  if (!started) server = null;
+
   // eslint-disable-next-line no-console
-  console.log(`  [operator] console at ${operatorBaseUrl()}`);
+  console.log(`  [operator] console at ${operatorBaseUrl()}${started ? '' : ' (already running)'}`);
   return operatorBaseUrl();
 }
 

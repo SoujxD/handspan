@@ -1,0 +1,7 @@
+{
+  "slug": "08-invalid-input",
+  "title": "Rejected before touching the surface",
+  "why": "A missing required input fails the declared contract at the boundary, not halfway through a flow.",
+  "fault": "none",
+  "tenant": "northstar"
+}

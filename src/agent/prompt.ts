@@ -51,10 +51,42 @@ supply differently — a member id, an amount, an account nickname — pass \`pa
 the same call. The recorded step then stores the parameter reference rather than the
 literal. Credentials must always be parameters; never leave a password as a literal.
 
-**Notice the unhappy paths and record them.** A capability that only works when everything
-goes right is worthless in production. As you go, use \`record_note\` for anything a future
-caller would need to know, and put it in \`businessOutcomes\` when you finish. Classify each
-one honestly:
+**Go and look at the unhappy paths — do not guess their wording.** This is the single most
+common way a capability ships broken. If an alternative outcome is cheap and safe to reach
+(searching an id that will not exist, submitting a form with a field left blank), *actually
+do it* and copy the exact words off the screen into your detector, then carry on with the
+real task. A detector written from remembered phrasing does not match: an app that says
+"No member record found" will not match a pattern for "no member found", and the capability
+then reports a perfectly normal result as a failure. Observed text beats plausible text
+every time.
+
+Mark every probe with \`exploratory: true\`. Those actions still run and what you see still
+informs your detectors, but they are kept out of the recorded flow — otherwise the detour
+becomes part of the capability and every future caller takes it too. Return to where you
+were afterwards, then continue the real task.
+
+Only skip probing where trying it would change data or is otherwise unsafe — in that case say
+in the note that the wording is inferred rather than observed.
+
+**A detector must be false on every screen of the normal flow.** This is the constraint
+people get wrong most often, and it is checked: a detector is a guard evaluated before every
+single step, so if it is true on a screen the task legitimately passes through, it fires on
+every run and the capability never completes. Before you write one, ask "did I see this text
+on a screen I visited while doing the task?" — if yes, the detector is too loose.
+
+Real examples of the mistake, all rejected at compile time: matching the word "restricted"
+when the home page carries a link reading "Administration — restricted"; matching a URL
+containing "login" when the flow starts at the sign-in page; matching text that also appears
+on the success screen. Quote the phrase that is unique to the *exceptional* screen — the
+error sentence itself, not a word that happens to appear in it.
+
+Detectors are JavaScript regular expressions. Do NOT write inline flags such as \`(?i)\`;
+matching is already case-insensitive and dot-matches-newline. Prefer a plain
+\`textPresent\` with a distinctive phrase you actually saw over a clever pattern.
+
+**Record what you learn.** A capability that only works when everything goes right is
+worthless in production. As you go, use \`record_note\` for anything a future caller would
+need to know, and put it in \`businessOutcomes\` when you finish. Classify each one honestly:
   - \`business\` — a legitimate answer, not an error. "No member found" is a result the
     caller needs, not a crash. Getting this classification wrong is the most damaging
     mistake available to you.
@@ -87,7 +119,15 @@ thoughtful pause is much cheaper than a confident wrong click.
 Take one action at a time and read the result before deciding the next. You get a fresh
 observation automatically after every action, so do not call \`observe\` just to confirm
 something worked. Give every action a one-sentence \`intent\` in business terms — those
-sentences become the human-readable step list a reviewer approves.`;
+sentences become the human-readable step list a reviewer approves.
+
+Acting is one-at-a-time, but recording is not: \`record_note\` calls carry no risk and can
+be batched, including alongside \`finish\` in the same turn. When you reach the goal state,
+emit your notes and \`finish\` together rather than spending a turn on each.
+
+**Do not stop without calling \`finish\` or \`escalate\`.** A run that completes the task and
+then trails off produces no capability at all — the work is thrown away. The moment the
+goal state is on screen, write the contract and finish.`;
 }
 
 /** Rendered per turn. Kept after the cache breakpoint since it changes every turn. */

@@ -27,7 +27,7 @@ import { EvidenceRecorder } from './evidence/recorder.js';
 import { SessionLease } from './control/lease.js';
 import { PlaywrightSurface } from './surface/web/playwright-surface.js';
 import { runDiscovery } from './agent/loop.js';
-import { compile, detemplatize } from './agent/compiler.js';
+import { compile, detemplatize, hashCapability } from './agent/compiler.js';
 import { CapabilityStore, toToolDefinition } from './catalog/store.js';
 import { replay } from './replay/engine.js';
 import { exitCodeFor, summarize, type ReplayResult } from './types/result.js';
@@ -262,8 +262,17 @@ program
       return;
     }
 
+    if (store.rejected.length) {
+      console.log(`\n  ${store.rejected.length} artifact(s) on disk failed validation and are NOT offered:\n`);
+      for (const r of store.rejected) console.log(`  ${r.file}\n    ${r.reason.replace(/\n/g, '\n    ')}\n`);
+    }
+
     if (!caps.length) {
-      console.log('No capabilities yet. Run `npm run discover -- --goal "..."` first.');
+      console.log(
+        store.rejected.length
+          ? 'No valid capabilities. Fix or re-record the artifacts listed above.'
+          : 'No capabilities yet. Run `npm run discover -- --goal "..."` first.',
+      );
       return;
     }
 
@@ -315,6 +324,12 @@ program
   .requiredOption('-c, --capability <id>', 'Capability id.')
   .requiredOption('-t, --tenant <id>', 'Tenant to add.')
   .option('--label <canonical=tenant...>', 'Label override. Repeatable.', collect, [])
+  .option(
+    '--dismiss <detectText=buttonLabel...>',
+    'Interstitial this tenant interposes: when the text appears, click the named button. Repeatable.',
+    collect,
+    [],
+  )
   .action((o: Record<string, unknown>) => {
     const store = new CapabilityStore(PATHS.artifacts);
     const cap = store.load(String(o['capability']));
@@ -331,6 +346,44 @@ program
       if (idx > 0) overrides[pair.slice(0, idx)] = pair.slice(idx + 1);
     }
 
+    /**
+     * Guards this tenant needs that the recording tenant did not.
+     *
+     * This is the second half of the per-tenant delta, and in practice the
+     * more interesting half: two institutions on the same vendor build differ
+     * by vocabulary *and* by the screens their configuration interposes.
+     * Lakeshore shows a daily maintenance notice after sign-in; Northstar does
+     * not. Declaring it here as a `recoverable` outcome is what lets one
+     * recording serve both, instead of a second discovery run.
+     */
+    const additionalOutcomes = ((o['dismiss'] as string[]) ?? []).map((pair, i) => {
+      const idx = pair.indexOf('=');
+      const detectText = idx > 0 ? pair.slice(0, idx) : pair;
+      const buttonLabel = idx > 0 ? pair.slice(idx + 1) : 'Continue';
+      return {
+        code: `tenant_interstitial_${i + 1}`,
+        title: `${tenant.displayName} interstitial: "${detectText}"`,
+        classification: 'recoverable' as const,
+        detect: { kind: 'textPresent' as const, text: detectText, caseSensitive: false },
+        scope: 'global' as const,
+        recovery: {
+          do: 'click' as const,
+          target: {
+            description: `button "${buttonLabel}" dismissing this tenant's interstitial`,
+            role: 'button' as const,
+            name: buttonLabel,
+            nameMatch: 'normalized' as const,
+            labelMatch: 'normalized' as const,
+            framePath: [] as string[],
+            hints: {},
+          },
+        },
+        extract: [],
+        origin: 'reviewer' as const,
+        addedBy: 'bind-tenant',
+      };
+    });
+
     const existing = cap.tenants.findIndex((t) => t.tenantId === tenantId);
     const binding = {
       tenantId,
@@ -338,7 +391,7 @@ program
       baseUrl: `${runtimeConfig().targetAppBase}/t/${tenant.slug}`,
       productVersion: tenant.vendorVersion,
       labelOverrides: overrides,
-      additionalOutcomes: [],
+      additionalOutcomes,
       overrides: {},
       verification: { lastResult: 'unverified' as const },
     };
@@ -348,9 +401,95 @@ program
 
     cap.version += 1;
     cap.governance.approval = 'draft'; // a new binding is a new thing to review
+    // Re-hash: this is a *tracked* edit. The hash exists to reveal untracked
+    // ones, and the version bump plus the approval reset are the audit trail.
+    // Leaving it stale would cry wolf on every subsequent load.
+    cap.provenance.contentHash = hashCapability(cap);
     const path = store.save(cap);
     console.log(`  Bound ${cap.id} to ${tenantId} -> ${path} (now v${cap.version}, approval reset to draft)`);
     console.log(`  Label overrides: ${JSON.stringify(overrides)}`);
+    if (additionalOutcomes.length) {
+      console.log(`  Tenant guards:   ${additionalOutcomes.map((g) => g.title).join('; ')}`);
+    }
+  });
+
+/**
+ * Reviewer-added outcome rule.
+ *
+ * `verify-outcomes` reports which declared detectors actually fire and, by
+ * omission, which real states nothing covers — a restricted record surfacing
+ * as `checkpoint_failed` is the system telling you it does not know about that
+ * screen. Closing that gap is a review action, and it resets approval so the
+ * addition gets read by a person before it can run unattended.
+ */
+program
+  .command('declare-outcome')
+  .description('Add an outcome rule the discovery model missed. Records reviewer provenance.')
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .requiredOption('--code <name>', 'snake_case machine name the caller switches on.')
+  .requiredOption('--title <text>', 'Human-readable title.')
+  .requiredOption(
+    '--class <classification>',
+    'business | recoverable | hard | escalate',
+  )
+  .requiredOption('--detect <text>', 'Text that appears on that screen and nowhere earlier.')
+  .requiredOption('-r, --reviewer <name>', 'Who is asserting this rule.')
+  .option('--dismiss <buttonLabel>', 'For `recoverable`: the button that clears the state.')
+  .option('--guidance <text>', 'For `escalate`: what the operator should do.')
+  .action((o: Record<string, unknown>) => {
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.load(String(o['capability']));
+    const classification = String(o['class']) as 'business' | 'recoverable' | 'hard' | 'escalate';
+
+    if (!['business', 'recoverable', 'hard', 'escalate'].includes(classification)) {
+      console.error(`Unknown classification "${classification}".`);
+      process.exit(2);
+    }
+
+    const rule = {
+      code: String(o['code']).toLowerCase().replace(/[^a-z0-9_]/g, '_'),
+      title: String(o['title']),
+      classification,
+      detect: { kind: 'textPresent' as const, text: String(o['detect']), caseSensitive: false },
+      scope: 'global' as const,
+      extract: [],
+      origin: 'reviewer' as const,
+      addedBy: String(o['reviewer']),
+      ...(classification === 'recoverable'
+        ? {
+            recovery: {
+              do: 'click' as const,
+              target: {
+                description: `button "${String(o['dismiss'] ?? 'Continue')}" clearing this state`,
+                role: 'button' as const,
+                name: String(o['dismiss'] ?? 'Continue'),
+                nameMatch: 'normalized' as const,
+                labelMatch: 'normalized' as const,
+                framePath: [] as string[],
+                hints: {},
+              },
+            },
+          }
+        : {}),
+      ...(classification === 'escalate'
+        ? { operatorGuidance: String(o['guidance'] ?? 'Resolve this manually, then hand control back.') }
+        : {}),
+    };
+
+    if (cap.outcomes.some((x) => x.code === rule.code)) {
+      console.error(`Capability already declares an outcome "${rule.code}".`);
+      process.exit(2);
+    }
+
+    cap.outcomes.push(rule);
+    cap.version += 1;
+    cap.governance.approval = 'draft';
+    cap.provenance.contentHash = hashCapability(cap);
+    store.save(cap);
+
+    console.log(
+      `  Added ${rule.code} (${classification}, origin=reviewer) to ${cap.id}. Now v${cap.version}, approval reset to draft.`,
+    );
   });
 
 program
@@ -365,6 +504,8 @@ program
     cap.governance.approval = 'approved';
     cap.governance.reviewedBy = String(o['reviewer']);
     if (o['note']) cap.governance.notes = String(o['note']);
+    // Tracked edit: re-hash so the mismatch warning stays meaningful.
+    cap.provenance.contentHash = hashCapability(cap);
     store.save(cap);
     console.log(`  ${cap.id} v${cap.version} approved by ${cap.governance.reviewedBy}.`);
   });
@@ -431,7 +572,10 @@ function printResult(r: ReplayResult): void {
   switch (r.status) {
     case 'success':
       for (const [k, v] of Object.entries(r.outputs)) {
-        console.log(`      ${k.padEnd(20)} ${String(v.value)}${v.redacted ? '  (redacted: ' + v.sensitivity + ')' : ''}`);
+        // `redacted` means "scrubbed from the persisted evidence", not
+        // "withheld from you" — the caller is authorised, the log file is not.
+        const note = v.redacted ? `  (${v.sensitivity}; scrubbed from evidence)` : '';
+        console.log(`      ${k.padEnd(20)} ${String(v.value)}${note}`);
       }
       break;
     case 'outcome':

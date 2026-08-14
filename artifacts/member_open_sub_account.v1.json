@@ -1,0 +1,623 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "member_open_sub_account",
+  "version": 1,
+  "name": "Open Member Sub-Account",
+  "description": "Signs in to the Meridian core servicing console, looks up a member by member ID, and opens a new share sub-account with the given account type, nickname and opening deposit, confirming through the review screen. Returns the confirmation number, new account number, account type, nickname and opening deposit from the confirmation screen. If the member ID does not exist, returns the no_member_found business outcome instead.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "meridian-core",
+    "productVersion": "8.4",
+    "recordedOnTenant": "northstar",
+    "entryUrl": "{{baseUrl}}/login"
+  },
+  "inputs": [
+    {
+      "name": "userId",
+      "type": "string",
+      "description": "Servicing console user ID of the teller.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller01"
+    },
+    {
+      "name": "password",
+      "type": "string",
+      "description": "Password for the servicing console user.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "memberId",
+      "type": "string",
+      "description": "Member number to look up in Member Search.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "12345"
+    },
+    {
+      "name": "accountType",
+      "type": "enum",
+      "description": "Account type for the new sub-account, as shown in the Account Type dropdown.",
+      "required": true,
+      "sensitivity": "public",
+      "enumValues": [
+        "Savings",
+        "Checking",
+        "Money Market",
+        "Certificate"
+      ],
+      "example": "Savings"
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "description": "Account nickname for the new sub-account.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "Vacation Fund"
+    },
+    {
+      "name": "openingDeposit",
+      "type": "money",
+      "description": "Initial deposit in USD; must be at least 25.00.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "250.00"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "confirmationNumber",
+      "type": "string",
+      "description": "Confirmation number for the completed sub-account opening.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Confirmation Number",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "newAccountNumber",
+      "type": "string",
+      "description": "Account number of the newly opened sub-account.",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "New Account Number",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "accountTypeOpened",
+      "type": "string",
+      "description": "Account type recorded on the new account (uppercase, e.g. SAVINGS).",
+      "sensitivity": "public",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Account Type",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "nicknameOpened",
+      "type": "string",
+      "description": "Account nickname recorded on the new account.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Account Nickname",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "openingDepositPosted",
+      "type": "money",
+      "description": "Opening deposit posted to the new account.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Opening Deposit",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "stripCurrency",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the teller's user ID to sign in to the servicing console.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"User ID\" in the \"Northstar Community Credit Union — Core Servicing Sign In\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "User ID",
+          "labelMatch": "normalized",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "hints": {
+            "domId": "ctl00$MainContent$txtUser",
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "userId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the teller's password.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password\" in the \"Northstar Community Credit Union — Core Servicing Sign In\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password",
+          "labelMatch": "normalized",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "hints": {
+            "domId": "ctl00$MainContent$txtPwd",
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "password"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign in to the servicing console.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign In\" in the \"Northstar Community Credit Union — Core Servicing Sign In\" panel",
+          "role": "button",
+          "name": "Sign In",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/shell(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Select a task to begin.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open the Member Servicing lookup screen.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Servicing — look up a member record\" in the \"Select a task to begin.\" panel (frame mainFrame)",
+          "role": "link",
+          "name": "Member Servicing — look up a member record",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Select a task to begin.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "textPresent",
+        "text": "Member Search",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Enter the member number to look up.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Member ID\" in the \"Member Search\" panel (frame mainFrame)",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Member ID",
+          "labelMatch": "normalized",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "domId": "ctl00$MainContent$txtMbr",
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "memberId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Search for the member record.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"Member Search\" panel (frame mainFrame)",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "textAbsent",
+        "text": "Member Search",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s07",
+      "intent": "Start opening a new sub-account for the member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Open Sub-Account\" in the \"Share Accounts\" panel (frame mainFrame)",
+          "role": "button",
+          "name": "Open Sub-Account",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Share Accounts",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "textPresent",
+        "text": "Money Market",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s08",
+      "intent": "Select the account type for the new sub-account.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Account Type\" in the \"Open Sub-Account — Member 12345\" panel (frame mainFrame)",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Account Type",
+          "labelMatch": "normalized",
+          "container": "Open Sub-Account — Member 12345",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "domId": "ctl00$MainContent$ddlType",
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "accountType"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s09",
+      "intent": "Enter the nickname for the new sub-account.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Account Nickname\" in the \"Open Sub-Account — Member 12345\" panel (frame mainFrame)",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Account Nickname",
+          "labelMatch": "normalized",
+          "container": "Open Sub-Account — Member 12345",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "domId": "ctl00$MainContent$txtNick",
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "nickname"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s10",
+      "intent": "Enter the opening deposit amount.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Initial Deposit\" in the \"Open Sub-Account — Member 12345\" panel (frame mainFrame)",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Initial Deposit",
+          "labelMatch": "normalized",
+          "container": "Open Sub-Account — Member 12345",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "domId": "ctl00$MainContent$txtAmt",
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "openingDeposit"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s11",
+      "intent": "Continue to the review screen for the new sub-account.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Continue to Review\" in the \"Open Sub-Account — Member 12345\" panel (frame mainFrame)",
+          "role": "button",
+          "name": "Continue to Review",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Open Sub-Account — Member 12345",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "textPresent",
+        "text": "Review — Open Sub-Account",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s12",
+      "intent": "Confirm and open the new sub-account.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Confirm and Open Account\" in the \"Review — Open Sub-Account\" panel (frame mainFrame)",
+          "role": "button",
+          "name": "Confirm and Open Account",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Review — Open Sub-Account",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "confirmable",
+      "checkpoint": {
+        "kind": "textPresent",
+        "text": "Sub-account opened successfully.",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "textPresent",
+    "text": "Sub-account opened successfully.",
+    "caseSensitive": false
+  },
+  "outcomes": [
+    {
+      "code": "no_member_found",
+      "title": "No member record for the supplied member ID",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "No member record found for",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "required_field_missing",
+      "title": "Required sub-account field left blank",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(Account Type|Account Nickname|Initial Deposit) is required\\."
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "sign_in_failed",
+      "title": "Sign-in rejected (wording inferred, not observed)",
+      "classification": "escalate",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(invalid user id or password|sign[- ]in failed|credentials were not recognized)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Check the servicing console credentials and whether the teller account is locked, then re-run.",
+      "origin": "discovered"
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "northstar",
+      "displayName": "Northstar Community Credit Union",
+      "baseUrl": "http://localhost:4300/t/northstar",
+      "productVersion": "8.4",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "confirmable",
+    "requiresConfirmation": true,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300"
+    ]
+  },
+  "governance": {
+    "approval": "approved",
+    "stability": {
+      "runs": 2,
+      "successes": 1
+    },
+    "reviewedBy": "s.chavan",
+    "notes": "State-committing. Confirmable step and confirmation gate reviewed."
+  },
+  "provenance": {
+    "discoveredAt": "2026-08-14T07:37:00.951Z",
+    "model": "claude-opus-5",
+    "effort": "high",
+    "discoveryRunId": "disc-20260814-073435-418498",
+    "contentHash": "aa326cc88ebf12f871d99faf0dc8378e",
+    "generator": "handspan"
+  }
+}

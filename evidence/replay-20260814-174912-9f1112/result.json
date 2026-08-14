@@ -1,0 +1,178 @@
+{
+  "status": "success",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-9f1112",
+    "capabilityId": "member_savings_balance_lookup",
+    "capabilityVersion": 6,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-08-14T17:49:13.279Z",
+    "finishedAt": "2026-08-14T17:49:18.347Z",
+    "durationMs": 5068,
+    "stepsAttempted": 6,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-9f1112",
+    "llmCalls": 0
+  },
+  "outputs": {
+    "savingsCurrentBalance": {
+      "value": 18432.07,
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "savingsAccountNumber": {
+      "value": "000[REDACTED:SECRET]0001",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "memberName": {
+      "value": "[REDACTED:SECRET]",
+      "sensitivity": "pii",
+      "redacted": true
+    },
+    "memberStatus": {
+      "value": "ACTIVE",
+      "sensitivity": "internal",
+      "redacted": false
+    }
+  },
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the teller's user ID in the sign-in form.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:49:13.456Z",
+      "durationMs": 504,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the teller's password in the sign-in form.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-08-14T17:49:13.961Z",
+      "durationMs": 528,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:49:14.494Z",
+      "durationMs": 1090,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing lookup task.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:49:15.585Z",
+      "durationMs": 1114,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 55,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member number to look up in the Member Search panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:49:16.700Z",
+      "durationMs": 431,
+      "status": "ok",
+      "resolution": {
+        "score": 102,
+        "runnerUpScore": 60,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Search for the member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-08-14T17:49:17.132Z",
+      "durationMs": 1058,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 0,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-9f1112/run.jsonl",
+      "capturedAt": "2026-08-14T17:49:12.278Z"
+    }
+  ]
+}

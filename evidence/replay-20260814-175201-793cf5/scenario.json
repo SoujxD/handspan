@@ -1,0 +1,7 @@
+{
+  "slug": "09-cross-tenant",
+  "title": "Cross-tenant reuse: lakeshore",
+  "why": "Same artifact at a second institution running the same vendor product, via a label overlay. No re-recording.",
+  "fault": "none",
+  "tenant": "lakeshore"
+}

@@ -89,6 +89,17 @@ export interface SurfaceSnapshot {
   nodes: UiNode[];
   /** Flattened visible text across all frames, for text conditions. */
   text: string;
+  /**
+   * URL of every live frame, top document first.
+   *
+   * `url` alone is the TOP document's address, and in a frameset app that
+   * address does not change when the user navigates — every real transition
+   * happens inside a child frame. Anything that asks "did the page move?" by
+   * comparing `url` is therefore blind to all of it, which is how a recovery
+   * that worked perfectly got reported as having made no progress.
+   */
+  frameUrls: string[];
+
   /** Last HTTP status observed for a main-frame navigation, if known. */
   lastStatus?: number;
 }

@@ -95,7 +95,20 @@ export interface RunMeta {
 export interface TypedValue {
   value: string | number | boolean | null;
   sensitivity: Sensitivity;
-  /** True when the value was redacted before leaving the process. */
+  /**
+   * True when this value was scrubbed from the run's PERSISTED evidence —
+   * logs, snapshots, the saved result document.
+   *
+   * It does not mean the value was withheld from the caller. Regulated data is
+   * returned in full to the agent that asked for it, because that agent is
+   * operating on the record legitimately; what must not happen is the value
+   * coming to rest in a log file. Conflating the two produced a capability
+   * that dutifully returned "[REDACTED]" as the account balance it existed to
+   * fetch.
+   *
+   * `secret`-classified values are a separate matter: the schema forbids them
+   * as outputs at all, so they never reach this type.
+   */
   redacted: boolean;
 }
 
@@ -125,6 +138,8 @@ export interface ReplayEscalated {
   status: 'escalated';
   meta: RunMeta;
   interventionId: string;
+  /** The declared rule that triggered this, when it was a declared outcome. */
+  outcomeCode?: string;
   reason: string;
   /** What the operator is being asked to do. */
   guidance: string;
@@ -150,6 +165,15 @@ export interface ReplayFailure {
     remediation: string | null;
     /** Populated for target_ambiguous so you can see what it couldn't choose. */
     candidates?: Array<{ description: string; score: number }>;
+    /**
+     * The declared outcome rule that produced this failure, when one did.
+     *
+     * Without it, "surface_error" gives no clue that the capability *predicted*
+     * this state and classified it `hard` — you cannot tell a rule that fired
+     * from a rule that is silently dead, which is exactly what outcome
+     * verification needs to know.
+     */
+    outcomeCode?: string;
   };
   /** Partial outputs collected before the failure. Often the useful part. */
   partialOutputs: Record<string, TypedValue>;

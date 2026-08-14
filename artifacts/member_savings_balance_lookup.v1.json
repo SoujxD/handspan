@@ -1,0 +1,380 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "member_savings_balance_lookup",
+  "version": 1,
+  "name": "Member SAVINGS Balance Lookup",
+  "description": "Signs in to the Meridian Core Servicing console for the institution, searches Member Servicing for a given member number, and returns the member's name, status, and the current balance of their SAVINGS share account (plus the savings account number). If no member record exists for the number supplied, returns the business outcome member_not_found instead.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "meridian-core",
+    "productVersion": "8.4",
+    "recordedOnTenant": "northstar",
+    "entryUrl": "{{baseUrl}}/login"
+  },
+  "inputs": [
+    {
+      "name": "userId",
+      "type": "string",
+      "description": "Servicing console user ID for the teller/service account.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller01"
+    },
+    {
+      "name": "password",
+      "type": "string",
+      "description": "Password for the servicing console user.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "memberId",
+      "type": "string",
+      "description": "Member number to look up in the Member Search panel.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "12345"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "savingsCurrentBalance",
+      "type": "money",
+      "description": "Current balance of the member's SAVINGS share account.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromTableCell",
+        "rowMatch": "SAVINGS",
+        "columnLabel": "Current Balance",
+        "matchMode": "contains",
+        "framePath": []
+      },
+      "transform": "stripCurrency",
+      "required": true
+    },
+    {
+      "name": "savingsAccountNumber",
+      "type": "string",
+      "description": "Account number of the SAVINGS share account.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromTableCell",
+        "rowMatch": "SAVINGS",
+        "columnLabel": "Account",
+        "matchMode": "contains",
+        "framePath": []
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "memberName",
+      "type": "string",
+      "description": "Member name as shown on the Member Record panel.",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Member Name",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "memberStatus",
+      "type": "string",
+      "description": "Membership status, e.g. ACTIVE.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Status",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the teller's user ID in the sign-in form.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"User ID\" in the \"Northstar Community Credit Union — Core Servicing Sign In\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "User ID",
+          "labelMatch": "normalized",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "hints": {
+            "domId": "ctl00$MainContent$txtUser",
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "userId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the teller's password in the sign-in form.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password\" in the \"Northstar Community Credit Union — Core Servicing Sign In\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password",
+          "labelMatch": "normalized",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "hints": {
+            "domId": "ctl00$MainContent$txtPwd",
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "password"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign in to the servicing console.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign In\" in the \"Northstar Community Credit Union — Core Servicing Sign In\" panel",
+          "role": "button",
+          "name": "Sign In",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/shell(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Select a task to begin.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open the Member Servicing lookup task.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Servicing — look up a member record\" in the \"Select a task to begin.\" panel (frame mainFrame)",
+          "role": "link",
+          "name": "Member Servicing — look up a member record",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Select a task to begin.",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "href": "/t/northstar/member/search",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "textPresent",
+        "text": "Member Search",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Enter the member number to look up in the Member Search panel.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Member ID\" in the \"Member Search\" panel (frame mainFrame)",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Member ID",
+          "labelMatch": "normalized",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "domId": "ctl00$MainContent$txtMbr",
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "memberId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Search for the member record.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"Member Search\" panel (frame mainFrame)",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Member Search",
+          "framePath": [
+            "mainFrame"
+          ],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "textAbsent",
+        "text": "Member Search",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "textPresent",
+    "text": "Share Accounts",
+    "caseSensitive": false
+  },
+  "outcomes": [
+    {
+      "code": "member_not_found",
+      "title": "No member record for the supplied member number",
+      "classification": "business",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "No member record found for .*?\\. Verify the number and try again\\."
+      },
+      "scope": "global",
+      "extract": []
+    },
+    {
+      "code": "no_savings_account",
+      "title": "Member record has no SAVINGS share account",
+      "classification": "business",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "Share Accounts(?![\\s\\S]*SAVINGS)"
+      },
+      "scope": "global",
+      "extract": []
+    },
+    {
+      "code": "sign_in_failed",
+      "title": "Sign-in rejected — still on the Core Servicing Sign In page",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "Core Servicing Sign In[\\s\\S]*(invalid|incorrect|failed|not recognized)"
+      },
+      "scope": "global",
+      "extract": []
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "northstar",
+      "displayName": "Northstar Community Credit Union",
+      "baseUrl": "http://localhost:4300/t/northstar",
+      "productVersion": "8.4",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "sensitive",
+    "requiresConfirmation": false,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300"
+    ]
+  },
+  "governance": {
+    "approval": "approved",
+    "stability": {
+      "runs": 2,
+      "successes": 1
+    },
+    "reviewedBy": "s.chavan",
+    "notes": "Read-only lookup. Steps, checkpoints and the 3 outcome detectors reviewed; all 3 verified against the live app."
+  },
+  "provenance": {
+    "discoveredAt": "2026-08-14T06:44:43.918Z",
+    "model": "claude-opus-5",
+    "effort": "high",
+    "discoveryRunId": "disc-20260814-064328-08afad",
+    "contentHash": "51abbcae6235df07b37ef09d62176bca",
+    "generator": "handspan"
+  }
+}

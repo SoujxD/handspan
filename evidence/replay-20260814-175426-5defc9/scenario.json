@@ -1,0 +1,7 @@
+{
+  "slug": "05-recoverable-interstitial",
+  "title": "Recoverable: unexpected interstitial",
+  "why": "An advisory screen appears on every request. The engine dismisses it, verifies the recovery made progress, and continues.",
+  "fault": "unexpected_dialog",
+  "tenant": "northstar"
+}

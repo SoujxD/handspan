@@ -61,17 +61,24 @@ export class CapabilityStore {
     return cap;
   }
 
+  /** Artifacts on disk that failed validation, with the reason. */
+  readonly rejected: Array<{ file: string; reason: string }> = [];
+
   list(): Capability[] {
     if (!existsSync(this.dir)) return [];
     const out: Capability[] = [];
+    this.rejected.length = 0;
+
     for (const f of readdirSync(this.dir)) {
       if (!f.endsWith('.json')) continue;
       try {
         out.push(parseCapability(JSON.parse(readFileSync(join(this.dir, f), 'utf8'))));
-      } catch {
-        // A malformed artifact must not take down the whole catalog; it simply
-        // is not offered. `handspan capabilities` reports the count so a
-        // missing one is noticeable.
+      } catch (e) {
+        // A malformed artifact must not take down the whole catalog — but it
+        // must not vanish silently either. Swallowing this turned "your
+        // capability has an invalid outcome detector" into "no capabilities
+        // yet", which sends you looking in entirely the wrong place.
+        this.rejected.push({ file: f, reason: (e as Error).message });
       }
     }
     return out.sort((a, b) => a.id.localeCompare(b.id) || b.version - a.version);
@@ -146,6 +153,11 @@ export function toToolDefinition(cap: Capability): ToolDefinition {
           ? ` (${p.sensitivity}: never logged or persisted)`
           : ''),
       ...(p.enumValues?.length ? { enum: p.enumValues } : {}),
+      // Examples help a calling model get the shape right first time — a member
+      // number that looks like "12345" is a different thing from one that looks
+      // like "MBR-000-12345". Never for a secret: an example credential in a
+      // published catalog is a credential in a published catalog.
+      ...(p.example !== undefined && p.sensitivity !== 'secret' ? { examples: [p.example] } : {}),
     };
     if (p.required) required.push(p.name);
   }

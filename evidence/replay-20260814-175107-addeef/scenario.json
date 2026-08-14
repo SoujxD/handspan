@@ -1,0 +1,7 @@
+{
+  "slug": "06-recoverable-slow-load",
+  "title": "Recoverable: degraded/slow application",
+  "why": "Six seconds per request. Condition-based waiting rides it out where a fixed sleep would fail.",
+  "fault": "slow_load",
+  "tenant": "northstar"
+}

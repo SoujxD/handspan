@@ -1,0 +1,7 @@
+{
+  "slug": "02-success-different-input",
+  "title": "Different input, same capability",
+  "why": "Proves replay is parameterised rather than replaying memorised values.",
+  "fault": "none",
+  "tenant": "northstar"
+}

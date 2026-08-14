@@ -410,10 +410,41 @@ function collectNodes(startIndex: number): { nodes: RawNode[]; text: string } {
   document.querySelectorAll(INTERACTIVE).forEach((el) => push(el, true));
   document.querySelectorAll(READABLE).forEach((el) => push(el, false));
 
-  const bodyClone = document.body ? (document.body.cloneNode(true) as HTMLElement) : null;
-  bodyClone?.querySelectorAll('script,style').forEach((n) => n.remove());
+  // Read `innerText` from the LIVE body, not from a detached clone.
+  //
+  // `innerText` is layout-dependent: on a rendered element it inserts tabs
+  // between table cells and newlines between blocks. On a *detached* clone
+  // there is no layout, so it silently degrades to `textContent` semantics and
+  // every separator disappears — turning `<td>Tax ID</td><td>412-88-7301</td>`
+  // into the single token "Tax ID412-88-7301".
+  //
+  // That is not just ugly. It defeated the SSN redaction pattern, whose
+  // leading `\b` cannot match between "D" and "4", and a real SSN reached a
+  // persisted evidence file as a result. Cloning was only ever there to drop
+  // <script>/<style>, and `innerText` already excludes them because they are
+  // not rendered.
+  const liveBody = document.body;
 
-  return { nodes: out, text: NORM(bodyClone?.innerText ?? bodyClone?.textContent ?? '') };
+  /**
+   * Collapse horizontal whitespace but KEEP line structure.
+   *
+   * `NORM` flattens everything to single spaces, which is right for comparing
+   * one label to another and wrong for the page as a whole. Flattening the
+   * whole page produces a single enormous line, and anything that reasons
+   * about the text in units — picking a distinctive phrase to build a
+   * checkpoint from, or showing the screen to the model — has nothing to work
+   * with. Comparisons are normalised at comparison time anyway
+   * (`normalizeText`), so nothing downstream depends on this being flat.
+   */
+  const NORM_BLOCK = (s: string | null | undefined): string =>
+    String(s ?? '')
+      .replace(/[   ]/g, ' ')
+      .split('\n')
+      .map((l) => l.replace(/[ \t]+/g, ' ').trim())
+      .filter((l) => l.length > 0)
+      .join('\n');
+
+  return { nodes: out, text: NORM_BLOCK(liveBody?.innerText ?? liveBody?.textContent ?? '') };
 }
 /* c8 ignore stop */
 
@@ -546,6 +577,7 @@ export async function snapshotPage(page: Page, lastStatus?: number): Promise<Sur
   return {
     capturedAt: new Date().toISOString(),
     url: page.url(),
+    frameUrls: frames.filter((f) => !f.isDetached()).map((f) => f.url()),
     title: await page.title().catch(() => ''),
     nodes,
     text: texts.join('\n'),

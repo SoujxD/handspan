@@ -372,6 +372,20 @@ export const OutcomeRule = z.object({
   extract: z.array(OutputField).default([]),
   /** Shown to the human operator when classification is `escalate`. */
   operatorGuidance: z.string().optional(),
+
+  /**
+   * Who put this rule here.
+   *
+   * The discovery model only declares outcomes it inferred or went and looked
+   * at, and it will miss some — the verification pass exists precisely to show
+   * which. A reviewer closing those gaps before approval is the intended
+   * workflow, not a workaround, but the two must stay distinguishable: a rule
+   * a human asserted carries different evidential weight from one grounded in
+   * observed text, and a reviewer reading this artifact in six months needs to
+   * know which is which.
+   */
+  origin: z.enum(['discovered', 'reviewer']).default('discovered'),
+  addedBy: z.string().optional(),
 });
 export type OutcomeRule = z.infer<typeof OutcomeRule>;
 
@@ -561,6 +575,67 @@ export function validateCapability(cap: Capability): string[] {
     if (out.sensitivity === 'secret') {
       problems.push(`output "${out.name}" is classified secret; secrets must not be returned to callers`);
     }
+  }
+
+  /**
+   * Every regular expression in the artifact must actually compile.
+   *
+   * Condition evaluation has to fail closed, so an uncompilable pattern
+   * silently evaluates to `false` forever. A capability whose outcome
+   * detectors cannot compile therefore *looks* like it declares business
+   * outcomes while declaring none of them — and the first sign is a legitimate
+   * "no such member" being reported as a checkpoint failure in production.
+   * Cheap to check here, expensive to debug there.
+   */
+  const badPatterns: string[] = [];
+  const checkCondition = (c: Condition, where: string): void => {
+    switch (c.kind) {
+      case 'urlMatches':
+      case 'regexPresent':
+        try {
+          new RegExp(c.pattern, 'is');
+        } catch (e) {
+          badPatterns.push(`${where}: /${c.pattern}/ — ${(e as Error).message}`);
+        }
+        break;
+      case 'all':
+      case 'any':
+        c.of.forEach((sub, i) => checkCondition(sub, `${where}[${i}]`));
+        break;
+      case 'not':
+        checkCondition(c.of, where);
+        break;
+      default:
+        break;
+    }
+  };
+
+  for (const step of cap.steps) {
+    if (step.checkpoint) checkCondition(step.checkpoint, `step ${step.id} checkpoint`);
+    if (step.act.action === 'waitFor') checkCondition(step.act.condition, `step ${step.id} waitFor`);
+  }
+  checkCondition(cap.successCheckpoint, 'successCheckpoint');
+  for (const rule of cap.outcomes) checkCondition(rule.detect, `outcome "${rule.code}" detector`);
+  for (const t of cap.tenants) {
+    for (const rule of t.additionalOutcomes) {
+      checkCondition(rule.detect, `tenant ${t.tenantId} outcome "${rule.code}" detector`);
+    }
+  }
+  for (const out of cap.outputs) {
+    const ex = out.extraction;
+    if (ex.via === 'regexOnPageText' || ex.via === 'urlCapture') {
+      try {
+        new RegExp(ex.pattern, 'is');
+      } catch (e) {
+        badPatterns.push(`output "${out.name}" extraction: /${ex.pattern}/ — ${(e as Error).message}`);
+      }
+    }
+  }
+
+  for (const p of badPatterns) {
+    problems.push(
+      `invalid regular expression in ${p}. Note ECMAScript does not support inline flag groups such as (?i); patterns are compiled case-insensitively already.`,
+    );
   }
 
   const declaredMax = cap.policy.maxRisk;

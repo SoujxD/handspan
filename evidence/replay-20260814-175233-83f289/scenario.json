@@ -1,0 +1,7 @@
+{
+  "slug": "01-success",
+  "title": "Happy path",
+  "why": "The capability reaches its checkpoint and returns typed outputs.",
+  "fault": "none",
+  "tenant": "northstar"
+}

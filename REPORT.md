@@ -477,6 +477,47 @@ tested against something real rather than asserted.
 
 ## 7. Cuts
 
+### What the real runs actually produced
+
+Two capabilities, both discovered by `claude-opus-5` driving the live mock app:
+
+| | `member_savings_balance_lookup` | `member_open_sub_account` |
+|---|---|---|
+| steps | 6 | 12 |
+| typed inputs | 3 | 6 (incl. an `enum` and a `money`) |
+| typed outputs | 4 | 5 |
+| max risk | `sensitive` | **`confirmable`** |
+| outcome rules | 3 discovered + 4 reviewer-added | 3 discovered + 4 reviewer-added |
+| detectors verified firing | **7/7** | **6/7** |
+
+All four safety gates were exercised against the state-committing capability
+and hold independently: unattended with no token → denied; unattended with a
+token *naming a different capability* → denied; correct token but still `draft`
+→ denied; approved + correct token → runs. `irreversible` is refused in every
+mode.
+
+### Defects the build surfaced — and how
+
+Almost all of these were silent, which is the point worth taking from this
+section: the failure modes in this problem space do not announce themselves.
+
+| Defect | How it surfaced | Why it mattered |
+|---|---|---|
+| `policy.yaml` used POSIX `(?i)` inline flags | a unit test | JavaScript cannot compile them — the **entire safety layer** threw on first load |
+| Model emitted `(?i)` in outcome detectors | `verify-outcomes` reporting **0/8** | condition evaluation fails closed, so every declared business outcome was **silently dead** |
+| Detectors written from remembered phrasing | `verify-outcomes` again | `no member found` never matches an app that says `No member record found` |
+| PII leak into saved evidence | `audit-evidence` | a balance registered as `"$55,023.10"` was stored as the number `55023.1`; the redactor skipped numbers |
+| SSN survived redaction | `audit-evidence` | legacy markup renders `Tax ID412-88-7301` — `\b` cannot match between `D` and `4` |
+| Recovery was fire-and-hope | an integration scenario | it re-snapshotted before the frame navigated, then burned the budget on stale content |
+| Guards evaluated against a half-loaded frame tree | a `recoverable` rule intermittently "unverified" | a page-level load state says nothing about a child frame — the core of a frameset app |
+| Recovery progress measured by `page.url()` | same rule still unverified | in a frameset the top URL **never changes**; all navigation is in the child |
+| Recoveries after a checkpoint failure unrecorded | trace showed `recoveries: 0` while logs showed recovery | that is the *common* path, so anything reading the trace concluded the rule never fired |
+| A checkpoint quoting the recorded member's name | replaying a different member | a capability that only works for the member it was recorded against |
+
+Three of these were only findable by building the tool that looks for them.
+`verify-outcomes` and `audit-evidence` began as evidence generators and turned
+into the two most valuable pieces of the harness.
+
 ### Cut deliberately
 
 **Real-time co-browsing.** Screenshot polling instead of CDP screencast. Cut
@@ -517,6 +558,30 @@ can re-submit an already-committed step. It escalates instead.
 5. **Artifact signing**, replacing the review-signal hash with real integrity.
 
 ### Known rough edges
+
+- **A per-request interstitial across a long flow exhausts the recovery budget.**
+  The 6-step capability rides it out; the 12-step one hits
+  `target_not_found`. The budget is per-step and does not account for a
+  condition that re-fires on every single request. A production version would
+  track a guard's *rate* rather than a per-step count, and promote a
+  persistently re-firing recoverable to an escalation.
+- **One detector on the sub-account capability is unverified.** Provoking
+  `required_field_missing` needs a blank required field, which the typed input
+  contract rejects before the browser is touched. Verifying it needs a probe
+  mode that bypasses input validation — worth adding, not yet added.
+- **The discovery model under-declares outcomes.** Both runs needed a reviewer
+  to add four rules each. That is the designed workflow and the provenance is
+  recorded (`origin: reviewer`), but the honest reading is that discovery gets
+  you most of a contract, not all of it.
+- **The discovery run directories are missing from `/evidence`.** Both
+  capabilities came from real Opus 5 runs — the run ids, model, effort and
+  timestamps are in each artifact's `provenance` — but the `disc-*` log
+  directories were destroyed by a careless cleanup command while the replay
+  evidence was being regenerated. It is called out in
+  [`/evidence/README.md`](./evidence/README.md) rather than glossed over. The
+  lesson generalises past this repo: evidence that a cleanup step can delete is
+  evidence you do not actually have, and the fix is that a run directory should
+  be append-only to everything except an explicit retention policy.
 
 - `container` derivation is heuristic (nearest heading-ish preceding sibling).
   It handles the panel patterns enterprise apps reinvent, and it will mislabel

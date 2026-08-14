@@ -41,6 +41,14 @@ export const TOOLS: Anthropic.Tool[] = [
       properties: {
         url: { type: 'string', description: 'Absolute URL.' },
         intent: { type: 'string', description: 'One sentence: why this navigation, in business terms.' },
+        exploratory: {
+          type: 'boolean',
+          description:
+            'Set true when this action is a SIDE TRIP to observe an alternative outcome screen rather than ' +
+            'part of the task. Exploratory actions still run, and what you see still informs your detectors, ' +
+            'but they are excluded from the recorded flow. Use this for probes such as searching an id that ' +
+            'will not exist, and return to where you were afterwards.',
+        },
       },
       required: ['url', 'intent'],
     },
@@ -53,6 +61,14 @@ export const TOOLS: Anthropic.Tool[] = [
       properties: {
         handle: { type: 'string', description: 'Handle such as "e12" from the current observation.' },
         intent: { type: 'string', description: 'One sentence: what this click is meant to accomplish.' },
+        exploratory: {
+          type: 'boolean',
+          description:
+            'Set true when this action is a SIDE TRIP to observe an alternative outcome screen rather than ' +
+            'part of the task. Exploratory actions still run, and what you see still informs your detectors, ' +
+            'but they are excluded from the recorded flow. Use this for probes such as searching an id that ' +
+            'will not exist, and return to where you were afterwards.',
+        },
       },
       required: ['handle', 'intent'],
     },
@@ -74,6 +90,14 @@ export const TOOLS: Anthropic.Tool[] = [
           description: 'Optional. Input parameter name this value should be bound to, e.g. "memberId".',
         },
         intent: { type: 'string' },
+        exploratory: {
+          type: 'boolean',
+          description:
+            'Set true when this action is a SIDE TRIP to observe an alternative outcome screen rather than ' +
+            'part of the task. Exploratory actions still run, and what you see still informs your detectors, ' +
+            'but they are excluded from the recorded flow. Use this for probes such as searching an id that ' +
+            'will not exist, and return to where you were afterwards.',
+        },
       },
       required: ['handle', 'text', 'intent'],
     },
@@ -88,6 +112,14 @@ export const TOOLS: Anthropic.Tool[] = [
         value: { type: 'string', description: 'Visible option text.' },
         parameter: { type: 'string', description: 'Optional input parameter name to bind this to.' },
         intent: { type: 'string' },
+        exploratory: {
+          type: 'boolean',
+          description:
+            'Set true when this action is a SIDE TRIP to observe an alternative outcome screen rather than ' +
+            'part of the task. Exploratory actions still run, and what you see still informs your detectors, ' +
+            'but they are excluded from the recorded flow. Use this for probes such as searching an id that ' +
+            'will not exist, and return to where you were afterwards.',
+        },
       },
       required: ['handle', 'value', 'intent'],
     },
@@ -237,7 +269,14 @@ export const TOOLS: Anthropic.Tool[] = [
                   'hard = stop with an error; escalate = needs a person.',
               },
               detectKind: { type: 'string', enum: ['textPresent', 'regexPresent', 'urlMatches'] },
-              detectValue: { type: 'string' },
+              detectValue: {
+                type: 'string',
+                description:
+                  'For regexPresent/urlMatches this is a JavaScript regular expression. Do NOT write inline ' +
+                  'flag groups such as (?i) or (?s) — ECMAScript does not support them and the pattern will ' +
+                  'fail to compile. Matching is already case-insensitive and dot-matches-newline. ' +
+                  'Prefer textPresent unless you genuinely need alternation.',
+              },
               recoveryClickLabel: {
                 type: 'string',
                 description: 'For `recoverable`: the visible label of the button that dismisses it.',

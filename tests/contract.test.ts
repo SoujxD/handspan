@@ -75,7 +75,26 @@ function snap(over: Partial<SurfaceSnapshot> = {}): SurfaceSnapshot {
     title: 'Member 12345',
     nodes: [],
     text: 'Member Record — 12345 Status ACTIVE',
+    frameUrls: ['http://localhost:4300/t/northstar/member/12345'],
     ...over,
+  };
+}
+
+/**
+ * Outcome-rule literal with the boilerplate filled in.
+ *
+ * `origin` defaults to `discovered` because that is what the compiler emits;
+ * a test asserting reviewer provenance passes it explicitly.
+ */
+function outcome(p: Partial<Capability['outcomes'][number]> & { code: string }): Capability['outcomes'][number] {
+  return {
+    title: p.code,
+    classification: 'business',
+    detect: { kind: 'textPresent', text: 'something', caseSensitive: false },
+    scope: 'global',
+    extract: [],
+    origin: 'discovered',
+    ...p,
   };
 }
 
@@ -165,11 +184,69 @@ describe('capability invariants', () => {
 
   it('rejects a recoverable outcome with no recovery action', () => {
     const cap = baseCapability({
-      outcomes: [
-        { code: 'notice', title: 'Notice', classification: 'recoverable', detect: { kind: 'textPresent', text: 'Notice', caseSensitive: false }, scope: 'global', extract: [] },
-      ],
+      outcomes: [outcome({ code: 'notice', title: 'Notice', classification: 'recoverable' })],
     });
     expect(validateCapability(cap).some((p) => /declares no recovery/.test(p))).toBe(true);
+  });
+
+  it('rejects an outcome detector that is not a valid JavaScript regex', () => {
+    // The highest-impact defect found during real discovery runs. Models reach
+    // for POSIX inline flags — `(?i)` — which ECMAScript cannot compile.
+    // Condition evaluation has to fail closed, so the guard silently evaluates
+    // false forever: the capability *looks* like it declares business outcomes
+    // while declaring none, and a legitimate "no such member" surfaces in
+    // production as a checkpoint failure. Five of six detectors in a real run
+    // were dead this way before it was caught.
+    const cap = baseCapability({
+      outcomes: [
+        outcome({
+          code: 'member_not_found',
+          title: 'No member',
+          classification: 'business',
+          detect: { kind: 'regexPresent', pattern: '(?i)no member record found' },
+        }),
+      ],
+    });
+    const problems = validateCapability(cap);
+    expect(problems.some((p) => /invalid regular expression/.test(p))).toBe(true);
+    expect(problems.some((p) => /inline flag/.test(p))).toBe(true);
+  });
+
+  it('accepts the same detector once the inline flag is gone', () => {
+    const cap = baseCapability({
+      outcomes: [
+        outcome({
+          code: 'member_not_found',
+          title: 'No member',
+          classification: 'business',
+          detect: { kind: 'regexPresent', pattern: 'no member record found' },
+        }),
+      ],
+    });
+    expect(validateCapability(cap).some((p) => /invalid regular expression/.test(p))).toBe(false);
+  });
+
+  it('rejects an invalid regex anywhere in the artifact, including checkpoints', () => {
+    const cap = baseCapability({ successCheckpoint: { kind: 'regexPresent', pattern: '([unclosed' } });
+    expect(validateCapability(cap).some((p) => /successCheckpoint/.test(p))).toBe(true);
+  });
+
+  it('records whether a rule was discovered or added by a reviewer', () => {
+    // Verification shows which declared detectors actually fire, and by
+    // omission which real states nothing covers. A reviewer closing those gaps
+    // is the intended workflow — but a rule a human asserted carries different
+    // evidential weight from one grounded in observed text, so the two must
+    // stay distinguishable in the artifact.
+    const cap = baseCapability({
+      outcomes: [
+        outcome({ code: 'from_model', title: 'a', classification: 'business' }),
+        outcome({ code: 'from_human', title: 'b', classification: 'business', origin: 'reviewer', addedBy: 'reviewer@bank' }),
+      ],
+    });
+    const parsed = parseCapability(cap);
+    expect(parsed.outcomes[0]!.origin).toBe('discovered');
+    expect(parsed.outcomes[1]!.origin).toBe('reviewer');
+    expect(parsed.outcomes[1]!.addedBy).toBe('reviewer@bank');
   });
 
   it('rejects a declared maxRisk that disagrees with the steps', () => {
