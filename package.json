@@ -1,0 +1,40 @@
+{
+  "name": "handspan",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Computer-use automation: an LLM discovers how to drive a legacy UI once, then the flow replays deterministically as a typed, agent-invocable capability.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "target": "tsx target-app/server.ts",
+    "discover": "tsx src/cli.ts discover",
+    "replay": "tsx src/cli.ts replay",
+    "operator": "tsx src/cli.ts operator",
+    "catalog": "tsx src/cli.ts catalog",
+    "capabilities": "tsx src/cli.ts capabilities",
+    "test": "vitest run",
+    "test:replay": "tsx tests/integration-replay.ts",
+    "test:escalation": "tsx tests/integration-escalation.ts",
+    "test:perception": "tsx tests/smoke-perception.ts",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "playwright": "^1.49.1",
+    "yaml": "^2.6.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

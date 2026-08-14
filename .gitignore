@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+*.log
+
+# Evidence is committed for the submission (see /evidence), but scratch runs are not.
+evidence/scratch/
+.playwright/
+.DS_Store
+
+# The assignment brief itself is interface.ai's document, not part of the
+# submission. Kept locally, never published.
+Assignment*.pdf

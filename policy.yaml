@@ -1,0 +1,136 @@
+# Handspan safety policy.
+#
+# This file is the single enforcement point for "what is the automation allowed
+# to do". It is loaded once at process start and consulted before EVERY action,
+# in both discovery and replay. There is no code path that acts on a surface
+# without passing through `PolicyEngine.evaluate()`.
+#
+# The model can propose anything; the policy decides what actually happens.
+
+version: 1
+
+navigation:
+  # Exact-match origins. Any navigation outside these is denied outright.
+  # Deliberately narrow: this is an allowlist, not a blocklist.
+  allowedOrigins:
+    - "http://localhost:4300"
+    - "http://127.0.0.1:4300"
+
+  # Path patterns, matched against the URL path with `:param` wildcards.
+  # A navigation must match at least one. This is what stops an agent that has
+  # been prompt-injected by page content from wandering into /admin.
+  allowedPathPatterns:
+    - "/"
+    - "/t/:tenant"
+    - "/t/:tenant/login"
+    - "/t/:tenant/shell"
+    - "/t/:tenant/nav"
+    - "/t/:tenant/home"
+    - "/t/:tenant/member/search"
+    - "/t/:tenant/member/results"
+    - "/t/:tenant/member/:id"
+    - "/t/:tenant/member/:id/subaccount/new"
+    - "/t/:tenant/member/:id/subaccount/review"
+    - "/t/:tenant/member/:id/subaccount/confirm"
+
+  deniedPathPatterns:
+    - "/t/:tenant/admin"
+    - "/t/:tenant/admin/:rest"
+
+actions:
+  # Action kinds the automation may emit at all. Anything absent is rejected by
+  # the type system AND by this list (defence in depth — a new action kind added
+  # to the code is inert until it is named here).
+  allowed:
+    - navigate
+    - click
+    - type
+    - select
+    - press
+    - read
+    - waitFor
+    - screenshot
+
+  denied:
+    - upload      # file exfiltration surface; not needed for these flows
+    - download
+    - execute_script
+
+risk:
+  # These are JavaScript regular expressions, compiled case-insensitively by the
+  # engine. Do NOT write an inline `(?i)` flag: ECMAScript has no inline-flag
+  # syntax, the pattern fails to compile, and because these are compiled in the
+  # PolicyEngine constructor the failure takes the entire safety layer down at
+  # startup. Compiling centrally also stops a policy author from accidentally
+  # writing a case-sensitive rule that silently misses "PURGE".
+  #
+  # Classification is structural — what kind of control is this, and what does
+  # its visible name say — rather than a list of known-bad selectors, so it
+  # transfers across tenants and vendor skins instead of being rebuilt per
+  # institution.
+  #
+  # safe        -> execute
+  # sensitive   -> execute, but redact captured values and mask in screenshots
+  # irreversible-> BLOCK, always; escalate to a human rather than proceeding
+  irreversiblePatterns:
+    - "\\b(delete|remove|purge|void)\\b"
+    - "\\b(transfer|wire|disburse|payment)\\b"
+    - "\\b(close\\s+account|freeze|lock\\s+card)\\b"
+    - "\\bpost\\s+transaction\\b"
+
+  # Actions that create durable state but are the whole point of the capability.
+  # These are `confirmable`: allowed unattended only when the calling agent
+  # passes an explicit confirmation token naming the capability.
+  confirmablePatterns:
+    - "\\b(submit|confirm|create|open\\s+account|approve)\\b"
+
+  # Reading these is fine; persisting them raw is not.
+  sensitiveNamePatterns:
+    - "\\b(ssn|social\\s*security|tax\\s*id|tin)\\b"
+    - "\\b(password|passcode|pin|secret|token|api[\\s_-]*key)\\b"
+    - "\\b(card|pan|cvv|account\\s*number)\\b"
+    - "\\b(dob|date\\s+of\\s+birth)\\b"
+
+redaction:
+  # Applied to every log record, every artifact write, and every extracted
+  # output before it leaves the process. Order matters: structural rules run
+  # before pattern rules so a labelled field wins over a lucky regex match.
+  patterns:
+    - name: ssn
+      regex: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+      replacement: "[REDACTED:SSN]"
+    - name: pan
+      regex: "\\b(?:\\d[ -]*?){13,19}\\b"
+      replacement: "[REDACTED:PAN]"
+    - name: email
+      regex: "\\b[\\w.%+-]+@[\\w.-]+\\.[A-Za-z]{2,}\\b"
+      replacement: "[REDACTED:EMAIL]"
+    - name: bearer
+      regex: "\\b(bearer|api[_-]?key|authorization)\\s*[:=]\\s*\\S+"
+      replacement: "$1: [REDACTED:CREDENTIAL]"
+    - name: anthropic_key
+      regex: "sk-ant-[A-Za-z0-9_\\-]{8,}"
+      replacement: "[REDACTED:CREDENTIAL]"
+
+  # Values supplied as `secret`-classified inputs are additionally registered at
+  # runtime for exact-substring scrubbing, so a credential can never survive in
+  # a log even if no regex matches it.
+  scrubRuntimeSecrets: true
+
+limits:
+  maxStepsPerDiscovery: 40
+  maxWallClockMsPerDiscovery: 420000
+  maxStepsPerReplay: 60
+
+  # Budget for one step's action plus its checkpoint.
+  #
+  # Sized for a degraded core system, not a healthy one. These apps do
+  # full-page postbacks and a single logical step can involve several
+  # server round trips (submit -> redirect -> render), so a budget tuned to
+  # the happy path turns ordinary slowness into a spurious timeout. Because
+  # waiting is condition-based rather than a fixed sleep, a generous ceiling
+  # costs nothing when the app is fast — the checkpoint passes and the step
+  # returns immediately.
+  defaultActionTimeoutMs: 20000
+
+  maxConsecutiveNoProgress: 3
