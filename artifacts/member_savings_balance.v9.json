@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "member_savings_balance",
-  "version": 8,
+  "version": 9,
   "name": "Member SAVINGS Balance Lookup",
   "description": "Signs in to the Northstar (Meridian Core Servicing 8.4) back-office console with supplied teller credentials, searches Member Servicing for a given Member ID, and returns the current balance of that member's SAVINGS share along with the share account number, member name and member status. Reports \"member not found\" as a normal business result.",
   "surface": {
@@ -434,7 +434,10 @@
       "displayName": "Northstar Community Credit Union",
       "baseUrl": "http://localhost:4300/t/northstar",
       "productVersion": "8.4",
-      "labelOverrides": {},
+      "labelOverrides": {
+        "Member ID": "Member Number",
+        "Search": "Find Member"
+      },
       "additionalOutcomes": [],
       "overrides": {},
       "verification": {
@@ -493,20 +496,19 @@
     ]
   },
   "governance": {
-    "approval": "approved",
+    "approval": "draft",
     "stability": {
       "runs": 4,
       "successes": 3
     },
-    "reviewedBy": "s.chavan",
-    "notes": "Read-only lookup. 2 discovered + 5 reviewer-added outcome rules; all 7 detectors verified firing against the live application. Bound to lakeshore via label overlay plus that tenant's maintenance interstitial."
+    "notes": "Repair proposal from run repair-20260901-162756-bb06e2: \"Member ID\" -> \"Member Number\" (analysis), \"Search\" -> \"Find Member\" (analysis). Label overlay only; steps, checkpoints, outcomes and policy unchanged. Requires review."
   },
   "provenance": {
     "discoveredAt": "2026-08-14T20:37:06.142Z",
     "model": "claude-opus-5",
     "effort": "high",
     "discoveryRunId": "disc-20260814-203551-eb30cf",
-    "contentHash": "23e8f50dd0d7254a1680fe0386da222b",
+    "contentHash": "302c115a7146e4a4ba16e0db44946cb2",
     "generator": "handspan"
   }
 }

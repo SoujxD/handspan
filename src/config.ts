@@ -68,7 +68,7 @@ export function buildRedactor(policy: PolicyEngine): Redactor {
   return r;
 }
 
-export function newRunId(prefix: 'disc' | 'replay' | 'verify'): string {
+export function newRunId(prefix: 'disc' | 'replay' | 'verify' | 'drift' | 'repair'): string {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
   return `${prefix}-${stamp}-${randomUUID().slice(0, 6)}`;
 }

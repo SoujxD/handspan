@@ -1,0 +1,403 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-365377",
+    "capabilityId": "member_open_sub_account",
+    "capabilityVersion": 5,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-09-01T16:05:10.555Z",
+    "finishedAt": "2026-09-01T16:07:05.176Z",
+    "durationMs": 114621,
+    "stepsAttempted": 16,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-365377",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "target_not_found",
+    "message": "No control on screen matched button \"Continue to Review\" in the \"Open Sub-Account — Member 12345\" panel (frame mainFrame) (best score -2, threshold 55).",
+    "atStepId": "s11",
+    "stepIntent": "Continue to the review step for the new sub-account.",
+    "expected": "button \"Continue to Review\" in the \"Open Sub-Account — Member 12345\" panel (frame mainFrame)",
+    "observed": "closest candidates: link labelled \"Sign Out\" in \"teller01\" (-2); link labelled \"Home\" (-2); link labelled \"Member Servicing\" in \"Home\" (-2); link labelled \"Administration\" in \"Member Servicing\" (-2); cell (-47)",
+    "remediation": "The screen may have changed, or the run may not be where the artifact expects. Check the screenshot and the a11y snapshot in this run.",
+    "candidates": [
+      {
+        "description": "link labelled \"Sign Out\" in \"teller01\"",
+        "score": -2,
+        "handle": "e1",
+        "role": "link",
+        "label": "Sign Out",
+        "name": "Sign Out",
+        "container": "teller01"
+      },
+      {
+        "description": "link labelled \"Home\"",
+        "score": -2,
+        "handle": "e2",
+        "role": "link",
+        "label": "Home",
+        "name": "Home"
+      },
+      {
+        "description": "link labelled \"Member Servicing\" in \"Home\"",
+        "score": -2,
+        "handle": "e3",
+        "role": "link",
+        "label": "Member Servicing",
+        "name": "Member Servicing",
+        "container": "Home"
+      },
+      {
+        "description": "link labelled \"Administration\" in \"Member Servicing\"",
+        "score": -2,
+        "handle": "e4",
+        "role": "link",
+        "label": "Administration",
+        "name": "Administration",
+        "container": "Member Servicing"
+      },
+      {
+        "description": "cell",
+        "score": -47,
+        "handle": "e5",
+        "role": "cell",
+        "label": "",
+        "name": ""
+      }
+    ]
+  },
+  "partialOutputs": {},
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator's user ID on the servicing console sign-in screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:10.719Z",
+      "durationMs": 531,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5,
+        "observed": {
+          "role": "textbox",
+          "label": "User ID",
+          "name": "",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In"
+        }
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator's password on the sign-in screen.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-01T16:05:11.250Z",
+      "durationMs": 533,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5,
+        "observed": {
+          "role": "textbox",
+          "label": "Password",
+          "name": "",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:11.788Z",
+      "durationMs": 21896,
+      "status": "recovered",
+      "recovery": {
+        "outcomeCode": "workstation_advisory",
+        "action": "click button \"Continue\" clearing this state",
+        "attempt": 1
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:11.788Z",
+      "durationMs": 22205,
+      "status": "ok",
+      "note": "checkpoint already satisfied after recovery"
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing task to look up a member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:33.993Z",
+      "durationMs": 21905,
+      "status": "recovered",
+      "recovery": {
+        "outcomeCode": "workstation_advisory",
+        "action": "click button \"Continue\" clearing this state",
+        "attempt": 1
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing task to look up a member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:33.993Z",
+      "durationMs": 22216,
+      "status": "ok",
+      "note": "checkpoint already satisfied after recovery"
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member id to look up in the Member Search panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:56.209Z",
+      "durationMs": 423,
+      "status": "ok",
+      "resolution": {
+        "score": 102,
+        "runnerUpScore": 60,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12,
+        "observed": {
+          "role": "textbox",
+          "label": "Member ID",
+          "name": "",
+          "container": "Member Search"
+        }
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Search for the member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:56.633Z",
+      "durationMs": 1045,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 0,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "framePath",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 12,
+        "observed": {
+          "role": "button",
+          "label": "Search",
+          "name": "Search",
+          "container": "Member Search"
+        }
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Start opening a new sub-account for this member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:57.679Z",
+      "durationMs": 940,
+      "status": "recovered",
+      "recovery": {
+        "outcomeCode": "workstation_advisory",
+        "action": "click button \"Continue\" clearing this state",
+        "attempt": 1
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Start opening a new sub-account for this member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:57.679Z",
+      "durationMs": 1883,
+      "status": "recovered",
+      "recovery": {
+        "outcomeCode": "workstation_advisory",
+        "action": "click button \"Continue\" clearing this state",
+        "attempt": 2
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Start opening a new sub-account for this member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:57.679Z",
+      "durationMs": 23821,
+      "status": "recovered",
+      "recovery": {
+        "outcomeCode": "workstation_advisory",
+        "action": "click button \"Continue\" clearing this state",
+        "attempt": 3
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Start opening a new sub-account for this member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:05:57.679Z",
+      "durationMs": 24115,
+      "status": "ok",
+      "note": "checkpoint already satisfied after recovery"
+    },
+    {
+      "stepId": "s08",
+      "intent": "Choose the account type for the new sub-account.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:06:21.794Z",
+      "durationMs": 20341,
+      "status": "ok",
+      "resolution": {
+        "score": 97,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "combobox",
+          "label": "Account Type",
+          "name": "",
+          "container": "Open Sub-Account — Member 12345"
+        }
+      }
+    },
+    {
+      "stepId": "s09",
+      "intent": "Set the nickname for the new sub-account.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:06:42.136Z",
+      "durationMs": 558,
+      "status": "ok",
+      "resolution": {
+        "score": 102,
+        "runnerUpScore": 60,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "textbox",
+          "label": "Account Nickname",
+          "name": "",
+          "container": "Open Sub-Account — Member 12345"
+        }
+      }
+    },
+    {
+      "stepId": "s10",
+      "intent": "Set the opening deposit amount for the new sub-account.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:06:42.695Z",
+      "durationMs": 421,
+      "status": "ok",
+      "resolution": {
+        "score": 102,
+        "runnerUpScore": 60,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "framePath",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "textbox",
+          "label": "Initial Deposit",
+          "name": "",
+          "container": "Open Sub-Account — Member 12345"
+        }
+      }
+    },
+    {
+      "stepId": "s11",
+      "intent": "Continue to the review step for the new sub-account.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:06:43.117Z",
+      "durationMs": 21762,
+      "status": "recovered",
+      "recovery": {
+        "outcomeCode": "workstation_advisory",
+        "action": "click button \"Continue\" clearing this state",
+        "attempt": 1
+      }
+    },
+    {
+      "stepId": "s11",
+      "intent": "Continue to the review step for the new sub-account.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T16:07:05.250Z",
+      "durationMs": 0,
+      "status": "failed",
+      "note": "No control on screen matched button \"Continue to Review\" in the \"Open Sub-Account — Member 12345\" panel (frame mainFrame) (best score -2, threshold 55)."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-365377/run.jsonl",
+      "capturedAt": "2026-09-01T16:05:09.512Z"
+    }
+  ]
+}

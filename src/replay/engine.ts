@@ -149,6 +149,24 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
 
   let snapshot: SurfaceSnapshot = await surface.snapshot();
 
+  /**
+   * How often each recoverable rule has fired across the WHOLE run.
+   *
+   * The per-step recovery budget answers "is this step stuck?" and cannot
+   * answer "is this condition endemic?". A daily-notice interstitial that
+   * re-appears on every single request never exhausts any one step's budget
+   * until late in a long flow, and when it finally does, the run reports
+   * `target_not_found` at step eleven — which sends whoever is on call looking
+   * at a control that was never the problem.
+   *
+   * Counting per rule across the run makes the actual condition legible: this
+   * guard has fired nine times, it is not an anomaly, and a human should be
+   * told rather than the engine grinding on. It is the difference between a
+   * hiccup and a policy change at the institution.
+   */
+  const guardFirings = new Map<string, number>();
+  const maxFiringsPerRun = policy.limits.maxGuardFiringsPerRun;
+
   // -------------------------------------------------------------------------
   // Step loop
   // -------------------------------------------------------------------------
@@ -159,6 +177,8 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
     // Per-step recovery budget. Shared across attempts so a guard that keeps
     // re-firing cannot loop forever.
     let recoveryAttempts = 0;
+    /** Which guard last recovered this step, so a later failure can name it. */
+    let lastRecoveryCode: string | undefined;
     const maxRecoveries = 4;
 
     let attempt = 0;
@@ -172,6 +192,43 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
       // --- 2. guards ------------------------------------------------------
       const hit = firstMatchingGuard(guards, step.id, { snapshot, resolveOptions });
       if (hit) {
+        const firings = (guardFirings.get(hit.code) ?? 0) + 1;
+        guardFirings.set(hit.code, firings);
+
+        // A recoverable condition that keeps recurring is no longer recoverable
+        // — it is the application's new normal, and continuing to dismiss it is
+        // how a bounded retry turns into a livelock. Promote it once, with the
+        // count, so the report says what actually happened.
+        if (hit.classification === 'recoverable' && firings > maxFiringsPerRun) {
+          evidence.warn('guard_rate_exceeded', {
+            code: hit.code,
+            firings,
+            limit: maxFiringsPerRun,
+            stepId: step.id,
+          });
+          const reason =
+            `"${hit.code}" fired ${firings} times in this run (limit ${maxFiringsPerRun}). ` +
+            `It is recurring on every request rather than being a one-off, so it is not something replay can dismiss its way past.`;
+
+          const esc = await escalate({
+            opts,
+            step,
+            snapshot,
+            trace,
+            reason,
+            guidance:
+              hit.operatorGuidance ??
+              'Clear the underlying condition in the live session, then hand control back. If the institution has made this screen permanent, the capability needs a declared step for it rather than a recovery.',
+            trigger: 'recovery_exhausted',
+            outcomeCode: hit.code,
+          });
+          if (esc.kind === 'terminal') return esc.result;
+          // A human cleared it. Reset the count — the condition they fixed is
+          // not the condition the next screens will present.
+          guardFirings.set(hit.code, 0);
+          continue;
+        }
+
         const outcome = await handleGuard({
           rule: hit,
           step,
@@ -186,6 +243,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
 
         if (outcome.kind === 'recovered') {
           recoveryAttempts++;
+          lastRecoveryCode = hit.code;
           trace.push({
             stepId: step.id,
             intent: step.intent,
@@ -330,6 +388,49 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
           case 'select': {
             const r = resolve(step.act.target, snapshot.nodes, resolveOptions);
 
+            if (!r.ok && recoveryAttempts > 0) {
+              /**
+               * The recovery is the suspect, not the descriptor.
+               *
+               * A recoverable condition is defined as one the engine can clear
+               * and carry on from. Some cannot be: dismissing an advisory that
+               * interrupts a half-filled form navigates away and discards it,
+               * so the step resumes on a screen where its target legitimately
+               * does not exist. Reporting that as `target_not_found` sends
+               * whoever is on call to inspect a button that was never the
+               * problem — which is exactly what this system did until this run
+               * was read carefully.
+               *
+               * The honest classification is that recovery failed, and the
+               * honest response is a human: a person can re-enter the form and
+               * the engine cannot. Naming the guard that fired is what makes
+               * the report actionable.
+               */
+              evidence.warn('recovery_lost_progress', {
+                stepId: step.id,
+                recoveries: recoveryAttempts,
+                ...(lastRecoveryCode ? { code: lastRecoveryCode } : {}),
+              });
+
+              const esc = await escalate({
+                opts,
+                step,
+                snapshot,
+                trace,
+                reason:
+                  `Recovering from "${lastRecoveryCode ?? 'a recoverable condition'}" left the run on a screen ` +
+                  `where step ${step.id} cannot proceed — the interruption most likely discarded work in progress.`,
+                guidance:
+                  'Take the live session back to where this step expects to be — re-entering any form data the ' +
+                  'interruption discarded — then hand control back. If this screen now interrupts every request, ' +
+                  'the capability needs a declared step for it rather than a recovery.',
+                trigger: 'recovery_exhausted',
+                ...(lastRecoveryCode ? { outcomeCode: lastRecoveryCode } : {}),
+              });
+              if (esc.kind === 'terminal') return esc.result;
+              continue; // a human put us back; re-run the step
+            }
+
             if (!r.ok) {
               lastFailure = fail(
                 r.reason === 'ambiguous' ? 'target_ambiguous' : 'target_not_found',
@@ -355,6 +456,12 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
               matchedSignals: r.matchedSignals,
               missedSignals: r.missedSignals,
               candidateCount: r.candidateCount,
+              observed: {
+                role: r.node.role,
+                label: r.node.label,
+                name: r.node.name,
+                ...(r.node.container === undefined ? {} : { container: r.node.container }),
+              },
             };
 
             // A match that lost signals still worked, but it is the earliest
@@ -439,6 +546,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
             });
             if (outcome.kind === 'recovered') {
               recoveryAttempts++;
+              lastRecoveryCode = guard.code;
               // Record it, exactly as the pre-step guard path does.
               //
               // Omitting this made recoveries triggered *after* a checkpoint
@@ -1005,6 +1113,39 @@ async function escalate(args: {
 }): Promise<{ kind: 'resumed' } | { kind: 'terminal'; result: ReplayResult }> {
   const { opts, step, snapshot, trace, reason, guidance, trigger } = args;
   const { evidence, surface, lease, capability: cap } = opts;
+
+  /**
+   * Honour "no escalation" here rather than at each call site.
+   *
+   * The verification harness and the integration tests deliberately run with
+   * escalation disabled, because a suite that parks on a human is a suite that
+   * hangs. Checking the flag at the top of the only function that can park a
+   * run means a new escalation path cannot forget to — which two of them
+   * promptly did, turning a 20-second test into a ten-minute wait for an
+   * operator who was never coming.
+   */
+  if (opts.allowEscalation === false) {
+    return {
+      kind: 'terminal',
+      result: {
+        status: 'failure',
+        meta: metaFor(opts, trace.length),
+        failure: {
+          kind: 'recovery_exhausted',
+          message: `${reason} Escalation is disabled for this run, so there is nobody to hand it to.`,
+          atStepId: step?.id ?? null,
+          stepIntent: step?.intent ?? null,
+          expected: 'a state the automation can continue from',
+          observed: reason,
+          remediation: 'Re-run with escalation enabled so a person can take the session.',
+          ...(args.outcomeCode ? { outcomeCode: args.outcomeCode } : {}),
+        },
+        partialOutputs: {},
+        trace,
+        evidence: evidence.evidence,
+      },
+    };
+  }
 
   const shot = await surface.screenshot();
   const shotRef = evidence.saveScreenshot(`escalation-${step?.id ?? 'final'}`, shot);

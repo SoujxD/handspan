@@ -71,6 +71,23 @@ export interface TraceEntry {
     /** Signals the descriptor declared that did NOT match. The drift signal. */
     missedSignals: string[];
     candidateCount: number;
+    /**
+     * What the winning node actually looked like.
+     *
+     * `missedSignals` says a signal did not match; this says what it matched
+     * *instead*, which is the difference between "something drifted" and
+     * "'Member ID' is now called 'Member Number'". Without it a drift report
+     * can only report symptoms, and a repair proposal has nothing to propose.
+     *
+     * Chrome, not record data — labels and panel titles are the same for every
+     * member. It still passes through the redactor with everything else.
+     */
+    observed?: {
+      role: string;
+      label: string;
+      name: string;
+      container?: string;
+    };
   };
   /** Present when a recoverable outcome fired during this step. */
   recovery?: { outcomeCode: string; action: string; attempt: number };
@@ -164,7 +181,19 @@ export interface ReplayFailure {
     observed: string | null;
     remediation: string | null;
     /** Populated for target_ambiguous so you can see what it couldn't choose. */
-    candidates?: Array<{ description: string; score: number }>;
+    /**
+     * What it was choosing between, with the signals each one carried. The
+     * scores make a failure debuggable without opening a browser; the signals
+     * make it machine-readable, which is what drift analysis consumes.
+     */
+    candidates?: Array<{
+      description: string;
+      score: number;
+      role?: string;
+      label?: string;
+      name?: string;
+      container?: string;
+    }>;
     /**
      * The declared outcome rule that produced this failure, when one did.
      *

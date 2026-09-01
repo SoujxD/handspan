@@ -1,0 +1,33 @@
+
+  ────────────────────────────────────────────────────────────────────────
+  REPAIR
+  ────────────────────────────────────────────────────────────────────────
+  capability    member_savings_balance v8
+  tenant        northstar
+  assist        disabled — analysis only
+  rounds        3
+  ────────────────────────────────────────────────────────────────────────
+
+  round 1: broken — 1 finding(s)
+  round 2: degraded — 3 finding(s)
+  round 3: degraded — 2 finding(s)
+
+  Repair proposal — member_savings_balance v8 @ northstar
+  ────────────────────────────────────────────────────────────────────────────────────────
+  Proposed change: tenant label overlay only
+    ~ "Member ID"  ->  "Member Number"      [analysis] observed on 1 step(s)
+    ~ "Search"  ->  "Find Member"      [analysis] observed on 1 step(s)
+
+  Unchanged, and asserted so:
+    steps, checkpoints, outcomes, inputs, outputs, risk policy, entry surface
+
+  Refused:
+    ! s05 (structural) — Structural drift. The control now sits in a differently-named container, so the descriptor means something slightly different. That is a layout change for a human to review, not a vocabulary delta.
+    ! s06 (structural) — Structural drift. The control now sits in a differently-named container, so the descriptor means something slightly different. That is a layout change for a human to review, not a vocabulary delta.
+
+  Model calls: 0 — every rename was resolved deterministically
+
+  Written as v9, approval=draft, hash 302c115a7146e4a4ba16e0db44946cb2
+  Nothing runs against it until a human approves it:
+    npx tsx src/cli.ts approve -c member_savings_balance -r <you> -n "reviewed repair proposal"
+

@@ -244,12 +244,67 @@ Exit codes: success `0`, **business outcome `0`** (a scheduler retrying on
 non-zero must not retry "no such member"), escalation `75` (parked, not lost),
 failure `1`.
 
-### UI drift (secondary, per the brief)
+### UI drift — detection, classification, and reviewed repair
 
-Drift shows up as `missedSignals` on a *successful* resolution — the match held
-on role + label but the container was renamed. That is logged as
-`resolution_degraded` with the score and the missed signals, making drift
-**observable before it becomes breakage**, which is the useful moment.
+Drift shows up first as `missedSignals` on a *successful* resolution: the match
+held on role + label but the container was renamed. That is logged as
+`resolution_degraded`, making drift **observable before it becomes breakage**,
+which is the useful moment.
+
+`src/replay/drift.ts` turns that signal into a report. The key property is that
+**nothing new is instrumented**: every resolution already records which declared
+signals matched, which did not, and what it matched instead, and every
+resolution *failure* already records the candidates it was choosing between with
+their scores. Drift analysis is a pure function from a finished `ReplayResult`
+to a report, so it runs equally well over a live check or a `result.json`
+captured weeks ago — fleet-wide analysis is a batch job over evidence, not a
+re-run of every capability at every institution.
+
+It classifies, because these look identical in a log and need opposite
+responses:
+
+| kind | meaning | response |
+|---|---|---|
+| `vocabulary` | the institution renamed a thing | a tenant binding absorbs it; no re-recording |
+| `structural` | the container was renamed or the control moved frames | the descriptor now *means* something different — a human looks |
+| `missing` | nothing on screen resembles it | the flow changed; renaming fixes nothing |
+| `ambiguous` | several candidates tie | the descriptor is under-specified *for this surface*; tighten, don't translate |
+| `checkpoint` | the condition proving the step worked no longer matches | **verification** drift, not targeting drift |
+
+A rename severe enough to fail resolution outright is still recoverable from
+the candidate list — the control keeps its role and position and only loses the
+40 points its label was carrying. `inferRename` reads it back off the
+candidates under three guards: same role, shares a word with the old label, and
+*exactly one* candidate survives both. That third guard is what keeps
+"Member ID" → "Member Number" from becoming "Member ID" → "Last Name", which
+was a live 47-vs-45 scoring tie in the real run.
+
+**Repair is a proposal, never an edit.** `src/repair/propose.ts` writes a new
+draft version with a label overlay, prints the diff, and stops. Three
+constraints:
+
+1. **The model is the fallback, not the mechanism.** Ordinary renames resolve
+   deterministically at zero token cost — the captured proposal in
+   [`/evidence/REPAIR-member_savings_balance.txt`](./evidence/REPAIR-member_savings_balance.txt)
+   reports `Model calls: 0`. `--assist` allows *one* bounded call per finding
+   the analysis cannot explain. This is the system's own thesis applied to its
+   maintenance: spend the model where judgement is genuinely required, nowhere
+   else.
+2. **It may only choose, never invent.** An assisted proposal must name a label
+   that appears verbatim among the observed candidates. A hallucinated control
+   fails validation before it reaches an artifact.
+3. **It may change how the flow is FOUND, never how it is VERIFIED.** Steps,
+   checkpoints, outcomes, inputs, outputs, policy and surface are asserted
+   byte-identical after the patch, by comparing serialised subtrees rather than
+   hand-checked fields. Checkpoint drift is detected and *refused*: the cheapest
+   way to make a broken capability pass is to weaken the assertion that proves
+   it worked, and a repair tool permitted to do that is a machine for turning
+   outages into silent data corruption.
+
+And a draft never runs by accident: an unpinned load takes the newest
+**approved** version, not the newest one, so a proposal sits until a person
+approves it. Newest-wins was the original rule and it was wrong the moment
+anything other than a human could write a version.
 
 ---
 
@@ -490,6 +545,7 @@ Two capabilities, both discovered by `claude-opus-5` driving the live mock app:
 | max risk | `sensitive` | **`confirmable`** |
 | outcome rules | 2 discovered + 5 reviewer-added | 3 discovered + 4 reviewer-added |
 | detectors verified firing | **7/7** | **6/7** |
+| stability (clean runs recorded) | 3/4 | 3/5 |
 | replay scenarios correct | **9/9** (incl. cross-tenant) | 7/8 |
 
 The action counts exceed the recorded steps in both runs because the model went
@@ -502,7 +558,28 @@ All four safety gates were exercised against the state-committing capability
 and hold independently: unattended with no token → denied; unattended with a
 token *naming a different capability* → denied; correct token but still `draft`
 → denied; approved + correct token → runs. `irreversible` is refused in every
-mode.
+mode. Approval itself is now gated too: it needs
+`minStableRunsBeforeApproval` clean runs on the record, with a `--force`
+override that is written into the artifact rather than left silent — a
+governance control people route around is worse than one that bends and leaves
+a mark.
+
+### The lifecycle after day one
+
+The work that followed the submission is one theme: a capability's problems do
+not start at recording time, they start three months later when the vendor
+ships an upgrade. `POST /__control/upgrade?level=minor|major` makes that
+happen on demand, so the response can be demonstrated rather than described:
+
+| | `minor` (8.7) | `major` (9.0) |
+|---|---|---|
+| what changed | two fields re-worded | the same, plus the panel renamed |
+| detection | `drift` → **broken**, classified `vocabulary` | `drift` → **broken**, classified `checkpoint` |
+| repair | proposes a label overlay, **0 model calls**, writes a draft | **refuses** — verification drift is not repairable |
+| after review | replays green against 8.7 | escalates to a human, as it should |
+
+Element ids deliberately do not change in either variant, so a system that was
+secretly leaning on them would sail through and prove nothing.
 
 ### Defects the build surfaced — and how
 
@@ -525,6 +602,10 @@ section: the failure modes in this problem space do not announce themselves.
 | Loop detection keyed on element handles | an 18-action run killed one turn before `finish` | handles are reissued every observation, so returning to the same page three times looked identical; it now compares the *semantic* description plus the URL, and spends a nudge before giving up |
 | `verify-outcomes` reported 0/7 on a capability with extra parameters | reading the trace, not the summary | every probe died in pre-flight input validation, which is indistinguishable in the summary from "every detector is broken"; it now fills required inputs from the artifact's own examples and refuses to run if it still cannot |
 | A goal that omits the fixture credentials | a `refusal` stop reason from the API | the model signed in wrongly, and a retried failed sign-in against a banking console is indistinguishable from credential guessing; the environment context now travels with the goal |
+| Every `npm run replay` example in the README omitted the credentials | running the demo from a clean clone, as the brief asks | the code was right and the documentation contradicted the contract it enforces — anyone following the README verbatim, reviewer included, would have concluded the project was broken |
+| `stability.runs` counted runs rejected at pre-flight | two mistyped commands took a healthy capability to 1/2 | a caller's typo lowered a capability's reliability score, and once approval is gated on that score, a typo can block a deployment |
+| An unpinned load took the newest version, approved or not | writing the first repair draft | the moment anything other than a human can write a version, newest-wins means an unreviewed draft silently becomes what production runs |
+| `escalate()` did not honour `allowEscalation` | a suite that should take 20 seconds hung for ten minutes | the check lived at each call site, so two new escalation paths forgot it; it now lives in the one function that can park a run |
 
 Three of these were only findable by building the tool that looks for them.
 `verify-outcomes` and `audit-evidence` began as evidence generators and turned
@@ -571,12 +652,25 @@ can re-submit an already-committed step. It escalates instead.
 
 ### Known rough edges
 
-- **A per-request interstitial across a long flow exhausts the recovery budget.**
-  The 6-step capability rides it out; the 12-step one hits
-  `target_not_found`. The budget is per-step and does not account for a
-  condition that re-fires on every single request. A production version would
-  track a guard's *rate* rather than a per-step count, and promote a
-  persistently re-firing recoverable to an escalation.
+- **A recoverable condition that destroys work in progress is not recoverable.**
+  This was previously written up here as a recovery-budget problem. Reading the
+  run properly showed it was not: dismissing the advisory that interrupts a
+  half-filled sub-account form navigates away and *discards the form*, so the
+  step resumes on a screen where its target legitimately does not exist. The
+  engine reported `target_not_found` at step 11 and pointed whoever was on call
+  at a button that was never the problem.
+
+  It now detects that a recovery is the suspect — a resolution failure on a step
+  that has already recovered — and escalates with the guard named, because a
+  person can re-enter the form and the engine cannot. Two supporting limits went
+  in alongside it: a per-run cap on how often one recoverable rule may fire
+  before it stops being an anomaly (`maxGuardFiringsPerRun`), and honouring
+  "escalation disabled" inside `escalate()` itself rather than at each call
+  site, since two new paths promptly forgot to check it and turned a
+  twenty-second test into a ten-minute wait for an operator who was never
+  coming. The remaining honest limit: the flow still cannot *complete* under
+  that fault unattended, and should not — re-entering discarded input is a
+  human's job.
 - **One detector on the sub-account capability is unverified.** Provoking
   `required_field_missing` needs a blank required field, which the typed input
   contract rejects before the browser is touched. Verifying it needs a probe

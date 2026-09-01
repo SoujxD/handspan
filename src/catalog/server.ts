@@ -112,7 +112,7 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
         operatorBaseUrl: operatorBaseUrl(),
       });
 
-      store.recordRun(cap, result.status === 'success' || result.status === 'outcome');
+      store.recordRun(cap, result);
       evidence.saveJson('result', result);
     } catch (e) {
       res.status(500).json({ error: (e as Error).message });

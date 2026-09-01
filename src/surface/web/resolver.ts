@@ -99,7 +99,7 @@ export interface ResolutionFailure {
   reason: 'not_found' | 'ambiguous';
   candidateCount: number;
   /** Top few, so a failure report can show what it was choosing between. */
-  candidates: Array<{ description: string; score: number; handle: string }>;
+  candidates: Candidate[];
   bestScore: number;
 }
 
@@ -217,13 +217,40 @@ export function resolve(
   };
 }
 
-function toCandidate(s: { node: UiNode; score: number }): { description: string; score: number; handle: string } {
+export interface Candidate {
+  description: string;
+  score: number;
+  handle: string;
+  /**
+   * The candidate's own signals, alongside the rendered description.
+   *
+   * The description is for a human reading a failure report. These are for a
+   * program reading one: when a rename drops every candidate below the
+   * threshold, the answer to "what is this control called now" is sitting in
+   * the top candidate, and drift analysis should not have to parse it back out
+   * of an English sentence to find it.
+   */
+  role: string;
+  label: string;
+  name: string;
+  container?: string;
+}
+
+function toCandidate(s: { node: UiNode; score: number }): Candidate {
   const n = s.node;
   const bits: string[] = [n.role];
   if (n.label) bits.push(`labelled "${n.label}"`);
   else if (n.name) bits.push(`named "${n.name}"`);
   if (n.container) bits.push(`in "${n.container}"`);
-  return { description: bits.join(' '), score: Math.round(s.score), handle: n.handle };
+  return {
+    description: bits.join(' '),
+    score: Math.round(s.score),
+    handle: n.handle,
+    role: n.role,
+    label: n.label,
+    name: n.name,
+    ...(n.container === undefined ? {} : { container: n.container }),
+  };
 }
 
 function scoreNode(

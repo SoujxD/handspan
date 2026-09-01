@@ -48,7 +48,8 @@ cp .env.example .env        # then add your key (see below)
 
 | Variable | Needed for | Notes |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | **`discover` only** | Replay never reads it. If it did, the design would have failed. |
+| `ANTHROPIC_API_KEY` | **`discover`, and `repair --assist`** | Replay never reads it. If it did, the design would have failed. |
+| `HANDSPAN_INPUT_PASSWORD` | optional | Supplies a `secret`-classified input without putting it in shell history or `ps` output. Only `secret` inputs may come from the environment. |
 | `HANDSPAN_MODEL` | optional | Default `claude-opus-5`. |
 | `HANDSPAN_EFFORT` | optional | Default `high`. |
 | `DEMO_USERNAME` / `DEMO_PASSWORD` | the mock app | Fake, local-only. Registered with the redactor at startup so the password cannot reach a log. |
@@ -60,7 +61,7 @@ cp .env.example .env        # then add your key (see below)
 Everything except `discover` runs with **no API key and no network**:
 
 ```bash
-npm test                              # 81 tests — resolver, policy, redaction,
+npm test                              # 98 tests — resolver, policy, redaction,
                                       # schema invariants, control-transfer FSM
 npx tsx tests/smoke-perception.ts     # see exactly what the model would see
 npm run replay -- ...                 # deterministic replay: zero model calls
@@ -124,14 +125,14 @@ npx tsx src/cli.ts codegen -c member_savings_balance    # human-readable review 
 ### 3. Replay it — deterministically, no model
 
 ```bash
-npm run replay -- -c member_savings_balance -i memberId=12345
+npm run replay -- -c member_savings_balance -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
 ```
 
 Then prove it is not memorising the recording — a different member, whose
 balance was never seen during discovery:
 
 ```bash
-npm run replay -- -c member_savings_balance -i memberId=20881
+npm run replay -- -c member_savings_balance -i userId=teller01 -i password=demo-pass-1234 -i memberId=20881
 ```
 
 ### 4. Replay into the interesting failures
@@ -140,22 +141,22 @@ This is the part that matters. Each returns a **different result shape**:
 
 ```bash
 # A business outcome — a valid answer, NOT an error. Exits 0.
-npm run replay -- -c member_savings_balance -i memberId=99999
+npm run replay -- -c member_savings_balance -i userId=teller01 -i password=demo-pass-1234 -i memberId=99999
 
 # A permission denial — also a business outcome, not a crash.
-npm run replay -- -c member_savings_balance -i memberId=33417
+npm run replay -- -c member_savings_balance -i userId=teller01 -i password=demo-pass-1234 -i memberId=33417
 
 # A recoverable interstitial: the engine dismisses it and carries on.
 curl -X POST "http://localhost:4300/__control/fault?mode=unexpected_dialog"
-npm run replay -- -c member_savings_balance -i memberId=12345
+npm run replay -- -c member_savings_balance -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
 
 # A slow app: condition-based waiting rides it out where a fixed sleep would fail.
 curl -X POST "http://localhost:4300/__control/fault?mode=slow_load"
-npm run replay -- -c member_savings_balance -i memberId=12345
+npm run replay -- -c member_savings_balance -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
 
 # A hard failure: structured, with expected vs observed and evidence pointers.
 curl -X POST "http://localhost:4300/__control/fault?mode=server_error"
-npm run replay -- -c member_savings_balance -i memberId=12345
+npm run replay -- -c member_savings_balance -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
 
 curl -X POST "http://localhost:4300/__control/fault?mode=none"   # reset
 ```
@@ -171,7 +172,7 @@ npx tsx src/cli.ts bind-tenant -c member_savings_balance -t lakeshore \
   --label "Member ID=Member Number" --label "Search=Find Member" \
   --dismiss "Scheduled maintenance window=Acknowledge"
 
-npm run replay -- -c member_savings_balance -t lakeshore -i memberId=12345
+npm run replay -- -c member_savings_balance -t lakeshore -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
 ```
 
 One artifact, two institutions, no second discovery run. The binding carries
@@ -197,6 +198,7 @@ confirmation screens have to earn their keep.
 
 ```bash
 npm run replay -- -c member_open_sub_account \
+  -i userId=teller01 -i password=demo-pass-1234 \
   -i memberId=12345 -i accountType=Savings \
   -i nickname="Vacation Fund" -i openingDeposit=250.00
 ```
@@ -211,11 +213,73 @@ the schema enforces rather than the engine remembering to.
 # a member who does not exist — a business outcome on a state-committing flow,
 # reached before anything is committed. Exits 0.
 npm run replay -- -c member_open_sub_account \
+  -i userId=teller01 -i password=demo-pass-1234 \
   -i memberId=99999 -i accountType=Savings \
   -i nickname="Vacation Fund" -i openingDeposit=250.00
 ```
 
-### 8. Verify the artifacts rather than trusting them
+### 8. Drift — what happens when the vendor ships an upgrade
+
+The brief asks (§3.7) how per-tenant and per-version drift is *detected and
+managed* across hundreds of institutions on the same product. This is the
+answer, and you can cause it:
+
+```bash
+# The vendor ships 8.7. Nothing is broken; the screens are just re-worded.
+curl -X POST "http://localhost:4300/__control/upgrade?level=minor"
+
+npx tsx src/cli.ts drift -c member_savings_balance \
+  -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
+```
+
+The report classifies what moved — **vocabulary** (renamed, a binding absorbs
+it), **structural** (the panel moved, a human should look), **missing**,
+**ambiguous**, or **checkpoint** (how the flow is *verified* changed) — and
+proposes a label overlay. Nothing is changed. Exit codes are `0` stable, `10`
+degraded, `1` broken, so it can gate a scheduled job.
+
+Nothing new is instrumented to do this: replay already records which declared
+signals matched, which did not, and what it matched instead. Drift analysis is
+a pure function over a finished run, so it works on a `result.json` captured
+weeks ago — fleet-wide analysis is a batch job over evidence, not a re-run of
+every capability.
+
+### 9. Repair — a proposal, never an edit
+
+```bash
+npx tsx src/cli.ts repair -c member_savings_balance \
+  -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
+```
+
+It writes a **new draft version** with the label overlay applied, prints the
+diff, and stops. Three properties are worth pausing on:
+
+- **`Model calls: 0`.** The analysis resolves ordinary renames deterministically.
+  The `--assist` flag allows *one* bounded model call per finding the analysis
+  cannot explain, and even then the model may only pick a label that was
+  actually observed on screen — it cannot invent a control.
+- **It may change how the flow is found, never how it is verified.** Steps,
+  checkpoints, outcomes, inputs, outputs and risk policy are asserted
+  byte-identical after the patch.
+- **A draft never runs by accident.** An unpinned load takes the newest
+  *approved* version, not the newest one.
+
+Now make it worse — the vendor also renames the panel, which is what the
+capability's checkpoint asserts:
+
+```bash
+curl -X POST "http://localhost:4300/__control/upgrade?level=major"
+npx tsx src/cli.ts repair -c member_savings_balance \
+  -i userId=teller01 -i password=demo-pass-1234 -i memberId=12345
+
+curl -X POST "http://localhost:4300/__control/upgrade?level=none"   # reset
+```
+
+It refuses, and says why. The cheapest way to make a broken capability pass is
+to weaken the assertion that proves it worked; a repair tool permitted to do
+that is a machine for turning outages into silent data corruption.
+
+### 10. Verify the artifacts rather than trusting them
 
 Two checks that found real defects in this repo, not decoration:
 
@@ -232,7 +296,7 @@ with inline `(?i)` flags, which JavaScript does not support, so every declared
 outcome was silently dead. It now reports 7/7 and 6/7. The one that remains
 unverified is called out as unverified rather than quietly counted.
 
-### 9. The agent-facing surface
+### 11. The agent-facing surface
 
 ```bash
 npm run catalog         # http://localhost:4500
@@ -271,10 +335,12 @@ must not retry it forever.
 | `npx tsx src/cli.ts approve` | Mark a capability approved for unattended runs |
 | `npx tsx src/cli.ts codegen -c <id>` | Emit a human-readable review document |
 | `npx tsx src/cli.ts declare-outcome` | Add a reviewer-authored outcome rule (recorded with `origin: reviewer`) |
+| `npx tsx src/cli.ts drift -c <id> [-t <tenant>]` | Replay and report how far the surface has moved from what was recorded |
+| `npx tsx src/cli.ts repair -c <id> [--assist]` | Propose a reviewed patch for vocabulary drift; writes a draft, never applies it |
 | `npx tsx scripts/verify-artifact.ts <id>` | Audit an artifact: structural invariants, no baked-in credentials or PII, no id-based matching, approval traceable to a reviewer |
 | `npx tsx scripts/verify-outcomes.ts <id>` | Replay each declared outcome and report which detectors actually fire |
 | `npx tsx scripts/audit-evidence.ts` | Fail if any seeded PII or credential survived into `/evidence` |
-| `npm test` / `npm run typecheck` | 81 tests / strict TypeScript |
+| `npm test` / `npm run typecheck` | 98 tests / strict TypeScript |
 | `npm run test:replay` / `npm run test:escalation` | Integration: 8 replay scenarios (0 model calls) and the full control-transfer cycle |
 
 ---

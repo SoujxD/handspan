@@ -20,7 +20,7 @@
  */
 
 import type { Member, TenantConfig } from './data.js';
-import { formatUsd } from './data.js';
+import { containerLabel, formatUsd } from './data.js';
 
 const esc = (s: string): string =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -171,9 +171,9 @@ export function memberSearchPage(t: TenantConfig, error?: string): string {
   const p = t.idPrefix;
   return framePage(
     t,
-    'Member Search',
+    containerLabel('Member Search'),
     `<div class="panel">
-   <div class="panelhdr">Member Search</div>
+   <div class="panelhdr">${esc(containerLabel('Member Search'))}</div>
    <div class="panelbody">
    ${error ? `<div class="err">${esc(error)}</div>` : ''}
    <form method="GET" action="/t/${t.slug}/member/results">
@@ -199,9 +199,9 @@ export function memberSearchPage(t: TenantConfig, error?: string): string {
 export function notFoundPage(t: TenantConfig, query: string): string {
   return framePage(
     t,
-    'Member Search',
+    containerLabel('Member Search'),
     `<div class="panel">
-   <div class="panelhdr">Member Search</div>
+   <div class="panelhdr">${esc(containerLabel('Member Search'))}</div>
    <div class="panelbody">
      <!-- This is a legitimate business outcome, not an error page. It returns
           HTTP 200 on purpose: the caller needs "no such member", not a crash. -->

@@ -45,6 +45,13 @@ export interface PolicyFile {
     maxStepsPerReplay: number;
     defaultActionTimeoutMs: number;
     maxConsecutiveNoProgress: number;
+    /**
+     * How many times one recoverable rule may fire in a single run before it
+     * stops being treated as an anomaly and is escalated to a person.
+     */
+    maxGuardFiringsPerRun: number;
+    /** Clean replays a capability needs before it can be approved. */
+    minStableRunsBeforeApproval: number;
   };
 }
 

@@ -675,8 +675,8 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 0,
-      "successes": 0
+      "runs": 5,
+      "successes": 3
     },
     "reviewedBy": "s.chavan",
     "notes": "State-committing capability. 3 discovered + 4 reviewer-added outcome rules; confirmable step and confirmation gate reviewed."
@@ -686,7 +686,7 @@
     "model": "claude-opus-5",
     "effort": "high",
     "discoveryRunId": "disc-20260814-213001-926de7",
-    "contentHash": "7b26c84745f76f14b4900457f2537ef8",
+    "contentHash": "d6180d3c0f2d4572f0b52c027bfef0ea",
     "generator": "handspan"
   }
 }

@@ -66,6 +66,23 @@ This pass exists because a detector written from remembered phrasing rather
 than observed text never matches, and fails silently. On its first run it
 reported **0/8** — every declared detector was dead.
 
+## Drift and repair
+
+Two transcripts, captured against the mock app pretending to be a newer vendor
+release (`POST /__control/upgrade?level=minor`):
+
+| File | What it shows |
+|---|---|
+| [`DRIFT-member_savings_balance.txt`](./DRIFT-member_savings_balance.txt) | The drift report: the run broke, the cause is classified as **vocabulary** drift, and the rename is read back off the candidates the resolver rejected. |
+| [`REPAIR-member_savings_balance.txt`](./REPAIR-member_savings_balance.txt) | The repair proposal: two renames, `Model calls: 0`, written as a **draft** version, with two structural findings refused. |
+
+The line worth reading twice in the repair transcript is `Model calls: 0`.
+Ordinary renames are resolved deterministically; the model is a fallback for
+findings the analysis cannot explain, not the mechanism. And under the `major`
+variant — which also renames the panel the capability's checkpoint asserts —
+repair refuses outright, because the only way to make that pass is to weaken
+the assertion that proves the step worked.
+
 ## The agent-facing path
 
 Not captured as a file here, deliberately: the transcript of a caller invoking

@@ -29,7 +29,18 @@ import { PlaywrightSurface } from './surface/web/playwright-surface.js';
 import { runDiscovery } from './agent/loop.js';
 import { compile, detemplatize, hashCapability } from './agent/compiler.js';
 import { CapabilityStore, toToolDefinition } from './catalog/store.js';
+import type { Capability } from './types/artifact.js';
 import { replay } from './replay/engine.js';
+import { analyzeRun, renderReport, type DriftReport } from './replay/drift.js';
+import {
+  applyRenames,
+  assistRename,
+  isRepairable,
+  refusalFor,
+  renderProposal,
+  type ProposedRename,
+  type RepairProposal,
+} from './repair/propose.js';
 import { exitCodeFor, summarize, type ReplayResult } from './types/result.js';
 import { operatorBaseUrl, startOperatorConsole } from './operator/server.js';
 import { startCatalog } from './catalog/server.js';
@@ -179,7 +190,7 @@ program
       process.exit(2);
     }
 
-    const inputs = parseInputs(o['input'] as string[]);
+    const inputs = fillSecretsFromEnvironment(cap, parseInputs(o['input'] as string[]));
     const repeat = Math.max(1, Number(o['repeat'] ?? 1));
     const results: ReplayResult[] = [];
 
@@ -236,7 +247,7 @@ program
 
       evidence.saveJson('result', result);
       results.push(result);
-      store.recordRun(cap, result.status === 'success' || result.status === 'outcome');
+      store.recordRun(cap, result);
 
       console.log(`\n  ${repeat > 1 ? `[run ${i + 1}/${repeat}] ` : ''}${summarize(result)}`);
       printResult(result);
@@ -249,6 +260,254 @@ program
 
     process.exit(exitCodeFor(results[results.length - 1]!));
   });
+
+// ---------------------------------------------------------------------------
+// drift
+// ---------------------------------------------------------------------------
+
+program
+  .command('drift')
+  .description('Replay a capability and report how far the surface has moved from what it recorded.')
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .option('-t, --tenant <id>', 'Institution to check against.')
+  .option('-i, --input <k=v...>', 'Input parameter. Repeatable.', collect, [])
+  .option('--headed', 'Show the browser.', false)
+  .option('--json', 'Emit the report as JSON instead of a table.', false)
+  .action(async (o: Record<string, unknown>) => {
+    const cfg = runtimeConfig({ headless: !o['headed'] });
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.load(String(o['capability']));
+    const tenantId = String(o['tenant'] ?? cap.surface.recordedOnTenant);
+    const tenant = cap.tenants.find((t) => t.tenantId === tenantId);
+
+    if (!tenant) {
+      console.error(
+        `Capability "${cap.id}" has no binding for tenant "${tenantId}". Bound: ${cap.tenants.map((t) => t.tenantId).join(', ')}`,
+      );
+      process.exit(2);
+    }
+
+    const policy = loadPolicy();
+    const redactor = buildRedactor(policy);
+    const runId = newRunId('drift');
+    const evidence = new EvidenceRecorder(runId, PATHS.evidence, redactor, false);
+    const lease = new SessionLease(runId);
+    const inputs = fillSecretsFromEnvironment(cap, parseInputs(o['input'] as string[]));
+
+    const surface = await PlaywrightSurface.launch({
+      lease,
+      headless: cfg.headless,
+      defaultTimeoutMs: policy.limits.defaultActionTimeoutMs,
+    });
+
+    let result: ReplayResult;
+    try {
+      await surface.act({ kind: 'navigate', url: detemplatize(cap.surface.entryUrl, tenant.baseUrl) });
+      result = await replay({
+        capability: cap,
+        tenantId,
+        inputs,
+        surface,
+        policy,
+        redactor,
+        evidence,
+        lease,
+        runId,
+        mode: 'attended',
+        // A drift check is diagnostic. Parking it on a human would be a
+        // category error: nobody asked for this run, so nobody is waiting to
+        // take it over.
+        allowEscalation: false,
+      });
+    } finally {
+      await surface.close();
+    }
+
+    const report = analyzeRun(cap, result);
+    evidence.saveJson('drift-report', report);
+
+    if (o['json']) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(renderReport(report));
+      console.log(`  Report: ${evidence.dir}/drift-report.json\n`);
+    }
+
+    // Exit codes so this can gate a scheduled job: 0 stable, 10 degraded,
+    // 1 broken. Degraded is deliberately not a failure — it is a warning that
+    // something needs a human before it becomes one.
+    process.exit(report.status === 'stable' ? 0 : report.status === 'degraded' ? 10 : 1);
+  });
+
+// ---------------------------------------------------------------------------
+// repair
+// ---------------------------------------------------------------------------
+
+program
+  .command('repair')
+  .description('Propose a reviewed patch for a drifted capability. Writes a draft; never applies it.')
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .option('-t, --tenant <id>', 'Institution the drift was observed at.')
+  .option('-i, --input <k=v...>', 'Input parameter for the diagnostic runs. Repeatable.', collect, [])
+  .option('--rounds <n>', 'Diagnostic runs. Each one can reveal the next rename.', (v) => Number(v), 3)
+  .option('--assist', 'Allow one bounded model call per finding the analysis cannot resolve.', false)
+  .action(async (o: Record<string, unknown>) => {
+    const cfg = runtimeConfig({ headless: true });
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.load(String(o['capability']));
+    const tenantId = String(o['tenant'] ?? cap.surface.recordedOnTenant);
+
+    if (!cap.tenants.some((t) => t.tenantId === tenantId)) {
+      console.error(`Capability "${cap.id}" has no binding for tenant "${tenantId}".`);
+      process.exit(2);
+    }
+
+    const policy = loadPolicy();
+    const redactor = buildRedactor(policy);
+    const runId = newRunId('repair');
+    const evidence = new EvidenceRecorder(runId, PATHS.evidence, redactor, false);
+    const inputs = fillSecretsFromEnvironment(cap, parseInputs(o['input'] as string[]));
+
+    const renames: ProposedRename[] = [];
+    const refused: RepairProposal['refused'] = [];
+    let modelCalls = 0;
+    const rounds = Math.max(1, Number(o['rounds'] ?? 3));
+
+    banner('REPAIR', [
+      ['capability', `${cap.id} v${cap.version}`],
+      ['tenant', tenantId],
+      ['assist', o['assist'] ? `enabled (${cfg.model}, one call per unresolved finding)` : 'disabled — analysis only'],
+      ['rounds', String(rounds)],
+    ]);
+
+    /**
+     * Each diagnostic run stops at the FIRST unresolved step, so one run can
+     * only ever reveal one rename. Re-running with the overlay applied is what
+     * uncovers the next one — an 8.7 upgrade that re-words four fields needs
+     * four rounds to describe itself fully. Bounded, because a capability that
+     * needs ten rounds is not drifting, it has been replaced.
+     */
+    for (let round = 1; round <= rounds; round++) {
+      // Probe with the overlay accumulated so far, without writing anything.
+      const probe: Capability = JSON.parse(JSON.stringify(cap));
+      const binding = probe.tenants.find((t) => t.tenantId === tenantId)!;
+      for (const r of renames) binding.labelOverrides[r.from] = r.to;
+
+      const report = await diagnose(probe, tenantId, inputs, policy, redactor, evidence, cfg.headless);
+      console.log(`  round ${round}: ${report.status}${report.findings.length ? ` — ${report.findings.length} finding(s)` : ''}`);
+
+      if (report.status === 'stable') break;
+
+      const before = renames.length;
+
+      for (const rename of report.suggestedLabelOverrides) {
+        if (renames.some((r) => r.from === rename.from)) continue;
+        renames.push({ ...rename, source: 'analysis', reason: `observed on ${rename.occurrences} step(s)` });
+      }
+
+      for (const f of report.findings) {
+        if (isRepairable(f)) continue;
+        if (refused.some((r) => r.stepId === f.stepId && r.kind === f.kind)) continue;
+
+        if (o['assist'] && (f.kind === 'ambiguous' || f.kind === 'missing')) {
+          requireAnthropicKey();
+          const { rename, calls } = await assistRename(f, {
+            model: cfg.model,
+            candidatesFor: () => lastCandidates,
+            declaredFor: () => declaredTargetFor(probe, f.stepId),
+          });
+          modelCalls += calls;
+          if (rename) {
+            renames.push(rename);
+            console.log(`           assisted: "${rename.from}" -> "${rename.to}" (${rename.reason})`);
+            continue;
+          }
+        }
+        refused.push({ stepId: f.stepId, kind: f.kind, why: refusalFor(f) });
+      }
+
+      if (renames.length === before) break; // no progress; further rounds cost time for nothing
+    }
+
+    const proposal: RepairProposal = {
+      capabilityId: cap.id,
+      tenantId,
+      fromVersion: cap.version,
+      renames,
+      refused,
+      modelCalls,
+    };
+
+    if (!renames.length) {
+      console.log(renderProposal(proposal, undefined, []));
+      evidence.saveJson('repair-proposal', proposal);
+      process.exit(refused.length ? 1 : 0);
+    }
+
+    const patch = applyRenames(cap, tenantId, renames, {
+      nextVersion: store.nextVersion(cap.id),
+      runId,
+      model: modelCalls ? cfg.model : null,
+    });
+
+    if (patch.ok && patch.capability) store.save(patch.capability);
+    console.log(renderProposal(proposal, patch.capability, patch.problems));
+    evidence.saveJson('repair-proposal', { ...proposal, problems: patch.problems });
+
+    process.exit(patch.ok ? 0 : 1);
+  });
+
+/** Candidates from the most recent diagnostic failure, for the assist path. */
+let lastCandidates: Array<{ description: string; score: number; role?: string; label?: string }> = [];
+
+function declaredTargetFor(cap: Capability, stepId: string) {
+  const step = cap.steps.find((s) => s.id === stepId);
+  if (!step || !('target' in step.act)) return undefined;
+  const t = step.act.target;
+  return { role: t.role, label: t.label, container: t.container, description: t.description };
+}
+
+/** One diagnostic replay, analysed. No writes, no escalation, no model. */
+async function diagnose(
+  cap: Capability,
+  tenantId: string,
+  inputs: Record<string, string>,
+  policy: ReturnType<typeof loadPolicy>,
+  redactor: ReturnType<typeof buildRedactor>,
+  evidence: EvidenceRecorder,
+  headless: boolean,
+): Promise<DriftReport> {
+  const tenant = cap.tenants.find((t) => t.tenantId === tenantId)!;
+  const lease = new SessionLease(`diagnose-${tenantId}`);
+  const surface = await PlaywrightSurface.launch({
+    lease,
+    headless,
+    defaultTimeoutMs: policy.limits.defaultActionTimeoutMs,
+  });
+
+  let result: ReplayResult;
+  try {
+    await surface.act({ kind: 'navigate', url: detemplatize(cap.surface.entryUrl, tenant.baseUrl) });
+    result = await replay({
+      capability: cap,
+      tenantId,
+      inputs,
+      surface,
+      policy,
+      redactor,
+      evidence,
+      lease,
+      runId: `diagnose-${tenantId}`,
+      mode: 'attended',
+      allowEscalation: false,
+    });
+  } finally {
+    await surface.close();
+  }
+
+  lastCandidates = result.status === 'failure' ? (result.failure.candidates ?? []) : [];
+  return analyzeRun(cap, result);
+}
 
 // ---------------------------------------------------------------------------
 // capabilities / operator / catalog
@@ -533,12 +792,51 @@ program
   .requiredOption('-c, --capability <id>', 'Capability id.')
   .requiredOption('-r, --reviewer <name>', 'Who reviewed it.')
   .option('-n, --note <text>', 'Review note.')
+  .option('-v, --capability-version <n>', 'Approve a specific version.', (v) => Number(v))
+  .option(
+    '--force',
+    'Approve despite too few clean runs. Recorded in the artifact, not hidden.',
+    false,
+  )
   .action((o: Record<string, unknown>) => {
     const store = new CapabilityStore(PATHS.artifacts);
-    const cap = store.load(String(o['capability']));
+    const cap = store.load(String(o['capability']), o['capabilityVersion'] as number | undefined);
+    const policy = loadPolicy();
+
+    /**
+     * Approval is the gate between "a model wrote this" and "this runs
+     * unattended against member accounts". Requiring evidence that the thing
+     * has actually completed, more than once, makes that gate cost something.
+     *
+     * The override exists and is *recorded* rather than silent: there are real
+     * reasons to approve early — a capability whose only failure mode needs
+     * production data, say — and a governance control people route around is
+     * worse than one that bends and leaves a mark. What is not available is
+     * approving with no clean run at all and no trace of having decided to.
+     */
+    const need = policy.limits.minStableRunsBeforeApproval;
+    const { runs, successes } = cap.governance.stability;
+
+    if (successes < need) {
+      if (!o['force']) {
+        console.error(
+          `\n  Refusing to approve ${cap.id} v${cap.version}: ${successes} clean run(s) of ${runs}, ` +
+            `and policy requires ${need}.\n\n` +
+            `  Replay it a few times first:\n` +
+            `    npm run replay -- -c ${cap.id} --repeat ${need - successes} -i ...\n\n` +
+            `  Or approve deliberately, which is recorded in the artifact:\n` +
+            `    npx tsx src/cli.ts approve -c ${cap.id} -r <you> --force -n "<why>"\n`,
+        );
+        process.exit(2);
+      }
+      cap.governance.notes =
+        `${o['note'] ? `${String(o['note'])} ` : ''}` +
+        `[force-approved with ${successes}/${need} clean runs by ${String(o['reviewer'])}]`;
+    }
+
     cap.governance.approval = 'approved';
     cap.governance.reviewedBy = String(o['reviewer']);
-    if (o['note']) cap.governance.notes = String(o['note']);
+    if (o['note'] && successes >= need) cap.governance.notes = String(o['note']);
     // Tracked edit: re-hash so the mismatch warning stays meaningful.
     cap.provenance.contentHash = hashCapability(cap);
     store.save(cap);
@@ -578,6 +876,43 @@ function parseInputs(pairs: string[] = []): Record<string, string> {
   for (const p of pairs) {
     const i = p.indexOf('=');
     if (i > 0) out[p.slice(0, i)] = p.slice(i + 1);
+  }
+  return out;
+}
+
+/**
+ * Let `secret`-classified inputs come from the environment.
+ *
+ * A password passed as `--input password=...` is written to shell history and
+ * is visible in `ps` to every other process on the machine, which is a poor
+ * ending for a system whose whole redaction story is that credentials never
+ * come to rest anywhere. `HANDSPAN_INPUT_PASSWORD` is read from the process
+ * environment (and therefore from the gitignored `.env`) instead.
+ *
+ * Deliberately narrow in two ways. Only `secret` inputs are eligible — every
+ * other parameter is the *meaning* of the call, and quietly defaulting a member
+ * id from an environment variable would be a genuinely dangerous convenience.
+ * And an explicit `--input` always wins, so a caller can still override.
+ *
+ * An explicit CLI value stays supported rather than being removed: the mock
+ * app's credentials are fixtures, and a demo that requires editing a dotfile
+ * before anything runs is a worse demo.
+ */
+export function fillSecretsFromEnvironment(
+  cap: { inputs: Array<{ name: string; sensitivity: string }> },
+  supplied: Record<string, string>,
+): Record<string, string> {
+  const out = { ...supplied };
+
+  for (const p of cap.inputs) {
+    if (p.sensitivity !== 'secret' || out[p.name] !== undefined) continue;
+    const key = `HANDSPAN_INPUT_${p.name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase()}`;
+    const value = process.env[key];
+    if (value) {
+      out[p.name] = value;
+      // Name the variable, never the value.
+      console.log(`  ${p.name} supplied from ${key}`);
+    }
   }
   return out;
 }

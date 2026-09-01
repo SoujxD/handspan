@@ -143,3 +143,27 @@ limits:
   defaultActionTimeoutMs: 20000
 
   maxConsecutiveNoProgress: 3
+
+  # How many times ONE recoverable rule may fire in a single run.
+  #
+  # The per-step recovery budget catches a stuck step. It cannot catch an
+  # endemic condition: an advisory that re-appears on every request never
+  # exhausts any single step's budget until late in a long flow, and then
+  # surfaces as a resolution failure on whatever step happened to be running —
+  # pointing the on-call engineer at a control that was never the problem.
+  #
+  # Six is chosen to sit above the noise and below a pattern. A legitimate
+  # interstitial fires once or twice in a flow; something firing seven times is
+  # not an anomaly, it is the institution's new normal, and that is a decision
+  # for a person rather than a retry loop.
+  maxGuardFiringsPerRun: 6
+
+  # Clean replays required before a capability may be approved.
+  #
+  # Approval is the gate between "a model wrote this" and "this runs unattended
+  # against member accounts", and until now the only thing behind it was
+  # someone's judgement. Three successful runs is not a proof of correctness,
+  # but it does mean nobody can approve a capability that has never completed
+  # once — which was previously possible, and is the cheapest class of mistake
+  # to make at 2am.
+  minStableRunsBeforeApproval: 3

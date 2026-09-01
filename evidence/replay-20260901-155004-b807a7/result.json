@@ -1,0 +1,128 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-b807a7",
+    "capabilityId": "member_savings_balance",
+    "capabilityVersion": 8,
+    "tenantId": "northstar",
+    "mode": "replay",
+    "startedAt": "2026-09-01T15:50:05.133Z",
+    "finishedAt": "2026-09-01T15:50:28.821Z",
+    "durationMs": 23688,
+    "stepsAttempted": 3,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-b807a7",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "checkpoint_failed",
+    "message": "Step s04 ran but did not reach the expected state.",
+    "atStepId": "s04",
+    "stepIntent": "Open the Member Servicing lookup task.",
+    "expected": "text \"Member Search\" present on screen",
+    "observed": "url=http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome; text starts \"Northstar Community Credit Union | Meridian Core Servicing 8.7 Signed in as teller01 Sign Out Home | Member Servicing | Administration Member Lookup Member Numb\"",
+    "remediation": "The action may not have taken effect, or the application returned a state this capability does not know about. If it is a legitimate outcome, declare it in the artifact."
+  },
+  "partialOutputs": {},
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator's user ID on the core servicing sign-in screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-01T15:50:05.312Z",
+      "durationMs": 524,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5,
+        "observed": {
+          "role": "textbox",
+          "label": "User ID",
+          "name": "",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In"
+        }
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator's password on the sign-in screen.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-01T15:50:05.836Z",
+      "durationMs": 561,
+      "status": "ok",
+      "resolution": {
+        "score": 92,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType",
+          "domId(weak)"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5,
+        "observed": {
+          "role": "textbox",
+          "label": "Password",
+          "name": "",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign in to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T15:50:06.402Z",
+      "durationMs": 1118,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 5,
+        "observed": {
+          "role": "button",
+          "label": "Sign In",
+          "name": "Sign In",
+          "container": "Northstar Community Credit Union — Core Servicing Sign In"
+        }
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Servicing lookup task.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-01T15:50:28.902Z",
+      "durationMs": 0,
+      "status": "failed",
+      "note": "Step s04 ran but did not reach the expected state."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-b807a7/run.jsonl",
+      "capturedAt": "2026-09-01T15:50:04.313Z"
+    }
+  ]
+}

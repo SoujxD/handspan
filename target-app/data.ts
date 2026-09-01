@@ -160,8 +160,73 @@ export const TENANTS: Record<string, TenantConfig> = {
   },
 };
 
+/**
+ * A vendor upgrade, as the institutions actually experience one.
+ *
+ * The fault modes simulate things going *wrong* at runtime. This simulates
+ * something going entirely right for the institution and badly for us: the
+ * vendor ships a new release, the screens are re-worded, nothing is broken,
+ * and every capability recorded against the old version quietly stops
+ * matching. No error is raised anywhere; it is a silent fleet-wide outage.
+ *
+ * Two levels, because the difference between them is the whole point of the
+ * drift/repair work. Element ids deliberately do NOT change in either, so a
+ * system that was secretly leaning on them would sail through and prove
+ * nothing.
+ */
+export type UpgradeLevel = 'none' | 'minor' | 'major';
+
+export const UPGRADE_VARIANTS: Record<Exclude<UpgradeLevel, 'none'>, {
+  version: string;
+  labels: Partial<TenantConfig['labels']>;
+  containers: Record<string, string>;
+}> = {
+  /**
+   * 8.7 — a vocabulary release. Fields are re-worded, nothing moves.
+   *
+   * This is the common case and the benign one: a capability's targets stop
+   * matching, but the flow, the panels and the success condition are all
+   * exactly where they were. A tenant binding absorbs it entirely.
+   */
+  minor: {
+    version: '8.7',
+    labels: { memberId: 'Member Number', searchButton: 'Find Member' },
+    containers: {},
+  },
+
+  /**
+   * 9.0 — a vocabulary release that also renames the panel.
+   *
+   * Superficially the same event, and materially a different one: the panel
+   * title is what the capability's checkpoint asserts, so this breaks how the
+   * flow is *verified*, not just how controls are *found*. Kept as a separate
+   * level because the repair path is required to treat the two differently —
+   * see `src/repair/propose.ts`.
+   */
+  major: {
+    version: '9.0',
+    labels: { memberId: 'Member Number', searchButton: 'Find Member' },
+    containers: { 'Member Search': 'Member Lookup' },
+  },
+};
+
 export function tenantOf(slug: string): TenantConfig | undefined {
-  return TENANTS[slug];
+  const t = TENANTS[slug];
+  const level = runtimeState.productUpgrade;
+  if (!t || level === 'none') return t;
+  const variant = UPGRADE_VARIANTS[level];
+  return {
+    ...t,
+    vendorVersion: variant.version,
+    labels: { ...t.labels, ...variant.labels },
+  };
+}
+
+/** Panel titles are rendered through this so an upgrade can rename them. */
+export function containerLabel(name: string): string {
+  const level = runtimeState.productUpgrade;
+  if (level === 'none') return name;
+  return UPGRADE_VARIANTS[level].containers[name] ?? name;
 }
 
 /** Injectable runtime conditions. Set via POST /__control/fault. */
@@ -186,4 +251,6 @@ export const runtimeState = {
   fault: 'none' as FaultMode,
   /** Confirmation counter so confirmation numbers are stable-ish but unique. */
   confirmationSeq: 4100,
+  /** Which vendor release the app is pretending to be. See UPGRADE_VARIANTS. */
+  productUpgrade: 'none' as UpgradeLevel,
 };

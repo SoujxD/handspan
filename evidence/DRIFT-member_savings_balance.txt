@@ -1,0 +1,20 @@
+
+  Drift report — member_savings_balance v8 @ northstar
+  ────────────────────────────────────────────────────────────────────────────────────────
+  status        BROKEN
+  steps         5 analyzed, 1 finding(s)
+  run           drift-20260901-162739-50ccf2
+  ────────────────────────────────────────────────────────────────────────────────────────
+
+  FAILED    s05   vocabulary  label      declared "Member ID" / found "Member Number"  (score 47)
+
+  Vocabulary drift on 1 step(s): "Member ID" -> "Member Number". 1 of them stopped resolving entirely — the control kept its role and container, so the rename is the whole explanation. The flow is intact; a tenant binding absorbs this without re-recording.
+
+  Proposed label overlay:
+    --label "Member ID=Member Number"      (1 step(s) agree)
+
+  Nothing has been changed. Apply it as a reviewed patch:
+    npx tsx src/cli.ts repair -c member_savings_balance -t northstar
+
+  Report: D:\project\interface-assessment\evidence\drift-20260901-162739-50ccf2/drift-report.json
+

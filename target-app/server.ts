@@ -16,6 +16,8 @@ import {
   tenantOf,
   runtimeState,
   FAULT_MODES,
+  UPGRADE_VARIANTS,
+  type UpgradeLevel,
   type FaultMode,
   type TenantConfig,
 } from './data.js';
@@ -51,7 +53,30 @@ app.post('/__control/fault', (req, res) => {
   res.json({ fault: runtimeState.fault });
 });
 
-app.get('/__control/health', (_req, res) => res.json({ ok: true, fault: runtimeState.fault }));
+/**
+ * Ship the vendor upgrade.
+ *
+ * Separate from the fault endpoint on purpose: a fault is something going
+ * wrong, and this is the institution's software working exactly as intended
+ * while every capability recorded against 8.4 quietly stops matching. They are
+ * different operational events and they deserve different switches.
+ */
+app.post('/__control/upgrade', (req, res) => {
+  const level = String(req.query['level'] ?? req.body?.level ?? 'minor') as UpgradeLevel;
+  if (!['none', 'minor', 'major'].includes(level)) {
+    res.status(400).json({ error: `unknown upgrade level: ${level}`, available: ['none', 'minor', 'major'] });
+    return;
+  }
+  runtimeState.productUpgrade = level;
+  const version = level === 'none' ? '8.4/8.6 (base)' : UPGRADE_VARIANTS[level].version;
+  // eslint-disable-next-line no-console
+  console.log(`[target-app] product version -> ${version}`);
+  res.json({ productUpgrade: level, version });
+});
+
+app.get('/__control/health', (_req, res) =>
+  res.json({ ok: true, fault: runtimeState.fault, productUpgrade: runtimeState.productUpgrade }),
+);
 
 // ---------------------------------------------------------------------------
 // Tenant resolution

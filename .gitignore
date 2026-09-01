@@ -11,3 +11,6 @@ evidence/scratch/
 # The assignment brief itself is interface.ai's document, not part of the
 # submission. Kept locally, never published.
 Assignment*.pdf
+
+# Personal demo-prep notes, not part of the submission.
+docs/DEMO-PREP.md
