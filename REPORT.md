@@ -306,6 +306,23 @@ And a draft never runs by accident: an unpinned load takes the newest
 approves it. Newest-wins was the original rule and it was wrong the moment
 anything other than a human could write a version.
 
+**What it found on the first run, against the unchanged application.** The
+report came back `degraded`, and it was right. Two steps had recorded their
+container as `"Member ID or Last Name is required."` — a validation banner that
+happened to be on screen during the discovery probe, captured as if it were the
+panel title. It has never broken a run, because `container` is worth 15 points
+against a floor of 45, and the label and role carry the match. But it is a
+descriptor that means something slightly wrong, and it would have degraded
+quietly until something else moved.
+
+That is the whole argument for the report in one example: the defect was latent
+in an artifact that passes every structural invariant, replays 3/3, and has 7/7
+verified detectors. And the loop closes correctly — `container` is exactly the
+signal repair **refuses** to patch, so the tool that found it also declines to
+fix it and hands it to a person. Left in place deliberately: fixing it by hand
+would edit an artifact behind its own provenance, and the honest remedies are a
+reviewer patch or a fresh recording.
+
 ---
 
 ## 4. Heterogeneity & multi-tenant

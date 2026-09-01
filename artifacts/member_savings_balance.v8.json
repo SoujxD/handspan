@@ -495,8 +495,8 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 4,
-      "successes": 3
+      "runs": 5,
+      "successes": 4
     },
     "reviewedBy": "s.chavan",
     "notes": "Read-only lookup. 2 discovered + 5 reviewer-added outcome rules; all 7 detectors verified firing against the live application. Bound to lakeshore via label overlay plus that tenant's maintenance interstitial."
@@ -506,7 +506,7 @@
     "model": "claude-opus-5",
     "effort": "high",
     "discoveryRunId": "disc-20260814-203551-eb30cf",
-    "contentHash": "23e8f50dd0d7254a1680fe0386da222b",
+    "contentHash": "40c36c277bff5a93b4f1c5c0eb3f9c3f",
     "generator": "handspan"
   }
 }
