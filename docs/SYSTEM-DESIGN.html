@@ -1,0 +1,947 @@
+<title>Handspan Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+  /* ---- tokens: complete light palette on bare :root ------------------- */
+  :root {
+    --ground:      #eef1f5;
+    --surface:     #ffffff;
+    --surface-2:   #f5f7fa;
+    --ink:         #131a24;
+    --ink-2:       #47536420;
+    --text:        #26303d;
+    --muted:       #5d6b7d;
+    --line:        #c8d1dc;
+    --line-soft:   #dfe5ec;
+
+    /* semantic, not decorative: ochre = the model is involved and it costs
+       money; teal = deterministic, zero model calls; clay = blocked/refused. */
+    --model:       #9a5a06;
+    --model-tint:  #f6efe2;
+    --model-edge:  #dfc79a;
+    --determ:      #0f6a68;
+    --determ-tint: #e4f0ef;
+    --determ-edge: #a8cdcb;
+    --refuse:      #a4372a;
+    --refuse-tint: #f7e8e5;
+
+    --shadow: 0 1px 2px rgba(19,26,36,.06), 0 8px 24px rgba(19,26,36,.05);
+    --radius: 10px;
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0d1117;
+      --surface:     #161c25;
+      --surface-2:   #1c2430;
+      --ink:         #e8edf4;
+      --ink-2:       #8fa2b840;
+      --text:        #c3cddb;
+      --muted:       #8b98a9;
+      --line:        #2f3a48;
+      --line-soft:   #232c38;
+
+      --model:       #e0a862;
+      --model-tint:  #262015;
+      --model-edge:  #4a3c22;
+      --determ:      #5cc4bf;
+      --determ-tint: #122523;
+      --determ-edge: #21453f;
+      --refuse:      #e28b7c;
+      --refuse-tint: #2a1a17;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0d1117;
+    --surface:     #161c25;
+    --surface-2:   #1c2430;
+    --ink:         #e8edf4;
+    --ink-2:       #8fa2b840;
+    --text:        #c3cddb;
+    --muted:       #8b98a9;
+    --line:        #2f3a48;
+    --line-soft:   #232c38;
+
+    --model:       #e0a862;
+    --model-tint:  #262015;
+    --model-edge:  #4a3c22;
+    --determ:      #5cc4bf;
+    --determ-tint: #122523;
+    --determ-edge: #21453f;
+    --refuse:      #e28b7c;
+    --refuse-tint: #2a1a17;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  /* ---- base ----------------------------------------------------------- */
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--text);
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-size: 16.5px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+
+  h1, h2, h3, .ui {
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.06;
+    margin: 0 0 .5rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -.012em;
+    margin: 0 0 .2rem;
+  }
+  h3 {
+    font-size: 1.06rem;
+    font-weight: 600;
+    letter-spacing: -.004em;
+    margin: 0 0 .35rem;
+  }
+
+  p { margin: 0 0 1rem; max-width: var(--measure); }
+  p.wide { max-width: none; }
+
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .855em;
+  }
+  code {
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 4px;
+    padding: .08em .34em;
+    color: var(--ink);
+  }
+
+  strong { color: var(--ink); font-weight: 600; }
+  em { font-style: italic; }
+
+  a { color: var(--determ); text-underline-offset: .18em; }
+  :focus-visible { outline: 2px solid var(--determ); outline-offset: 3px; border-radius: 3px; }
+
+  /* ---- masthead ------------------------------------------------------- */
+  header.mast {
+    padding: 68px 0 40px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 44px;
+  }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .72rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1rem;
+  }
+  .thesis {
+    font-size: 1.16rem;
+    max-width: 60ch;
+    color: var(--text);
+    margin: 0;
+  }
+  .thesis strong { color: var(--ink); }
+
+  /* ---- sections ------------------------------------------------------- */
+  section { margin: 0 0 60px; scroll-margin-top: 20px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .sec-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .06em;
+    padding-top: .25rem;
+  }
+
+  /* ---- figures -------------------------------------------------------- */
+  figure {
+    margin: 26px 0 30px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .canvas { overflow-x: auto; padding: 22px 22px 8px; }
+  figure svg { display: block; max-width: 100%; height: auto; min-width: 620px; color: var(--ink); }
+  figcaption {
+    font-size: .87rem;
+    color: var(--muted);
+    padding: 12px 22px 18px;
+    border-top: 1px solid var(--line-soft);
+    background: var(--surface-2);
+    max-width: none;
+  }
+  figcaption strong { color: var(--ink); }
+
+  /* ---- stage cards ---------------------------------------------------- */
+  .stages { display: grid; gap: 14px; margin: 22px 0 6px; }
+  .stage {
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .stage.is-model { border-left-color: var(--model); }
+  .stage.is-determ { border-left-color: var(--determ); }
+  .stage-tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: .3rem;
+  }
+  .stage h3 { margin-bottom: .3rem; }
+  .stage p { margin-bottom: .55rem; }
+  .io {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .78rem;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--line-soft);
+    margin-top: 10px;
+  }
+  .io b { color: var(--ink); font-weight: 500; }
+
+  @media (max-width: 720px) {
+    .stage { grid-template-columns: 1fr; gap: 6px; }
+  }
+
+  /* ---- tables --------------------------------------------------------- */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin: 20px 0 8px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: .93rem; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--muted);
+    font-weight: 600;
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td.mono { font-size: .82rem; color: var(--ink); white-space: nowrap; }
+  td.lines { font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; white-space: nowrap; }
+
+  .folder-head td {
+    background: var(--surface-2);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: .01em;
+  }
+  .folder-head td span { font-family: "IBM Plex Serif", serif; font-weight: 400; color: var(--muted); font-size: .84rem; margin-left: 10px; }
+
+  /* ---- callout -------------------------------------------------------- */
+  .note {
+    border-left: 3px solid var(--determ);
+    background: var(--determ-tint);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 15px 20px;
+    margin: 22px 0;
+  }
+  .note.warn { border-left-color: var(--refuse); background: var(--refuse-tint); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .ui {
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--muted);
+    display: block;
+    margin-bottom: .35rem;
+  }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 4px 0 0; font-size: .85rem; color: var(--muted); }
+  .key { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 11px; height: 11px; border-radius: 2px; border: 1px solid var(--line); }
+  .swatch.m { background: var(--model-tint); border-color: var(--model-edge); }
+  .swatch.d { background: var(--determ-tint); border-color: var(--determ-edge); }
+
+  footer { border-top: 1px solid var(--line); padding-top: 22px; color: var(--muted); font-size: .88rem; }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">Handspan · computer-use automation for back-office banking</p>
+    <h1>Architecture</h1>
+    <p class="thesis">
+      An LLM works out how to do a task in a UI that has no API — <strong>once</strong>.
+      That run is compiled into a typed capability. The capability then replays
+      <strong>with no model in the loop</strong>, thousands of times.
+    </p>
+  </header>
+
+  <!-- ============================================================ 1 -->
+  <section id="whole">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>The whole system, one picture</h2>
+    </div>
+
+    <p>Two halves that never run at the same time, joined by a file. Everything the
+    automation does — in either half — reaches the application through the same
+    adapter, and passes the same gate on the way.</p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1080 790" role="img" aria-label="Discovery uses an LLM to drive the application once and compiles the run into a capability artifact; replay executes that artifact with no model. Both halves act through one surface adapter and every action passes the policy gate.">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+            <marker id="ar-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--model)"/>
+            </marker>
+            <marker id="ar-d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--determ)"/>
+            </marker>
+          </defs>
+
+          <!-- ============ DISCOVERY band ============ -->
+          <rect x="24" y="36" width="676" height="196" rx="10" fill="var(--model-tint)" stroke="var(--model-edge)"/>
+          <text x="42" y="60" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.4" fill="var(--model)">DISCOVERY — ONCE PER FLOW · MODEL IN THE LOOP · COSTS MONEY</text>
+
+          <rect x="44" y="98" width="136" height="60" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="112" y="123" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="currentColor">Goal</text>
+          <text x="112" y="140" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">in plain English</text>
+
+          <rect x="222" y="76" width="222" height="126" rx="7" fill="var(--surface)" stroke="var(--model-edge)" stroke-width="1.5"/>
+          <text x="333" y="100" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="currentColor">agent/loop.ts</text>
+          <text x="333" y="124" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="currentColor">observe → decide → act</text>
+          <text x="333" y="145" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">records every action into a trace</text>
+          <rect x="266" y="160" width="134" height="24" rx="12" fill="var(--model-tint)" stroke="var(--model-edge)"/>
+          <text x="333" y="176" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--model)">Claude Opus 5</text>
+
+          <rect x="486" y="88" width="192" height="102" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="582" y="112" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="currentColor">agent/compiler.ts</text>
+          <text x="582" y="134" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="currentColor">trace → capability</text>
+          <text x="582" y="154" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">the model proposes,</text>
+          <text x="582" y="170" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">this code disposes</text>
+
+          <line x1="182" y1="128" x2="216" y2="128" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <line x1="446" y1="128" x2="480" y2="128" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+          <!-- ============ ARTIFACT ============ -->
+          <rect x="340" y="272" width="340" height="98" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="2"/>
+          <text x="510" y="299" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" font-weight="600" fill="currentColor">artifacts/&lt;id&gt;.v&lt;n&gt;.json</text>
+          <text x="510" y="321" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="currentColor">THE CAPABILITY</text>
+          <text x="510" y="341" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--muted)">typed · versioned · reviewed in git</text>
+          <text x="510" y="358" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--muted)">inputs · outputs · steps · outcomes · policy</text>
+
+          <line x1="582" y1="192" x2="582" y2="266" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <text x="592" y="234" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">writes, as a draft</text>
+
+          <line x1="440" y1="372" x2="440" y2="448" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <text x="450" y="414" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">loaded — approved version only</text>
+
+          <!-- ============ REPLAY band ============ -->
+          <rect x="24" y="452" width="676" height="184" rx="10" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+          <text x="42" y="476" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.4" fill="var(--determ)">REPLAY — THOUSANDS OF TIMES · NO MODEL · ZERO TOKENS</text>
+
+          <rect x="44" y="510" width="136" height="60" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="112" y="535" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="currentColor">AI agent</text>
+          <text x="112" y="552" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">calls it like a function</text>
+
+          <rect x="222" y="500" width="150" height="80" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="297" y="526" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="currentColor">catalog/</text>
+          <text x="297" y="542" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="currentColor">server.ts</text>
+          <text x="297" y="562" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">typed tool call</text>
+
+          <rect x="414" y="482" width="264" height="132" rx="7" fill="var(--surface)" stroke="var(--determ-edge)" stroke-width="1.5"/>
+          <text x="546" y="506" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="currentColor">replay/engine.ts</text>
+          <text x="546" y="528" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor">guards → policy → resolve</text>
+          <text x="546" y="545" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor">→ act → checkpoint</text>
+          <rect x="452" y="562" width="188" height="24" rx="12" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+          <text x="546" y="578" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--determ)">llmCalls === 0, asserted</text>
+
+          <line x1="182" y1="540" x2="216" y2="540" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <line x1="374" y1="540" x2="408" y2="540" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+          <!-- ============ RESULT ============ -->
+          <rect x="24" y="676" width="676" height="86" rx="10" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="42" y="700" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.4" fill="var(--muted)">RESULT — FOUR SHAPES, NOT FOUR STATUS VALUES</text>
+          <rect x="42" y="712" width="146" height="34" rx="6" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+          <text x="115" y="728" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="var(--determ)">success</text>
+          <text x="115" y="741" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">typed outputs · exit 0</text>
+
+          <rect x="200" y="712" width="146" height="34" rx="6" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+          <text x="273" y="728" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="var(--determ)">outcome</text>
+          <text x="273" y="741" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">a business answer · exit 0</text>
+
+          <rect x="358" y="712" width="146" height="34" rx="6" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="431" y="728" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="currentColor">escalated</text>
+          <text x="431" y="741" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">handed to a human · 75</text>
+
+          <rect x="516" y="712" width="164" height="34" rx="6" fill="var(--refuse-tint)" stroke="var(--refuse)" stroke-opacity=".4"/>
+          <text x="598" y="728" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="var(--refuse)">failure</text>
+          <text x="598" y="741" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">step · expected · observed</text>
+
+          <line x1="546" y1="618" x2="546" y2="670" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+          <!-- ============ THE GATE ============ -->
+          <rect x="714" y="36" width="34" height="600" rx="6" fill="var(--refuse-tint)" stroke="var(--refuse)" stroke-opacity=".45"/>
+          <text transform="rotate(-90 731 336)" x="731" y="336" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="var(--refuse)">safety/policy.ts — EVERY action, BOTH halves</text>
+
+          <!-- lane -> gate -> seam -->
+          <line x1="446" y1="212" x2="708" y2="212" stroke="var(--model)" stroke-width="1.5" marker-end="url(#ar-m)"/>
+          <text x="470" y="205" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--model)">act · observe</text>
+          <line x1="754" y1="212" x2="790" y2="212" stroke="var(--model)" stroke-width="1.5" marker-end="url(#ar-m)"/>
+
+          <line x1="680" y1="452" x2="708" y2="452" stroke="var(--determ)" stroke-width="1.5" marker-end="url(#ar-d)"/>
+          <text x="560" y="446" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--determ)">act · observe</text>
+          <line x1="754" y1="452" x2="790" y2="452" stroke="var(--determ)" stroke-width="1.5" marker-end="url(#ar-d)"/>
+
+          <!-- ============ THE SEAM ============ -->
+          <rect x="790" y="36" width="266" height="600" rx="10" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="808" y="60" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.4" fill="var(--muted)">THE SEAM — ONE ADAPTER</text>
+
+          <rect x="808" y="76" width="230" height="62" rx="7" fill="var(--surface)" stroke="currentColor" stroke-width="1.6"/>
+          <text x="923" y="99" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600" fill="currentColor">types/surface.ts</text>
+          <text x="923" y="118" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">Surface port · UiNode</text>
+          <text x="923" y="132" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">no selectors live above this line</text>
+
+          <rect x="808" y="160" width="230" height="66" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="923" y="182" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor">web/perception.ts</text>
+          <text x="923" y="200" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">page → UiNode[]</text>
+          <text x="923" y="216" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">role · label · panel · frame</text>
+
+          <rect x="808" y="248" width="230" height="66" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="923" y="270" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor">web/resolver.ts</text>
+          <text x="923" y="288" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">description → element</text>
+          <text x="923" y="304" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">scores; refuses to guess</text>
+
+          <rect x="808" y="336" width="230" height="56" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="923" y="358" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor">playwright-surface.ts</text>
+          <text x="923" y="376" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">a driver, not a locator engine</text>
+
+          <rect x="808" y="414" width="230" height="72" rx="7" fill="var(--surface)" stroke="var(--line)" stroke-dasharray="4 3"/>
+          <text x="923" y="438" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="currentColor">Meridian Core</text>
+          <text x="923" y="456" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">the legacy app · framesets, tables</text>
+          <text x="923" y="472" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--muted)">2 institutions · injectable faults</text>
+
+          <line x1="923" y1="140" x2="923" y2="156" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"/>
+          <line x1="923" y1="228" x2="923" y2="244" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"/>
+          <line x1="923" y1="316" x2="923" y2="332" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"/>
+          <line x1="923" y1="394" x2="923" y2="410" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"/>
+
+          <rect x="808" y="510" width="230" height="106" rx="7" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="808" y="502" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--muted)">ALWAYS ON, BOTH HALVES</text>
+          <text x="822" y="532" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor">safety/redaction.ts</text>
+          <text x="822" y="548" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">secrets read, never written down</text>
+          <text x="822" y="570" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor">evidence/recorder.ts</text>
+          <text x="822" y="586" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">JSONL log + screenshots, redacted</text>
+          <text x="822" y="606" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor">control/lease.ts + escalation.ts</text>
+        </svg>
+      </div>
+      <figcaption>
+        <strong>The two halves never overlap.</strong> Discovery runs once, with the model,
+        and its only output is the artifact. Replay reads that artifact and never
+        constructs a model client at all. Both act on the application through one
+        adapter, and every single action — in either half — passes the policy gate first.
+      </figcaption>
+    </figure>
+
+    <div class="legend">
+      <span class="key"><span class="swatch m"></span> the model is involved; this costs money</span>
+      <span class="key"><span class="swatch d"></span> deterministic; zero model calls</span>
+    </div>
+  </section>
+
+  <!-- ============================================================ 2 -->
+  <section id="flow">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>The flow, stage by stage</h2>
+    </div>
+
+    <p>Follow the picture left to right, then top to bottom. Each stage below says
+    what goes in and what comes out.</p>
+
+    <div class="stages">
+
+      <div class="stage is-model">
+        <div class="stage-tag">Stage 1<br>discovery</div>
+        <div>
+          <h3>A model drives the real application</h3>
+          <p>You hand it a goal in English. It opens a browser and works the screens
+          — but it never sees HTML. It sees the page the way a screen reader does: a
+          list of controls with a role, a visible label, and which panel and frame
+          each one sits in. It points at things by a throwaway handle like <code>e17</code>,
+          reissued every time the screen is looked at.</p>
+          <p>Because the tool it is given has no <em>selector</em> parameter, it cannot
+          write one down even if it wanted to. Constraining the tools is what
+          constrains the artifact.</p>
+          <div class="io"><span><b>in</b> goal + entry URL</span><span><b>out</b> a trace of every action, with before/after screen state</span><span><b>cost</b> ~11–22 model calls, once</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-tag">Stage 2<br>compile</div>
+        <div>
+          <h3>Code turns the run into a contract</h3>
+          <p>The model <em>proposes</em>; the compiler <em>disposes</em>. It rewrites each
+          target as a plain description, invents a checkpoint for any step that
+          changed something and lacks one, re-derives how risky each action is from
+          policy rather than trusting the model, and throws away any literal that was
+          bound to a parameter — passwords unconditionally.</p>
+          <p>Then the schema checks its own rules. If anything is unsafe, the recording
+          fails loudly instead of producing a plausible artifact that misbehaves in
+          three weeks.</p>
+          <div class="io"><span><b>in</b> the trace</span><span><b>out</b> a capability, marked <code>draft</code></span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-tag">Stage 3<br>the artifact</div>
+        <div>
+          <h3>One JSON file, reviewed like code</h3>
+          <p>This is the pivot of the whole system, and the thing to open on screen.
+          It holds the typed inputs a caller supplies, the typed outputs it gets back,
+          the ordered steps, the declared unhappy paths, the per-institution bindings,
+          the risk policy, and who approved it.</p>
+          <p>A calling agent can read the inputs, outputs and outcomes and know exactly
+          what it needs and what can happen — <em>without reading a single step</em>.</p>
+          <div class="io"><span><b>lives in</b> git</span><span><b>versions</b> immutable and additive</span><span><b>runs when</b> a human approves it</span></div>
+        </div>
+      </div>
+
+      <div class="stage is-determ">
+        <div class="stage-tag">Stage 4<br>replay</div>
+        <div>
+          <h3>The same flow, without the model</h3>
+          <p>An agent calls the capability by name with typed arguments. The engine
+          walks the recorded steps against the live application. Nothing here reasons:
+          it looks up each control by description, acts, and verifies. No model client
+          is even constructed, and the result carries a count of model calls that is
+          asserted to be zero before it is returned.</p>
+          <div class="io"><span><b>in</b> capability + inputs + which institution</span><span><b>out</b> one of four result shapes</span><span><b>cost</b> a browser, no tokens</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-tag">Stage 5<br>the answer</div>
+        <div>
+          <h3>Four shapes, so they cannot be confused</h3>
+          <p>Success and a <em>business outcome</em> are different things but both are
+          fine — "no such member" is an answer, not a crash, and both exit zero. An
+          escalation means a person now holds the browser. A failure carries the step,
+          what was expected, what was actually on screen, and a screenshot.</p>
+          <p>They are separate shapes rather than values of a status field, so a caller
+          physically cannot read outputs off an outcome — the field is not there.</p>
+          <div class="io"><span><b>HTTP</b> success 200 · outcome 200 · escalated 202 · failure 4xx/5xx</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ 3 -->
+  <section id="step">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>Inside one replay step</h2>
+    </div>
+
+    <p>The order is fixed, and the order <em>is</em> the error handling. Guards run
+    before every step — not only where a problem was first seen — which is how a
+    surprise screen is caught wherever it appears.</p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 300" role="img" aria-label="Each replay step runs snapshot, then guards, then a policy re-check, then resolve, act and checkpoint. Guards can end the run as a business outcome, recover and retry, escalate to a human, or stop hard.">
+          <defs>
+            <marker id="s-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <g font-family="IBM Plex Sans, sans-serif">
+            <rect x="20" y="40" width="140" height="58" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="90" y="65" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">1 · Snapshot</text>
+            <text x="90" y="83" text-anchor="middle" font-size="10.5" fill="var(--muted)">read the screen</text>
+
+            <rect x="196" y="40" width="150" height="58" rx="7" fill="var(--refuse-tint)" stroke="var(--refuse)" stroke-opacity=".4"/>
+            <text x="271" y="65" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">2 · Guards</text>
+            <text x="271" y="83" text-anchor="middle" font-size="10.5" fill="var(--muted)">is this a known screen?</text>
+
+            <rect x="382" y="40" width="150" height="58" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="457" y="65" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">3 · Policy</text>
+            <text x="457" y="83" text-anchor="middle" font-size="10.5" fill="var(--muted)">still allowed to do this?</text>
+
+            <rect x="568" y="40" width="150" height="58" rx="7" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+            <text x="643" y="65" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">4 · Resolve</text>
+            <text x="643" y="83" text-anchor="middle" font-size="10.5" fill="var(--muted)">find the control</text>
+
+            <rect x="754" y="40" width="120" height="58" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="814" y="65" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">5 · Act</text>
+            <text x="814" y="83" text-anchor="middle" font-size="10.5" fill="var(--muted)">click or type</text>
+
+            <rect x="910" y="40" width="112" height="58" rx="7" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+            <text x="966" y="65" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">6 · Check</text>
+            <text x="966" y="83" text-anchor="middle" font-size="10.5" fill="var(--muted)">did it work?</text>
+
+            <line x1="162" y1="69" x2="190" y2="69" stroke="currentColor" stroke-width="1.3" marker-end="url(#s-ar)"/>
+            <line x1="348" y1="69" x2="376" y2="69" stroke="currentColor" stroke-width="1.3" marker-end="url(#s-ar)"/>
+            <line x1="534" y1="69" x2="562" y2="69" stroke="currentColor" stroke-width="1.3" marker-end="url(#s-ar)"/>
+            <line x1="720" y1="69" x2="748" y2="69" stroke="currentColor" stroke-width="1.3" marker-end="url(#s-ar)"/>
+            <line x1="876" y1="69" x2="904" y2="69" stroke="currentColor" stroke-width="1.3" marker-end="url(#s-ar)"/>
+
+            <!-- guard exits -->
+            <line x1="271" y1="100" x2="271" y2="140" stroke="currentColor" stroke-width="1.3" marker-end="url(#s-ar)"/>
+            <text x="284" y="126" font-size="10.5" fill="var(--muted)">a declared screen was recognised →</text>
+
+            <rect x="20" y="150" width="196" height="46" rx="6" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+            <text x="118" y="169" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--determ)">business</text>
+            <text x="118" y="186" text-anchor="middle" font-size="10.5" fill="var(--muted)">end the run with an answer</text>
+
+            <rect x="234" y="150" width="196" height="46" rx="6" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="332" y="169" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">recoverable</text>
+            <text x="332" y="186" text-anchor="middle" font-size="10.5" fill="var(--muted)">clear it, retry this step</text>
+
+            <rect x="448" y="150" width="196" height="46" rx="6" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="546" y="169" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">escalate</text>
+            <text x="546" y="186" text-anchor="middle" font-size="10.5" fill="var(--muted)">hand the session to a person</text>
+
+            <rect x="662" y="150" width="196" height="46" rx="6" fill="var(--refuse-tint)" stroke="var(--refuse)" stroke-opacity=".4"/>
+            <text x="760" y="169" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--refuse)">hard</text>
+            <text x="760" y="186" text-anchor="middle" font-size="10.5" fill="var(--muted)">stop, with the diagnosis</text>
+
+            <!-- retry loop -->
+            <path d="M 332 198 L 332 236 L 271 236 L 271 106" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#s-ar)"/>
+            <text x="344" y="240" font-size="10.5" fill="var(--muted)">re-check before repeating — a recovery may already have done the step</text>
+
+            <!-- checkpoint fail -->
+            <path d="M 966 100 L 966 264 L 90 264 L 90 106" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#s-ar)"/>
+            <text x="520" y="280" text-anchor="middle" font-size="10.5" fill="var(--muted)">checkpoint failed → retry the step if it is safe to repeat, otherwise report the failure</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>
+        <strong>Two details do most of the work.</strong> Waiting is condition-based, never a
+        fixed sleep — a slow application changes how long a run takes, not whether it
+        works. And the resolver refuses to act when two controls are too close to
+        call, because acting on a coin flip inside a banking system is the worst
+        option available.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================ 4 -->
+  <section id="control">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>Handing control to a human</h2>
+    </div>
+
+    <p>When the system cannot safely continue, a person takes over <em>the same live
+    browser window</em> — same cookies, same half-filled form. Not a fresh session.</p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1000 260" role="img" aria-label="A session lease moves from automation to paused to operator and back through paused to automation. While the operator holds the lease the automation is blocked at the surface.">
+          <defs>
+            <marker id="l-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+          <g font-family="IBM Plex Sans, sans-serif">
+            <rect x="40" y="70" width="190" height="66" rx="8" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+            <text x="135" y="97" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">automation</text>
+            <text x="135" y="116" text-anchor="middle" font-size="10.5" fill="var(--muted)">the engine is driving</text>
+
+            <rect x="390" y="70" width="190" height="66" rx="8" fill="var(--surface-2)" stroke="var(--line)" stroke-dasharray="5 3"/>
+            <text x="485" y="97" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">paused</text>
+            <text x="485" y="116" text-anchor="middle" font-size="10.5" fill="var(--muted)">nobody holds it</text>
+
+            <rect x="740" y="70" width="190" height="66" rx="8" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="835" y="97" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">operator</text>
+            <text x="835" y="116" text-anchor="middle" font-size="10.5" fill="var(--muted)">a person is driving</text>
+
+            <line x1="232" y1="92" x2="384" y2="92" stroke="currentColor" stroke-width="1.4" marker-end="url(#l-ar)"/>
+            <text x="308" y="84" text-anchor="middle" font-size="10.5" fill="var(--muted)">stuck — pause</text>
+
+            <line x1="582" y1="92" x2="734" y2="92" stroke="currentColor" stroke-width="1.4" marker-end="url(#l-ar)"/>
+            <text x="658" y="84" text-anchor="middle" font-size="10.5" fill="var(--muted)">take control</text>
+
+            <line x1="734" y1="120" x2="582" y2="120" stroke="currentColor" stroke-width="1.4" marker-end="url(#l-ar)"/>
+            <text x="658" y="136" text-anchor="middle" font-size="10.5" fill="var(--muted)">hand back</text>
+
+            <path d="M 485 142 L 485 186 L 135 186 L 135 142" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#l-ar)"/>
+            <text x="310" y="202" text-anchor="middle" font-size="10.5" fill="var(--muted)">resume at the step that stopped</text>
+
+            <rect x="40" y="216" width="890" height="34" rx="6" fill="var(--refuse-tint)" stroke="var(--refuse)" stroke-opacity=".35"/>
+            <text x="485" y="238" text-anchor="middle" font-size="11.5" fill="var(--refuse)">while the operator holds the lease, the surface refuses every automated action — it is a check at the only door, not a flag</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>
+        <strong>Why <code>paused</code> exists as its own state.</strong> Going straight from
+        automation to operator makes the moment of transfer a race in which both
+        sides believe they are driving. The empty state removes that window.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================ 5 -->
+  <section id="lifecycle">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <h2>After day one: drift and repair</h2>
+    </div>
+
+    <p>A capability is not a program — it is a description of a screen, and screens
+    change. When the vendor renames a field, nothing errors anywhere; the
+    recording just quietly stops matching. Finding that is the part that does not
+    scale at thousands of app instances.</p>
+
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1040 300" role="img" aria-label="A replay result feeds drift analysis, which classifies findings. Vocabulary drift becomes a proposed repair written as a draft version that a human approves; structural and checkpoint drift are refused and handed to a person.">
+          <defs>
+            <marker id="d-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+          <g font-family="IBM Plex Sans, sans-serif">
+            <rect x="20" y="86" width="150" height="62" rx="7" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="95" y="110" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">any replay run</text>
+            <text x="95" y="128" text-anchor="middle" font-size="10.5" fill="var(--muted)">live, or a saved result</text>
+
+            <rect x="216" y="76" width="176" height="82" rx="7" fill="var(--determ-tint)" stroke="var(--determ-edge)"/>
+            <text x="304" y="100" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">replay/drift.ts</text>
+            <text x="304" y="119" text-anchor="middle" font-size="10.5" fill="var(--muted)">reads signals already</text>
+            <text x="304" y="134" text-anchor="middle" font-size="10.5" fill="var(--muted)">in the run — nothing new</text>
+            <text x="304" y="149" text-anchor="middle" font-size="10.5" fill="var(--muted)">is measured</text>
+
+            <line x1="172" y1="117" x2="210" y2="117" stroke="currentColor" stroke-width="1.3" marker-end="url(#d-ar)"/>
+
+            <rect x="440" y="30" width="180" height="52" rx="6" fill="var(--surface)" stroke="var(--determ-edge)"/>
+            <text x="530" y="52" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--determ)">vocabulary</text>
+            <text x="530" y="69" text-anchor="middle" font-size="10.5" fill="var(--muted)">a field was renamed</text>
+
+            <rect x="440" y="96" width="180" height="52" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+            <text x="530" y="118" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">structural · missing</text>
+            <text x="530" y="135" text-anchor="middle" font-size="10.5" fill="var(--muted)">the layout moved</text>
+
+            <rect x="440" y="162" width="180" height="52" rx="6" fill="var(--refuse-tint)" stroke="var(--refuse)" stroke-opacity=".4"/>
+            <text x="530" y="184" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--refuse)">checkpoint</text>
+            <text x="530" y="201" text-anchor="middle" font-size="10.5" fill="var(--muted)">the proof-of-success moved</text>
+
+            <line x1="394" y1="106" x2="434" y2="60" stroke="currentColor" stroke-width="1.2" marker-end="url(#d-ar)"/>
+            <line x1="394" y1="117" x2="434" y2="120" stroke="currentColor" stroke-width="1.2" marker-end="url(#d-ar)"/>
+            <line x1="394" y1="130" x2="434" y2="182" stroke="currentColor" stroke-width="1.2" marker-end="url(#d-ar)"/>
+
+            <rect x="676" y="30" width="180" height="52" rx="6" fill="var(--surface)" stroke="var(--determ-edge)"/>
+            <text x="766" y="52" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">repair proposes</text>
+            <text x="766" y="69" text-anchor="middle" font-size="10.5" fill="var(--muted)">a new draft version</text>
+            <line x1="624" y1="56" x2="670" y2="56" stroke="currentColor" stroke-width="1.2" marker-end="url(#d-ar)"/>
+
+            <rect x="676" y="120" width="180" height="70" rx="6" fill="var(--refuse-tint)" stroke="var(--refuse)" stroke-opacity=".4"/>
+            <text x="766" y="146" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--refuse)">refused</text>
+            <text x="766" y="164" text-anchor="middle" font-size="10.5" fill="var(--muted)">named and handed</text>
+            <text x="766" y="179" text-anchor="middle" font-size="10.5" fill="var(--muted)">to a person</text>
+            <line x1="624" y1="122" x2="670" y2="140" stroke="currentColor" stroke-width="1.2" marker-end="url(#d-ar)"/>
+            <line x1="624" y1="188" x2="670" y2="172" stroke="currentColor" stroke-width="1.2" marker-end="url(#d-ar)"/>
+
+            <rect x="900" y="30" width="120" height="52" rx="6" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="960" y="52" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">a human</text>
+            <text x="960" y="69" text-anchor="middle" font-size="10.5" fill="var(--muted)">approves it</text>
+            <line x1="860" y1="56" x2="894" y2="56" stroke="currentColor" stroke-width="1.2" marker-end="url(#d-ar)"/>
+
+            <path d="M 960 84 L 960 250 L 95 250 L 95 154" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#d-ar)"/>
+            <text x="530" y="266" text-anchor="middle" font-size="10.5" fill="var(--muted)">only then does the new version become the one that runs</text>
+
+            <text x="30" y="196" font-size="10.5" fill="var(--muted)">nothing is ever</text>
+            <text x="30" y="211" font-size="10.5" fill="var(--muted)">changed without</text>
+            <text x="30" y="226" font-size="10.5" fill="var(--muted)">a person saying so</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>
+        <strong>The line that matters:</strong> a repair may change how the flow is
+        <em>found</em>, never how it is <em>verified</em>. The cheapest way to make a broken
+        capability go green is to weaken the assertion that proves it worked — so
+        that is exactly the change it will not make.
+      </figcaption>
+    </figure>
+
+    <div class="note">
+      <span class="ui">Worth saying out loud</span>
+      <p>Ordinary renames are worked out with no model at all — the saved proposal
+      reports <code>Model calls: 0</code>. A model is spent only on a genuinely ambiguous
+      case, and even then it may only <em>pick</em> a label that was actually on screen.
+      Same principle as the system itself: spend the model where judgement is
+      needed, and nowhere else.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ 6 -->
+  <section id="components">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <h2>Every component, in one line</h2>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Component</th><th>What it does</th><th>Why it exists</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">agent/loop.ts</td><td>Drives the browser with the model: observe, decide, act, record.</td><td>A policy denial must come back as something the model can reason about, not an exception.</td></tr>
+          <tr><td class="mono">agent/tools.ts</td><td>The only actions the model may take.</td><td>No selector parameter exists, so a selector can never enter the artifact.</td></tr>
+          <tr><td class="mono">agent/compiler.ts</td><td>Turns the recorded run into a capability.</td><td>The model is the least trustworthy part; it proposes and code disposes.</td></tr>
+          <tr><td class="mono">types/artifact.ts</td><td>The capability schema, and the rules it must satisfy.</td><td>An unsafe capability cannot exist as a valid object.</td></tr>
+          <tr><td class="mono">types/result.ts</td><td>The four result shapes.</td><td>A caller cannot mistake a business answer for a crash.</td></tr>
+          <tr><td class="mono">types/surface.ts</td><td>The seam: what a "screen" is, abstractly.</td><td>Adding a desktop app means writing one adapter, not rewriting anything.</td></tr>
+          <tr><td class="mono">web/perception.ts</td><td>Turns a live page into labelled controls.</td><td>Legacy screens have no accessible names — the label is the text in the cell next door.</td></tr>
+          <tr><td class="mono">web/resolver.ts</td><td>Finds the control a description refers to.</td><td>Scores several weak signals, and refuses when two candidates tie.</td></tr>
+          <tr><td class="mono">web/playwright-surface.ts</td><td>Moves the mouse, types keys, reads frames.</td><td>A driver only — Playwright's own matching is never used, so the flow stays portable.</td></tr>
+          <tr><td class="mono">replay/engine.ts</td><td>Executes a capability against the live app.</td><td>The production path. No model is imported below this line.</td></tr>
+          <tr><td class="mono">replay/evaluate.ts</td><td>Answers "is this condition true?" and pulls values off the screen.</td><td>Checkpoints mean the same thing at record time and replay time.</td></tr>
+          <tr><td class="mono">replay/drift.ts</td><td>Reports how far the screen has moved from the recording.</td><td>Detection is what does not scale; the signal was already in every run.</td></tr>
+          <tr><td class="mono">repair/propose.ts</td><td>Writes a proposed new version for drift that is safely fixable.</td><td>Repair is a reviewed change to a file, never an edit and never a live decision.</td></tr>
+          <tr><td class="mono">safety/policy.ts</td><td>Decides whether an action may happen at all.</td><td>One gate, below both halves, on the only path to the browser.</td></tr>
+          <tr><td class="mono">safety/redaction.ts</td><td>Keeps credentials and regulated data out of anything written down.</td><td>Exact values for declared secrets; patterns as a backstop.</td></tr>
+          <tr><td class="mono">control/lease.ts</td><td>Tracks who is holding the browser session.</td><td>Enforced at the surface, so automation physically cannot act while a person holds it.</td></tr>
+          <tr><td class="mono">control/escalation.ts</td><td>Decides when a human is needed and packages the context.</td><td>Detection, routing and transfer are three different jobs.</td></tr>
+          <tr><td class="mono">operator/server.ts</td><td>The console a person takes control from.</td><td>The handoff is real; the video feed is deliberately a screenshot poll.</td></tr>
+          <tr><td class="mono">catalog/store.ts</td><td>Loads and saves capabilities; projects them as agent tools.</td><td>An unpinned load takes the newest <em>approved</em> version, never the newest.</td></tr>
+          <tr><td class="mono">catalog/server.ts</td><td>Two HTTP endpoints: list capabilities, invoke one.</td><td>Because the artifact is already a contract, this needed almost no code.</td></tr>
+          <tr><td class="mono">evidence/recorder.ts</td><td>Writes the log, screenshots and snapshots for every run.</td><td>The redactor is a constructor dependency, so unredacted writing is unreachable.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ 7 -->
+  <section id="map">
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <h2>Where everything lives</h2>
+    </div>
+
+    <p>~13,900 lines of TypeScript across 38 files, including the mock application
+    and the tests.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>File</th><th>Purpose</th><th>Lines</th></tr></thead>
+        <tbody>
+          <tr class="folder-head"><td colspan="3">src/types/ <span>the contracts — read these first</span></td></tr>
+          <tr><td class="mono">artifact.ts</td><td>Capability schema: descriptors, typed inputs and outputs with sensitivity, steps, outcome rules, tenant bindings — plus the invariants an artifact must satisfy to be valid.</td><td class="lines">675</td></tr>
+          <tr><td class="mono">result.ts</td><td>The four terminal result shapes, the failure taxonomy, and the per-step trace entries.</td><td class="lines">250</td></tr>
+          <tr><td class="mono">surface.ts</td><td>The <code>Surface</code> port and <code>UiNode</code>: what a control is, with no selector anywhere in it.</td><td class="lines">148</td></tr>
+
+          <tr class="folder-head"><td colspan="3">src/surface/web/ <span>the only surface-specific code</span></td></tr>
+          <tr><td class="mono">perception.ts</td><td>Live page across all frames → <code>UiNode[]</code>, including the label-derivation ladder that ends at the adjacent table cell.</td><td class="lines">600</td></tr>
+          <tr><td class="mono">resolver.ts</td><td>Pure scoring function from a description to an element, with a score floor and a margin below which it refuses to choose.</td><td class="lines">426</td></tr>
+          <tr><td class="mono">playwright-surface.ts</td><td>Browser driver: clicks, typing, frame tree, screenshots with sensitive regions masked before capture.</td><td class="lines">374</td></tr>
+
+          <tr class="folder-head"><td colspan="3">src/agent/ <span>discovery — the only place a model exists</span></td></tr>
+          <tr><td class="mono">loop.ts</td><td>The observe → decide → act loop, stop conditions, transient-failure retry, and the trace it produces.</td><td class="lines">672</td></tr>
+          <tr><td class="mono">compiler.ts</td><td>Trace → capability: re-derives targets, synthesises missing checkpoints, re-classifies risk, strips literals.</td><td class="lines">816</td></tr>
+          <tr><td class="mono">tools.ts</td><td>The tool definitions the model is given, including <code>finish</code>, which demands a contract rather than "done".</td><td class="lines">293</td></tr>
+          <tr><td class="mono">prompt.ts</td><td>The system prompt and the rendering of a screen observation.</td><td class="lines">199</td></tr>
+
+          <tr class="folder-head"><td colspan="3">src/replay/ <span>production — no model below this line</span></td></tr>
+          <tr><td class="mono">engine.ts</td><td>The step loop, guards, recovery, escalation triggers, output extraction, and the four-shape result.</td><td class="lines">1455</td></tr>
+          <tr><td class="mono">evaluate.ts</td><td>Condition evaluation and value extraction — pure functions over a screen snapshot.</td><td class="lines">294</td></tr>
+          <tr><td class="mono">drift.ts</td><td>Classifies how far the surface has moved, and reads renames back off rejected candidates.</td><td class="lines">409</td></tr>
+
+          <tr class="folder-head"><td colspan="3">src/repair/ <span>reviewed self-repair</span></td></tr>
+          <tr><td class="mono">propose.ts</td><td>Builds a draft patch from drift findings, asserts nothing outside the label overlay changed, and refuses what it must not touch.</td><td class="lines">346</td></tr>
+
+          <tr class="folder-head"><td colspan="3">src/safety/ · src/control/ · src/evidence/</td></tr>
+          <tr><td class="mono">safety/policy.ts</td><td>Navigation allowlist, structural risk classification, and the limits every run obeys.</td><td class="lines">295</td></tr>
+          <tr><td class="mono">safety/redaction.ts</td><td>Exact-value scrubbing for declared secrets plus pattern redaction as a backstop.</td><td class="lines">169</td></tr>
+          <tr><td class="mono">control/lease.ts</td><td>The single-holder session lease and its state machine.</td><td class="lines">189</td></tr>
+          <tr><td class="mono">control/escalation.ts</td><td>Intervention detection, routing and the broker a console talks to.</td><td class="lines">195</td></tr>
+          <tr><td class="mono">evidence/recorder.ts</td><td>JSONL logging, screenshots and snapshots — all redacted on the way out.</td><td class="lines">154</td></tr>
+
+          <tr class="folder-head"><td colspan="3">src/catalog/ · src/operator/ · src/cli.ts</td></tr>
+          <tr><td class="mono">catalog/store.ts</td><td>Load, save, version and validate artifacts; project them into agent tool definitions.</td><td class="lines">311</td></tr>
+          <tr><td class="mono">catalog/server.ts</td><td><code>GET /capabilities</code> and <code>POST /capabilities/:id/invoke</code>, with the result-to-HTTP mapping.</td><td class="lines">163</td></tr>
+          <tr><td class="mono">operator/server.ts</td><td>The human-in-the-loop console: take control, drive, hand back.</td><td class="lines">324</td></tr>
+          <tr><td class="mono">cli.ts</td><td>Every command: discover, replay, drift, repair, bind-tenant, declare-outcome, approve, codegen, catalog, operator.</td><td class="lines">1046</td></tr>
+          <tr><td class="mono">config.ts</td><td>One place that knows the filesystem, the environment, and how the safety objects are built.</td><td class="lines">85</td></tr>
+
+          <tr class="folder-head"><td colspan="3">target-app/ <span>the mock legacy bank</span></td></tr>
+          <tr><td class="mono">server.ts</td><td>Routes, session handling, fault injection, and the vendor-upgrade control endpoint.</td><td class="lines">357</td></tr>
+          <tr><td class="mono">views.ts</td><td>The deliberately hostile HTML: framesets, table layouts, no test IDs.</td><td class="lines">471</td></tr>
+          <tr><td class="mono">data.ts</td><td>Synthetic members, the two institutions, fault modes and the upgrade variants.</td><td class="lines">256</td></tr>
+
+          <tr class="folder-head"><td colspan="3">scripts/ <span>the tools that disbelieve the system</span></td></tr>
+          <tr><td class="mono">verify-outcomes.ts</td><td>Provokes every declared outcome and reports which detectors actually fire.</td><td class="lines">170</td></tr>
+          <tr><td class="mono">verify-artifact.ts</td><td>Audits an artifact: no baked-in credentials or PII, no id-based matching, approval traceable.</td><td class="lines">116</td></tr>
+          <tr><td class="mono">audit-evidence.ts</td><td>Greps everything persisted for seeded PII and credentials; exits non-zero if any survived.</td><td class="lines">57</td></tr>
+          <tr><td class="mono">capture-evidence.ts</td><td>Replays every result class and writes the evidence index.</td><td class="lines">252</td></tr>
+          <tr><td class="mono">agent-invoke-demo.ts</td><td>A calling agent discovering the catalog and invoking a capability.</td><td class="lines">173</td></tr>
+
+          <tr class="folder-head"><td colspan="3">tests/ <span>98 unit tests + 2 integration harnesses</span></td></tr>
+          <tr><td class="mono">contract.test.ts</td><td>Schema invariants and the result contract.</td><td class="lines">441</td></tr>
+          <tr><td class="mono">resolver.test.ts</td><td>Scoring, thresholds, and that a matching element id cannot rescue a wrong candidate.</td><td class="lines">230</td></tr>
+          <tr><td class="mono">safety.test.ts</td><td>Allowlist, risk classification, redaction, and the lease state machine.</td><td class="lines">235</td></tr>
+          <tr><td class="mono">drift.test.ts</td><td>Drift classification and — mostly — what repair refuses to touch.</td><td class="lines">289</td></tr>
+          <tr><td class="mono">integration-replay.ts</td><td>Eight scenarios covering every result class, asserting zero model calls.</td><td class="lines">225</td></tr>
+          <tr><td class="mono">integration-escalation.ts</td><td>The full control-transfer cycle, printing every lease transition.</td><td class="lines">213</td></tr>
+
+          <tr class="folder-head"><td colspan="3">root <span>config and outputs</span></td></tr>
+          <tr><td class="mono">policy.yaml</td><td>The single safety configuration: allowlists, risk patterns, redaction patterns, limits.</td><td class="lines">169</td></tr>
+          <tr><td class="mono">artifacts/</td><td>The capabilities themselves — one JSON file per version, reviewed in git.</td><td class="lines">—</td></tr>
+          <tr><td class="mono">evidence/</td><td>Real run logs: two discovery runs, seventeen replay runs, drift and repair transcripts.</td><td class="lines">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p class="wide">Handspan — built for the interface.ai computer-use take-home.
+    Full design write-up in <code>REPORT.md</code>; setup and the demo path in
+    <code>README.md</code>; run logs in <code>/evidence</code>.</p>
+  </footer>
+
+</div>
