@@ -1,0 +1,2570 @@
+{
+  "capturedAt": "2026-09-03T19:09:55.127Z",
+  "url": "https://web-sample.interface-hiring.com/members/100234",
+  "frameUrls": [
+    "https://web-sample.interface-hiring.com/members/100234"
+  ],
+  "title": "Member Record - Meridian Core",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "link",
+      "name": "Main Menu",
+      "label": "Main Menu",
+      "labelSource": "accessible-name",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 307,
+        "y": 42,
+        "width": 66.546875,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "link",
+      "name": "Member Inquiry",
+      "label": "Member Inquiry",
+      "labelSource": "accessible-name",
+      "container": "Main Menu",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 393.03125,
+        "y": 42,
+        "width": 88.125,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "link",
+      "name": "System Settings",
+      "label": "System Settings",
+      "labelSource": "accessible-name",
+      "container": "Member Inquiry",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/settings",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 500.640625,
+        "y": 42,
+        "width": 90.359375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "link",
+      "name": "Sign Off",
+      "label": "Sign Off",
+      "labelSource": "accessible-name",
+      "container": "System Settings",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/signoff",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 610.484375,
+        "y": 42,
+        "width": 44.625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "link",
+      "name": "Funds Transfer",
+      "label": "Funds Transfer",
+      "labelSource": "accessible-name",
+      "container": "ACTIONS",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members/100234/transfer",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 686,
+        "width": 81.328125,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "link",
+      "name": "Open New Share",
+      "label": "Open New Share",
+      "labelSource": "accessible-name",
+      "container": "Funds Transfer",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members/100234/open-share",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 415.8125,
+        "y": 686,
+        "width": 92.890625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "link",
+      "name": "Update Member Information",
+      "label": "Update Member Information",
+      "labelSource": "accessible-name",
+      "container": "Open New Share",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members/100234/update",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 528.1875,
+        "y": 686,
+        "width": 156.734375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e8",
+      "role": "link",
+      "name": "Place Account Hold",
+      "label": "Place Account Hold",
+      "labelSource": "accessible-name",
+      "container": "Update Member Information",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members/100234/hold",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 704.40625,
+        "y": 686,
+        "width": 105.015625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e9",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 15,
+        "width": 758,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e10",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "table-cell",
+      "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 40,
+        "width": 758,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e11",
+      "role": "cell",
+      "name": "",
+      "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "labelSource": "table-cell",
+      "value": "MEMBER RECORD SHARES / BALANCES ACTIONS Funds Transfer · Open New Share · Update Member Information · Place Account Hold",
+      "rowKey": "MEMBER RECORD SHARES / BALANCES ACTIONS Funds Transfer · Open New Share · Update Member Information · Place Account Hold",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 57,
+        "width": 758,
+        "height": 654
+      }
+    },
+    {
+      "handle": "e12",
+      "role": "heading",
+      "name": "",
+      "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "labelSource": "table-cell",
+      "value": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "h1"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 69,
+        "width": 730,
+        "height": 16
+      }
+    },
+    {
+      "handle": "e13",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "Member No.:",
+      "rowKey": "Member No.:",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 98,
+        "width": 124,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e14",
+      "role": "cell",
+      "name": "",
+      "label": "Member No.:",
+      "labelSource": "table-cell",
+      "value": "100234",
+      "rowKey": "Member No.:",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 439,
+        "y": 98,
+        "width": 304.6875,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e15",
+      "role": "cell",
+      "name": "",
+      "label": "100234",
+      "labelSource": "table-cell",
+      "value": "Name:",
+      "rowKey": "Member No.:",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 743.6875,
+        "y": 98,
+        "width": 84,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e16",
+      "role": "cell",
+      "name": "",
+      "label": "Name:",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "Member No.:",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 827.6875,
+        "y": 98,
+        "width": 217.3125,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e17",
+      "role": "cell",
+      "name": "",
+      "label": "Member No.:",
+      "labelSource": "table-cell",
+      "value": "E-mail:",
+      "rowKey": "E-mail:",
+      "columnHeader": "Member No.:",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 115,
+        "width": 124,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e18",
+      "role": "cell",
+      "name": "",
+      "label": "E-mail:",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "E-mail:",
+      "columnHeader": "100234",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 439,
+        "y": 115,
+        "width": 304.6875,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e19",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "Phone:",
+      "rowKey": "E-mail:",
+      "columnHeader": "Name:",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 743.6875,
+        "y": 115,
+        "width": 84,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e20",
+      "role": "cell",
+      "name": "",
+      "label": "Phone:",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "E-mail:",
+      "columnHeader": "[REDACTED:SECRET]",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 827.6875,
+        "y": 115,
+        "width": 217.3125,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e21",
+      "role": "cell",
+      "name": "",
+      "label": "E-mail:",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "[REDACTED:SECRET]",
+      "columnHeader": "Member No.:",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 132,
+        "width": 124,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e22",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "[REDACTED:SECRET]",
+      "columnHeader": "100234",
+      "container": "MEMBER RECORD",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 439,
+        "y": 132,
+        "width": 606,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e23",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "Share ID",
+      "rowKey": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 176,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e24",
+      "role": "cell",
+      "name": "",
+      "label": "Share ID",
+      "labelSource": "table-cell",
+      "value": "Type",
+      "rowKey": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 176,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e25",
+      "role": "cell",
+      "name": "",
+      "label": "Type",
+      "labelSource": "table-cell",
+      "value": "Balance",
+      "rowKey": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 176,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e26",
+      "role": "cell",
+      "name": "",
+      "label": "Balance",
+      "labelSource": "table-cell",
+      "value": "Status",
+      "rowKey": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 176,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e27",
+      "role": "cell",
+      "name": "",
+      "label": "Share ID",
+      "labelSource": "table-cell",
+      "value": "100234-S0001",
+      "rowKey": "100234-S0001",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 199,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e28",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 199,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e29",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 199,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e30",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-S0001",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 199,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e31",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001",
+      "labelSource": "table-cell",
+      "value": "100234-S0070",
+      "rowKey": "100234-S0070",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 222,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e32",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0070",
+      "labelSource": "table-cell",
+      "value": "Share Draft (Checking)",
+      "rowKey": "100234-S0070",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 222,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e33",
+      "role": "cell",
+      "name": "",
+      "label": "Share Draft (Checking)",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0070",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 222,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e34",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-S0070",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 222,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e35",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0070",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-3",
+      "rowKey": "100234-MMKT-3",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 245,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e36",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-3",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-3",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 245,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e37",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-3",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 245,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e38",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-MMKT-3",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 245,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e39",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-3",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-4",
+      "rowKey": "100234-MMKT-4",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 268,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e40",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-4",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-4",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 268,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e41",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-4",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 268,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e42",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-MMKT-4",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 268,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e43",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-4",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-5",
+      "rowKey": "100234-S0001-5",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 291,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e44",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-5",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-5",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 291,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e45",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-5",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 291,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e46",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-S0001-5",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 291,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e47",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-5",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-6",
+      "rowKey": "100234-S0001-6",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 314,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e48",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-6",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-6",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 314,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e49",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-6",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 2,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 314,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e50",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0001-6",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 314,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e51",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-6",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-7",
+      "rowKey": "100234-MMKT-7",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 337,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e52",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-7",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-7",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 337,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e53",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-7",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 2,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 337,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e54",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-MMKT-7",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 337,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e55",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-7",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-8",
+      "rowKey": "100234-MMKT-8",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 360,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e56",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-8",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-8",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 360,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e57",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-8",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 3,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 360,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e58",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-MMKT-8",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 360,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e59",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-8",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-9",
+      "rowKey": "100234-MMKT-9",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 383,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e60",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-9",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-9",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 383,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e61",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-9",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 4,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 383,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e62",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-MMKT-9",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 383,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e63",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-9",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-10",
+      "rowKey": "100234-MMKT-10",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 406,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e64",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-10",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-10",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 406,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e65",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-10",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 5,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 406,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e66",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-MMKT-10",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 406,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e67",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-10",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-11",
+      "rowKey": "100234-MMKT-11",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 429,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e68",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-11",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-11",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 429,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e69",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-11",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 6,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 429,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e70",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-MMKT-11",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 429,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e71",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-11",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-12",
+      "rowKey": "100234-S0001-12",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 452,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e72",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-12",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-12",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 452,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e73",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-12",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 3,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 452,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e74",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0001-12",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 452,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e75",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-12",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-13",
+      "rowKey": "100234-S0001-13",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 475,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e76",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-13",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-13",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 475,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e77",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-13",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 4,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 475,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e78",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0001-13",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 475,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e79",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-13",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-14",
+      "rowKey": "100234-S0001-14",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 498,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e80",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-14",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-14",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 498,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e81",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-14",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 5,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 498,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e82",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0001-14",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 498,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e83",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-14",
+      "labelSource": "table-cell",
+      "value": "100234-CERT-15",
+      "rowKey": "100234-CERT-15",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 521,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e84",
+      "role": "cell",
+      "name": "",
+      "label": "100234-CERT-15",
+      "labelSource": "table-cell",
+      "value": "Certificate",
+      "rowKey": "100234-CERT-15",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 521,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e85",
+      "role": "cell",
+      "name": "",
+      "label": "Certificate",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-CERT-15",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 521,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e86",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "HOLD [HOLD]",
+      "rowKey": "100234-CERT-15",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 521,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e87",
+      "role": "cell",
+      "name": "",
+      "label": "100234-CERT-15",
+      "labelSource": "table-cell",
+      "value": "100234-MMKT-16",
+      "rowKey": "100234-MMKT-16",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 544,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e88",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-16",
+      "labelSource": "table-cell",
+      "value": "Money Market",
+      "rowKey": "100234-MMKT-16",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 544,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e89",
+      "role": "cell",
+      "name": "",
+      "label": "Money Market",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-MMKT-16",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 7,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 544,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e90",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-MMKT-16",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 544,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e91",
+      "role": "cell",
+      "name": "",
+      "label": "100234-MMKT-16",
+      "labelSource": "table-cell",
+      "value": "100234-S0070-17",
+      "rowKey": "100234-S0070-17",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 567,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e92",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0070-17",
+      "labelSource": "table-cell",
+      "value": "Share Draft (Checking)",
+      "rowKey": "100234-S0070-17",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 567,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e93",
+      "role": "cell",
+      "name": "",
+      "label": "Share Draft (Checking)",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0070-17",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 567,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e94",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0070-17",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 567,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e95",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0070-17",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-18",
+      "rowKey": "100234-S0001-18",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 590,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e96",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-18",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-18",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 590,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e97",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-18",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 6,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 590,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e98",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0001-18",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 590,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e99",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-18",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-19",
+      "rowKey": "100234-S0001-19",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 613,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e100",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-19",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-19",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 613,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e101",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-19",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 7,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 613,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e102",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0001-19",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 613,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e103",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-19",
+      "labelSource": "table-cell",
+      "value": "100234-S0001-20",
+      "rowKey": "100234-S0001-20",
+      "columnHeader": "Share ID",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 316,
+        "y": 636,
+        "width": 198.40625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e104",
+      "role": "cell",
+      "name": "",
+      "label": "100234-S0001-20",
+      "labelSource": "table-cell",
+      "value": "Regular Shares",
+      "rowKey": "100234-S0001-20",
+      "columnHeader": "Type",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 514.40625,
+        "y": 636,
+        "width": 246.15625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e105",
+      "role": "cell",
+      "name": "",
+      "label": "Regular Shares",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "100234-S0001-20",
+      "columnHeader": "Balance",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 8,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 760.5625,
+        "y": 636,
+        "width": 119.34375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e106",
+      "role": "cell",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "OPEN",
+      "rowKey": "100234-S0001-20",
+      "columnHeader": "Status",
+      "container": "SHARES / BALANCES",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 879.90625,
+        "y": 636,
+        "width": 164.09375,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e107",
+      "role": "cell",
+      "name": "",
+      "label": "MEMBER RECORD SHARES / BALANCES ACTIONS Funds Transfer · Open New Share · Update Member Information · Place Account Hold",
+      "labelSource": "table-cell",
+      "value": "OPR TELLER1 | BR MAIN-001 | 09/03/2026 19:08:11 | SID BBD97937",
+      "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/03/2026 19:08:11 | SID BBD97937",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 711,
+        "width": 758,
+        "height": 20
+      }
+    },
+    {
+      "handle": "e108",
+      "role": "cell",
+      "name": "",
+      "label": "OPR TELLER1 | BR MAIN-001 | 09/03/2026 19:08:11 | SID BBD97937",
+      "labelSource": "table-cell",
+      "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 731,
+        "width": 758,
+        "height": 19
+      }
+    }
+  ],
+  "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER RECORD\nMember No.: 100234 Name: [REDACTED:SECRET]\nE-mail: [REDACTED:SECRET] Phone: [REDACTED:SECRET]\n[REDACTED:SECRET] [REDACTED:SECRET]\nSHARES / BALANCES\nShare ID Type Balance Status\n100234-S0001 Regular Shares [REDACTED:SECRET] HOLD [HOLD]\n100234-S0070 Share Draft (Checking) [REDACTED:SECRET] HOLD [HOLD]\n100234-MMKT-3 Money Market [REDACTED:SECRET] HOLD [HOLD]\n100234-MMKT-4 Money Market [REDACTED:SECRET] HOLD [HOLD]\n100234-S0001-5 Regular Shares [REDACTED:SECRET] HOLD [HOLD]\n100234-S0001-6 Regular Shares [REDACTED:SECRET] OPEN\n100234-MMKT-7 Money Market [REDACTED:SECRET] HOLD [HOLD]\n100234-MMKT-8 Money Market [REDACTED:SECRET] HOLD [HOLD]\n100234-MMKT-9 Money Market [REDACTED:SECRET] HOLD [HOLD]\n100234-MMKT-10 Money Market [REDACTED:SECRET] HOLD [HOLD]\n100234-MMKT-11 Money Market [REDACTED:SECRET] OPEN\n100234-S0001-12 Regular Shares [REDACTED:SECRET] OPEN\n100234-S0001-13 Regular Shares [REDACTED:SECRET] OPEN\n100234-S0001-14 Regular Shares [REDACTED:SECRET] OPEN\n100234-CERT-15 Certificate [REDACTED:SECRET] HOLD [HOLD]\n100234-MMKT-16 Money Market [REDACTED:SECRET] OPEN\n100234-S0070-17 Share Draft (Checking) [REDACTED:SECRET] OPEN\n100234-S0001-18 Regular Shares [REDACTED:SECRET] OPEN\n100234-S0001-19 Regular Shares [REDACTED:SECRET] OPEN\n100234-S0001-20 Regular Shares [REDACTED:SECRET] OPEN\nACTIONS\nFunds Transfer · Open New Share · Update Member Information · Place Account Hold\nOPR TELLER1 | BR MAIN-001 | 09/03/2026 19:08:11 | SID BBD97937\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+  "lastStatus": 200
+}

@@ -16,7 +16,8 @@ they get no exemption; that is the point of the guarantee.
 `MERIDIAN CORE — Member Services Platform v4.2.1`, by
 `Cornerstone Financial Systems™`. Server-rendered HTML, `<table>` layout,
 `.fld` / `.btn` / `.lbl` class names, a numbered main menu, PF-key footer. No
-test ids, no ARIA, no accessible names anywhere.
+test ids and no ARIA; links and buttons get an accessible name from their own
+text, and every data-entry field has none at all (measured below).
 
 **Naming collision, stated plainly:** the local fixture app in `target-app/`,
 built for the take-home in August, is also called "Meridian Core" (v8.4). It is
@@ -62,22 +63,75 @@ Worth saying out loud: the per-transaction token is a genuinely hard problem for
 an HTTP-level integration, and a non-problem for something that drives the UI
 the way a human does. No `hiddenValue` node kind is needed.
 
-## Label derivation — which rung fires
+## Label derivation - which rung fires
 
-No control on this app has an accessible name, and none uses `<label for>`.
-Every field label sits in the adjacent table cell:
+Measured, not guessed: `scripts/recon-meridian.ts` walks all 17 screens through
+the real perception layer and counts `labelSource` per control.
+
+| role | n | label source |
+|---|---|---|
+| link | 84 | **100%** accessible-name |
+| button | 8 | **100%** accessible-name |
+| textbox | 11 | **100%** table-cell |
+| combobox | 8 | **100%** table-cell |
+
+The split is total, and that is the interesting result. Anything with intrinsic
+text - a link, a submit button - resolves on rung 1, because its text *is* its
+accessible name. **Every data-entry field on the entire application is carried
+by rung 3 alone:** all 19 of them, not one with an accessible name and not one
+with a `<label for>`. The markup is uniformly
 
 ```html
 <td class="lbl">From Share:</td><td><select name="from">...</select></td>
 ```
 
-That is **rung 3 of the ladder — adjacent table cell** — for essentially the
-entire surface. It is the rung that exists for exactly this kind of app, and
-this target is the first time it has carried a whole application on its own.
+Without the adjacent-table-cell rung, no form on this app would be addressable
+without selectors. It is the rung that exists for exactly this kind of app, and
+this target is the first time it has had to carry a whole application alone.
 
-The shares grid is two-dimensional (`Share ID` / `Type` / `Balance` / `Status`),
-which is what `fromTableCell` (rowMatch x columnLabel) was built for: "the
-Balance of the row whose Share ID is ...", named the way an operator says it.
+An earlier draft of these notes, written from raw HTML before the perception
+pass ran, claimed *no* control had an accessible name. That was wrong - true of
+the fields, false of the buttons and links. The table above comes from the
+layer that actually does the work, which is the only version worth quoting.
+
+### The shares grid
+
+Two-dimensional, and it arrives exactly as `fromTableCell`
+(rowMatch x columnLabel) needs:
+
+```
+col=Balance  rowKey=100234-S0070  value='$1,240.55'
+col=Status   rowKey=100234-S0070  value='HOLD [HOLD]'
+```
+
+So "the Balance of the row whose Share ID is 100234-S0070" is directly
+addressable, named the way an operator says it. Two details to know before
+writing an extraction rule:
+
+- A cell's own text is in `value`. Its `label` is the *neighbouring* cell,
+  which is meaningless inside a grid - which is precisely why the grid axes are
+  separate fields rather than another rung of the label ladder.
+- `columnHeader` is populated for layout tables too, where it is junk (the
+  first cell of a presentational row). Trust it only where a real header row
+  exists, as it does on the shares grid.
+
+Recon reads 10 OPEN shares off that grid and uses two of them to drive the
+transfer form through to its review screen. That is the same path the
+capability will take: the share id is read from the member record, never
+scraped from a combobox label that carries a balance.
+
+### Resolver separation, measured
+
+The two share pickers were the one place a tie looked plausible. Against the
+live page, with 19 candidate controls in scope:
+
+```
+From Share   score 70, runner-up 30, matched [role,label]
+To Share     score 70, runner-up 30, matched [role,label]
+```
+
+A 40-point margin against a required 12. No screen in the walk produced any
+control pair sharing role + label + container.
 
 ## Comboboxes: option value vs. option label
 
