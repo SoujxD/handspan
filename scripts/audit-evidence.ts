@@ -24,6 +24,41 @@ const FORBIDDEN: Array<[string, string]> = [
   ['marcus.ibarra@example.test', 'email'],
   [process.env.DEMO_PASSWORD ?? 'demo-pass-1234', 'console password'],
   [process.env.ANTHROPIC_API_KEY ?? '\u0000never', 'Anthropic API key'],
+
+  // MERIDIAN CORE (the hosted target). Names and street addresses have no
+  // reliable regex, so the redactor cannot catch them by pattern - they are
+  // scrubbed because something *declared* them regulated: an artifact output
+  // classified `pii`, or, before any artifact exists, the recon pass
+  // registering them off the member record before its first write. Seeding
+  // them here is what turns that from a claim into a check.
+  //
+  // Read from the live target, not remembered. Balances are deliberately NOT
+  // seeded: they change between runs, so a hardcoded one rots into a check
+  // that passes because it no longer matches anything.
+  ['Lovelace, Ada', 'member name (100234)'],
+  ['22 Harbor Lane, Arlington', 'member address (100234)'],
+  ['Turing, Alan', 'member name (100987)'],
+  ['100 Test Ave, Springfield', 'member address (100987)'],
+  ['Hopper, Grace', 'member name (101555)'],
+  ['1 Compiler Way, Arlington', 'member address (101555)'],
+  ['Johnson, Katherine', 'member name (102777)'],
+  ['12 Example St, Springfield', 'member address (102777)'],
+  ['Vaughan, Dorothy', 'member name (103001)'],
+  ['58 Fortran Ave, Newport', 'member address (103001)'],
+  ['grace.hopper@example.com', 'member email (101555)'],
+  ['dorothy.vaughan+replay@example.com', 'member email (103001)'],
+  // NOT seeded: MERIDIAN's demo operator password, whose literal value is the
+  // word "password". Seeding it reported 41 leaks, every one an English
+  // sentence ("Enter the operator's password on the sign-in screen").
+  //
+  // The lesson is about the instrument, not the threshold. A substring audit
+  // can only check a secret that is distinguishable from prose, and this one
+  // is not - so loosening the match would be pretending to check something.
+  // The guarantee for that field comes from somewhere else and is stronger:
+  // it is a `secret`-classified input, so its value is never shown to the
+  // model, never captured into a snapshot, and never written to an artifact.
+  // The audit checks values that could leak; classification stops this one
+  // from being collected at all.
 ];
 
 const root = process.argv[2] ?? PATHS.evidence;
