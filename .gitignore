@@ -1,6 +1,10 @@
 node_modules/
 .env
 .env.local
+# Any .env sidecar - backups, per-machine copies. A `.env.bak` holding a live
+# API key was one `git add -A` away from being published.
+.env.*
+!.env.example
 *.log
 
 # Evidence is committed for the submission (see /evidence), but scratch runs are not.

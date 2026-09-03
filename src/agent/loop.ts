@@ -17,12 +17,13 @@
  * against the trace rather than trusted to the model's good behaviour.
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import type Anthropic from '@anthropic-ai/sdk';
 import type { PolicyEngine } from '../safety/policy.js';
 import type { Redactor } from '../safety/redaction.js';
 import type { EvidenceRecorder } from '../evidence/recorder.js';
 import type { Surface, SurfaceSnapshot, UiNode } from '../types/surface.js';
 import type { RiskClass } from '../types/artifact.js';
+import { anthropicClient } from '../config.js';
 import { TOOLS } from './tools.js';
 import { renderObservation, systemPrompt } from './prompt.js';
 
@@ -118,7 +119,7 @@ export async function runDiscovery(
   deps: DiscoveryDeps,
 ): Promise<DiscoveryTrace> {
   const { surface, policy, redactor, evidence } = deps;
-  const client = new Anthropic();
+  const client = anthropicClient();
 
   const trace: DiscoveryTrace = {
     goal,

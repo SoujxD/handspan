@@ -38,7 +38,8 @@
  *    silent data corruption. It refuses, and escalates to a human instead.
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import type Anthropic from '@anthropic-ai/sdk';
+import { anthropicClient } from '../config.js';
 import { withTransientRetry } from '../agent/loop.js';
 import { hashCapability } from '../agent/compiler.js';
 import { parseCapability, validateCapability, type Capability } from '../types/artifact.js';
@@ -143,7 +144,7 @@ export async function assistRename(
   const candidates = deps.candidatesFor(finding);
   if (!declared?.label || !candidates.length) return { calls: 0 };
 
-  const client = new Anthropic();
+  const client = anthropicClient();
   const response = await withTransientRetry(
     () =>
       client.messages.create({

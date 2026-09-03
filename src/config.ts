@@ -9,6 +9,7 @@
  */
 
 import 'dotenv/config';
+import Anthropic from '@anthropic-ai/sdk';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -71,6 +72,27 @@ export function buildRedactor(policy: PolicyEngine): Redactor {
 export function newRunId(prefix: 'disc' | 'replay' | 'verify' | 'drift' | 'repair'): string {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
   return `${prefix}-${stamp}-${randomUUID().slice(0, 6)}`;
+}
+
+/**
+ * The one place a model client is constructed.
+ *
+ * An identity-linked API key — one issued against a person rather than a bare
+ * organisation key — is rejected with a 400 unless every request names the
+ * workspace it acts in. That is an account-shape difference, not a target
+ * difference: the same code works with either kind of key, and the header is
+ * simply omitted when there is nothing to send.
+ *
+ * Constructing the client here rather than at each call site means discovery
+ * and repair cannot drift apart on authentication, for the same reason the
+ * policy engine is built here: a run that authenticated differently from the
+ * one that recorded the artifact is not a comparable run.
+ */
+export function anthropicClient(): Anthropic {
+  const workspaceId = process.env['ANTHROPIC_WORKSPACE_ID'];
+  return new Anthropic(
+    workspaceId ? { defaultHeaders: { 'anthropic-workspace-id': workspaceId } } : {},
+  );
 }
 
 export function requireAnthropicKey(): string {
