@@ -15,6 +15,9 @@ navigation:
   allowedOrigins:
     - "http://localhost:4300"
     - "http://127.0.0.1:4300"
+    # MERIDIAN CORE (Cornerstone Financial Systems v4.2.1) — interface.ai's
+    # hosted target. Adding an institution is this line plus a tenant binding.
+    - "https://web-sample.interface-hiring.com"
 
   # Path patterns, matched against the URL path with `:param` wildcards.
   # A navigation must match at least one. This is what stops an agent that has
@@ -33,9 +36,34 @@ navigation:
     - "/t/:tenant/member/:id/subaccount/review"
     - "/t/:tenant/member/:id/subaccount/confirm"
 
+    # MERIDIAN CORE. Paths are enumerated rather than wildcarded so that a
+    # route the vendor adds later is denied until a human has looked at it.
+    - "/signon"
+    - "/menu"
+    - "/members"
+    - "/members/:id"
+    - "/members/:id/transfer"
+    - "/members/:id/transfer/review"
+    - "/members/:id/transfer/post"
+    - "/members/:id/open-share"
+    - "/members/:id/open-share/review"
+    - "/members/:id/open-share/post"
+    - "/members/:id/update"
+    - "/members/:id/hold"
+    - "/members/:id/hold/review"
+    - "/members/:id/hold/post"
+    - "/signoff"
+
   deniedPathPatterns:
     - "/t/:tenant/admin"
     - "/t/:tenant/admin/:rest"
+
+    # MERIDIAN CORE's System Settings screen sets error injection GLOBALLY, and
+    # the host is shared with other candidates and stateful in memory. An agent
+    # that wandered in there would break someone else's demo. Faults are
+    # injected per-request with ?inject=<kind> instead, which affects one
+    # response and nobody else. This is what an allowlist is actually for.
+    - "/settings"
 
 actions:
   # Action kinds the automation may emit at all. Anything absent is rejected by
@@ -74,15 +102,46 @@ risk:
   # irreversible-> BLOCK, always; escalate to a human rather than proceeding
   irreversiblePatterns:
     - "\\b(delete|remove|purge|void)\\b"
-    - "\\b(transfer|wire|disburse|payment)\\b"
+    - "\\b(wire|disburse)\\b"
     - "\\b(close\\s+account|freeze|lock\\s+card)\\b"
     - "\\bpost\\s+transaction\\b"
+    # Placing a hold on a member's funds is not undoable from the screen that
+    # does it, and MERIDIAN CORE says so itself: its confirmation page carries
+    # the banner "IRREVERSIBLE ACTION".
+    #
+    # Matched on the committing verb rather than the bare word "hold", so that
+    # *navigating* to the hold screen is permitted and the commit is what gets
+    # refused. That is deliberate: risk is a property of the control that
+    # commits an action, not of the link that opens the form. It is also what
+    # lets a blocked run hand a supervisor a filled-in form instead of an empty
+    # screen — the handoff is worth more when the work is already done.
+    - "\\b(apply|post|place|release)\\s+(account\\s+)?hold\\b"
 
   # Actions that create durable state but are the whole point of the capability.
   # These are `confirmable`: allowed unattended only when the calling agent
   # passes an explicit confirmation token naming the capability.
   confirmablePatterns:
     - "\\b(submit|confirm|create|open\\s+account|approve)\\b"
+    # A funds transfer between a member's own shares is a routine teller action
+    # with a compensating correction available, so blocking it unconditionally
+    # would be theatre: the capability could never run at all, and §3.1 of the
+    # brief requires one that posts.
+    #
+    # The risk actually being managed is executing the WRONG transfer — and
+    # that is what the confirmation token (which must name the capability) and
+    # the review-screen checkpoint exist to catch. Downgraded from irreversible
+    # deliberately and with that argument, not quietly to make a run pass.
+    - "\\b(transfer|payment)\\b"
+    # Vendor vocabulary, found by classifying MERIDIAN CORE's real button text
+    # against this list during recon rather than by assuming it transferred.
+    #
+    # `open account` did not match "Open Share", and nothing matched "Save
+    # Changes" at all — and Update Member Information has NO review screen, so
+    # an unattended agent could have rewritten a member's mailing address with
+    # no confirmation token. That is precisely the coupling the adaptation was
+    # supposed to surface: these patterns were written around the fixture app's
+    # wording. The fix is vocabulary, in config, which is the point.
+    - "\\b(save|open\\s+share)\\b"
 
   # Reading these is fine; persisting them raw is not.
   sensitiveNamePatterns:
@@ -114,6 +173,13 @@ redaction:
     - name: email
       regex: "[\\w.%+-]+@[\\w.-]+\\.[A-Za-z]{2,}"
       replacement: "[REDACTED:EMAIL]"
+    # MERIDIAN CORE renders member phone numbers as 555-0142. Anchored on digit
+    # boundaries for the same reason the SSN rule is: a legacy screen that
+    # concatenates "Phone:555-0142" gives \b nothing to match against.
+    - name: phone
+      regex: "(?<!\\d)(?:\\(\\d{3}\\)\\s*|\\d{3}[.-])?\\d{3}-\\d{4}(?!\\d)"
+      replacement: "[REDACTED:PHONE]"
+
     - name: bearer
       regex: "\\b(bearer|api[_-]?key|authorization)\\s*[:=]\\s*\\S+"
       replacement: "$1: [REDACTED:CREDENTIAL]"
