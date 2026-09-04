@@ -1,0 +1,722 @@
+{
+  "capturedAt": "2026-09-04T20:38:47.918Z",
+  "url": "https://web-sample.interface-hiring.com/menu",
+  "frameUrls": [
+    "https://web-sample.interface-hiring.com/menu"
+  ],
+  "title": "Main Menu - Meridian Core",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "link",
+      "name": "Main Menu",
+      "label": "Main Menu",
+      "labelSource": "accessible-name",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 307,
+        "y": 42,
+        "width": 66.546875,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "link",
+      "name": "Member Inquiry",
+      "label": "Member Inquiry",
+      "labelSource": "accessible-name",
+      "container": "Main Menu",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 393.03125,
+        "y": 42,
+        "width": 88.125,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "link",
+      "name": "System Settings",
+      "label": "System Settings",
+      "labelSource": "accessible-name",
+      "container": "Member Inquiry",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/settings",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 500.640625,
+        "y": 42,
+        "width": 90.359375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "link",
+      "name": "Sign Off",
+      "label": "Sign Off",
+      "labelSource": "accessible-name",
+      "container": "System Settings",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/signoff",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 610.484375,
+        "y": 42,
+        "width": 44.625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "link",
+      "name": "Member Inquiry / Selection",
+      "label": "Member Inquiry / Selection",
+      "labelSource": "accessible-name",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 364.875,
+        "y": 125,
+        "width": 151.21875,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "link",
+      "name": "Funds Transfer",
+      "label": "Funds Transfer",
+      "labelSource": "accessible-name",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members?next=transfer",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 364.875,
+        "y": 142,
+        "width": 81.328125,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "link",
+      "name": "Open New Share",
+      "label": "Open New Share",
+      "labelSource": "accessible-name",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members?next=open-share",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 364.875,
+        "y": 159,
+        "width": 92.890625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e8",
+      "role": "link",
+      "name": "Update Member Information",
+      "label": "Update Member Information",
+      "labelSource": "accessible-name",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members?next=update",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 364.875,
+        "y": 176,
+        "width": 156.734375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e9",
+      "role": "link",
+      "name": "Place Account Hold",
+      "label": "Place Account Hold",
+      "labelSource": "accessible-name",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members?next=hold",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 364.875,
+        "y": 193,
+        "width": 105.015625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e10",
+      "role": "link",
+      "name": "System Settings (error injection)",
+      "label": "System Settings (error injection)",
+      "labelSource": "accessible-name",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/settings",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 364.875,
+        "y": 210,
+        "width": 182.4375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e11",
+      "role": "link",
+      "name": "Sign Off",
+      "label": "Sign Off",
+      "labelSource": "accessible-name",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/signoff",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 364.875,
+        "y": 227,
+        "width": 44.625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e12",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 15,
+        "width": 758,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e13",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "table-cell",
+      "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 40,
+        "width": 758,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e14",
+      "role": "cell",
+      "name": "",
+      "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "labelSource": "table-cell",
+      "value": "MAIN MENU Signed on as J. TELLER (TELLER) Type or click a menu option to continue.",
+      "rowKey": "MAIN MENU Signed on as J. TELLER (TELLER) Type or click a menu option to continue.",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 57,
+        "width": 758,
+        "height": 235
+      }
+    },
+    {
+      "handle": "e15",
+      "role": "heading",
+      "name": "",
+      "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "labelSource": "table-cell",
+      "value": "MAIN MENU",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "h1"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 69,
+        "width": 730,
+        "height": 16
+      }
+    },
+    {
+      "handle": "e16",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "1.",
+      "rowKey": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 123,
+        "width": 32,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e17",
+      "role": "cell",
+      "name": "",
+      "label": "1.",
+      "labelSource": "table-cell",
+      "value": "Member Inquiry / Selection",
+      "rowKey": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 359,
+        "y": 123,
+        "width": 304,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e18",
+      "role": "cell",
+      "name": "",
+      "label": "1.",
+      "labelSource": "table-cell",
+      "value": "2.",
+      "rowKey": "2.",
+      "columnHeader": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 140,
+        "width": 32,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e19",
+      "role": "cell",
+      "name": "",
+      "label": "2.",
+      "labelSource": "table-cell",
+      "value": "Funds Transfer",
+      "rowKey": "2.",
+      "columnHeader": "Member Inquiry / Selection",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 359,
+        "y": 140,
+        "width": 304,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e20",
+      "role": "cell",
+      "name": "",
+      "label": "2.",
+      "labelSource": "table-cell",
+      "value": "3.",
+      "rowKey": "3.",
+      "columnHeader": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 157,
+        "width": 32,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e21",
+      "role": "cell",
+      "name": "",
+      "label": "3.",
+      "labelSource": "table-cell",
+      "value": "Open New Share",
+      "rowKey": "3.",
+      "columnHeader": "Member Inquiry / Selection",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 359,
+        "y": 157,
+        "width": 304,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e22",
+      "role": "cell",
+      "name": "",
+      "label": "3.",
+      "labelSource": "table-cell",
+      "value": "4.",
+      "rowKey": "4.",
+      "columnHeader": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 174,
+        "width": 32,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e23",
+      "role": "cell",
+      "name": "",
+      "label": "4.",
+      "labelSource": "table-cell",
+      "value": "Update Member Information",
+      "rowKey": "4.",
+      "columnHeader": "Member Inquiry / Selection",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 359,
+        "y": 174,
+        "width": 304,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e24",
+      "role": "cell",
+      "name": "",
+      "label": "4.",
+      "labelSource": "table-cell",
+      "value": "5.",
+      "rowKey": "5.",
+      "columnHeader": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 191,
+        "width": 32,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e25",
+      "role": "cell",
+      "name": "",
+      "label": "5.",
+      "labelSource": "table-cell",
+      "value": "Place Account Hold",
+      "rowKey": "5.",
+      "columnHeader": "Member Inquiry / Selection",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 359,
+        "y": 191,
+        "width": 304,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e26",
+      "role": "cell",
+      "name": "",
+      "label": "5.",
+      "labelSource": "table-cell",
+      "value": "8.",
+      "rowKey": "8.",
+      "columnHeader": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 208,
+        "width": 32,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e27",
+      "role": "cell",
+      "name": "",
+      "label": "8.",
+      "labelSource": "table-cell",
+      "value": "System Settings (error injection)",
+      "rowKey": "8.",
+      "columnHeader": "Member Inquiry / Selection",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 359,
+        "y": 208,
+        "width": 304,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e28",
+      "role": "cell",
+      "name": "",
+      "label": "8.",
+      "labelSource": "table-cell",
+      "value": "9.",
+      "rowKey": "9.",
+      "columnHeader": "1.",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 225,
+        "width": 32,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e29",
+      "role": "cell",
+      "name": "",
+      "label": "9.",
+      "labelSource": "table-cell",
+      "value": "Sign Off",
+      "rowKey": "9.",
+      "columnHeader": "Member Inquiry / Selection",
+      "container": "Signed on as J. TELLER (TELLER)",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 359,
+        "y": 225,
+        "width": 304,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e30",
+      "role": "cell",
+      "name": "",
+      "label": "MAIN MENU Signed on as J. TELLER (TELLER) Type or click a menu option to continue.",
+      "labelSource": "table-cell",
+      "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 20:36:44 | SID 6658C641",
+      "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 20:36:44 | SID 6658C641",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 292,
+        "width": 758,
+        "height": 20
+      }
+    },
+    {
+      "handle": "e31",
+      "role": "cell",
+      "name": "",
+      "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 20:36:44 | SID 6658C641",
+      "labelSource": "table-cell",
+      "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 312,
+        "width": 758,
+        "height": 19
+      }
+    }
+  ],
+  "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMAIN MENU\nSigned on as J. TELLER (TELLER)\n1. Member Inquiry / Selection\n2. Funds Transfer\n3. Open New Share\n4. Update Member Information\n5. Place Account Hold\n8. System Settings (error injection)\n9. Sign Off\nType or click a menu option to continue.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 20:36:44 | SID 6658C641\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+  "lastStatus": 200
+}

@@ -1,0 +1,99 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-ebfc6a",
+    "capabilityId": "place_account_hold_request",
+    "capabilityVersion": 3,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-04T20:38:25.778Z",
+    "finishedAt": "2026-09-04T20:38:47.920Z",
+    "durationMs": 22142,
+    "stepsAttempted": 2,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-ebfc6a",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "checkpoint_failed",
+    "message": "Step s03 ran but did not reach the expected state.",
+    "atStepId": "s03",
+    "stepIntent": "Sign on to the servicing console as the supervisor operator.",
+    "expected": "text \"Signed on as S.\" present on screen",
+    "observed": "url=https://web-sample.interface-hiring.com/menu; text starts \"MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™ Main Menu · Member Inquiry · System Settings · Sign Off MAIN MENU Signed on as J. T\"",
+    "remediation": "The action may not have taken effect, or the application returned a state this capability does not know about. If it is a legitimate outcome, declare it in the artifact."
+  },
+  "partialOutputs": {},
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the supervisor operator ID in the Operator ID box on the sign-on screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-04T20:38:25.993Z",
+      "durationMs": 503,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Operator ID:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator [REDACTED:SECRET] in the Password box.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-04T20:38:26.496Z",
+      "durationMs": 430,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Password:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign on to the servicing console as the supervisor operator.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-04T20:38:48.363Z",
+      "durationMs": 0,
+      "status": "failed",
+      "note": "Step s03 ran but did not reach the expected state."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-ebfc6a/run.jsonl",
+      "capturedAt": "2026-09-04T20:38:21.831Z"
+    }
+  ]
+}

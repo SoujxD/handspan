@@ -820,6 +820,12 @@ program
   .requiredOption('-c, --capability <id>', 'Capability id.')
   .requiredOption('-s, --step <id>', 'Step whose checkpoint to strengthen.')
   .option('--text <text...>', 'Text that must be present. Repeatable. Supports {{param}}.', collect, [])
+  .option(
+    '--replace',
+    'Discard the recorded checkpoint instead of adding to it. For when the recorded ' +
+      'assertion is wrong, not merely weak.',
+    false,
+  )
   .requiredOption('--why <text>', 'Why a reviewer added this. Recorded in governance notes.')
   .action((o: Record<string, unknown>) => {
     const store = new CapabilityStore(PATHS.artifacts);
@@ -865,7 +871,20 @@ program
     }
 
     const added = texts.map((t) => ({ kind: 'textPresent' as const, text: t, caseSensitive: false }));
-    const existing = step.checkpoint;
+
+    /**
+     * `--replace` exists for a checkpoint that is wrong rather than weak, and
+     * the distinction matters: weakening an assertion to make a run pass is
+     * exactly what this system is not allowed to do.
+     *
+     * The case it was built for: a capability recorded as a supervisor asserted
+     * `Signed on as S.` after its sign-on step. That checks WHO signed on, not
+     * THAT anyone did — it is not what the step guarantees and not part of the
+     * capability's contract, and it silently made the artifact unusable by any
+     * other operator. Replacing it with "reached the main menu, signed on" is a
+     * correction; ANDing a second assertion onto a wrong one would not be.
+     */
+    const existing = o['replace'] ? undefined : step.checkpoint;
     step.checkpoint = existing
       ? { kind: 'all' as const, of: [existing, ...added] }
       : added.length === 1
@@ -880,7 +899,10 @@ ${note}` : note;
     cap.provenance.contentHash = hashCapability(cap);
     store.save(cap);
 
-    console.log(`  Strengthened ${stepId} on ${cap.id}: ${texts.length} assertion(s).`);
+    console.log(
+      `  ${o['replace'] ? 'Replaced' : 'Strengthened'} the checkpoint on ${stepId} of ${cap.id}: ` +
+        `${texts.length} assertion(s).`,
+    );
     for (const t of texts) console.log(`    must show: ${t}`);
     console.log(`  Now v${cap.version}, approval reset to draft.`);
   });

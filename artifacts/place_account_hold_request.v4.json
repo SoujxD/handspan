@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "place_account_hold_request",
-  "version": 3,
+  "version": 4,
   "name": "Place Account Hold Request (to confirmation screen)",
   "description": "Signs on to Meridian Core as a supervisor operator, looks up a member by member number, opens the Place Account Hold action, fills in share, reason code and notes, and submits to reach the CONFIRM ACCOUNT HOLD review screen (banner: IRREVERSIBLE ACTION). It stops there without applying the hold, and returns the reviewed member, share, reason and notes for human approval. Returns a business outcome if no member matches the number supplied.",
   "surface": {
@@ -212,12 +212,13 @@
         "kind": "all",
         "of": [
           {
-            "kind": "urlMatches",
-            "pattern": "/menu(?:[?#].*)?$"
+            "kind": "textPresent",
+            "text": "MAIN MENU",
+            "caseSensitive": false
           },
           {
             "kind": "textPresent",
-            "text": "Signed on as S.",
+            "text": "Signed on as",
             "caseSensitive": false
           }
         ]
@@ -591,17 +592,17 @@
   "governance": {
     "approval": "draft",
     "stability": {
-      "runs": 2,
+      "runs": 3,
       "successes": 1
     },
-    "notes": "[reviewer] signon_failed: hard -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] input shareId: Recorded example carried the dropdown's descriptive suffix rather than the share id a caller has."
+    "notes": "[reviewer] signon_failed: hard -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] input shareId: Recorded example carried the dropdown's descriptive suffix rather than the share id a caller has.\n[reviewer] checkpoint on s03: The recorded checkpoint asserted 'Signed on as S.' because this capability was discovered while signed on as a supervisor. That checks WHO signed on rather than THAT anyone did, and it made the artifact unusable by any other operator - which is the whole point of the escalation path, where a teller attempts the action and is refused. Replaced with an assertion of what the step actually guarantees."
   },
   "provenance": {
     "discoveredAt": "2026-09-04T17:03:50.415Z",
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-170119-511808",
-    "contentHash": "bb103b63431f1afd45659e313be36c18",
+    "contentHash": "53839d234af6ea0eb7ba0d80fd61901e",
     "generator": "handspan"
   }
 }

@@ -34,6 +34,90 @@ would implement.
 
 ---
 
+## Now pointed at MERIDIAN CORE
+
+This repo also carries the **adaptation project**: the same core driving
+`web-sample.interface-hiring.com`, a hosted credit-union servicing console it
+had never seen — server-rendered table soup, a numbered menu, no test ids, a
+hidden per-transaction token, review-then-post confirmations and a
+supervisor-gated action.
+
+Seven capabilities cover its whole function surface, each recorded by a real
+discovery run and replaying with **zero model calls**.
+
+- Write-up: **[ADAPTATION.md](./ADAPTATION.md)** — what it cost, what had to
+  change, and what I cut.
+- Live demo path: **[DEMO-SCRIPT.md](./DEMO-SCRIPT.md)**.
+- What the target actually renders, measured before anything was recorded:
+  **[evidence/recon/SURFACE-NOTES.md](./evidence/recon/SURFACE-NOTES.md)**.
+
+> 330 lines of configuration, 292 lines of core change — all generic, none
+> target-specific — $10.30 across nine discovery runs, and 0 model calls across
+> 53 replays. `npx tsx scripts/adaptation-report.ts` recomputes it.
+
+**Two applications are called "Meridian Core" here and it is a coincidence.**
+The hosted target is Cornerstone Financial Systems' Meridian Core 4.2.1; the
+fixture in `target-app/` is Meridian Core 8.4, and its artifacts are dated
+2026-08-14, twelve days before the adaptation brief existed.
+
+### Running the API, dashboard and chatbot
+
+```bash
+cp .env.example .env     # ANTHROPIC_API_KEY, ANTHROPIC_WORKSPACE_ID,
+                         # HANDSPAN_INPUT_OPERATOR_PASSWORD, HANDSPAN_INPUT_OPERATOR_ID
+npx tsx src/cli.ts catalog
+```
+
+`http://localhost:4500` serves all three: the **capability catalog** as
+function-calling tool definitions, a **dashboard** (catalog, run history with
+per-step traces, and the adaptation ledger), and a **chatbot** that drives the
+API. One process, no build step.
+
+Credentials never travel in a request. `operatorPassword` is read from the
+server's environment, and `operatorId` is bound to the deployment — so the
+chatbot cannot ask to run as a supervisor, which is what makes the escalation
+path real rather than arranged.
+
+### Recording and replaying against the live target
+
+```bash
+# Record (needs a model). Windows: prefix with MSYS_NO_PATHCONV=1
+npx tsx src/cli.ts discover --tenant meridian-demo --entry "/signon" --headless   --goal "Sign on as operator teller1 ..."
+
+# Replay (never touches a model)
+npx tsx src/cli.ts replay -c member_share_balance_lookup -t meridian-demo --headless   -i memberNumber=100234 -i shareId=100234-S0001
+
+npx tsx src/cli.ts replay -c member_funds_transfer_between_shares -t meridian-demo --headless   -i memberNumber=100234 -i fromShareOption=100234-S0001-6   -i toShareOption=100234-MMKT-11 -i amount=1.00 -i memo="demo"
+
+# The staging capability that escalates: this deployment is a teller
+npx tsx src/cli.ts replay -c place_account_hold_request -t meridian-demo   -i memberNumber=100987 -i shareId=100987-S0001   -i "reasonCode=FRAUD - Suspected fraud" -i notes="pending review"
+
+# What the target renders, and what the adaptation cost
+npx tsx scripts/recon-meridian.ts
+npx tsx scripts/adaptation-report.ts
+npx tsx scripts/audit-evidence.ts
+```
+
+Operator passwords are supplied through `HANDSPAN_INPUT_*` environment
+variables, never on a command line where they would land in shell history.
+
+### Onboarding another institution
+
+```jsonc
+// institutions.json
+"harbor-cu": {
+  "displayName": "Harbor Credit Union",
+  "baseUrl": "https://harbor.example.com",
+  "product": "cornerstone-meridian-core",
+  "productVersion": "4.2.1",
+  "environmentNote": "..."
+}
+```
+
+plus its origin in `policy.yaml`. No code.
+
+---
+
 ## Setup
 
 Requires **Node ≥ 20**. Nothing else — the target application is included, so
