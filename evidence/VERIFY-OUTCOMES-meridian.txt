@@ -1,0 +1,76 @@
+Outcome-detector verification against the live MERIDIAN CORE target
+Generated 2026-09-04T21:02:53Z — zero model calls, every probe a real replay.
+
+Probes are declared per institution in institutions.json, because which member
+number does not exist and which share is on HOLD are properties of the target,
+not of the verification script. All natural error paths: the host is shared with
+other candidates, so its global fault-injection screen is never touched.
+
+════ member_funds_transfer_between_shares
+  VERIFIED    insufficient_available_balance business     fired on: amount exceeds balance
+  VERIFIED    source_share_on_hold       business     fired on: source share is on HOLD
+  VERIFIED    invalid_amount             business     fired on: amount the host will not accept
+  VERIFIED    same_source_and_destination business     fired on: same source and destination
+  VERIFIED    invalid_operator_credentials hard         fired on: operator credentials rejected
+  5/5 declared detectors verified against the live application.
+
+════ member_share_balance_lookup
+  VERIFIED    member_not_found           business     fired on: member does not exist
+  VERIFIED    invalid_operator_credentials hard         fired on: operator credentials rejected
+  UNVERIFIED  settings_area_off_limits   escalate     never fired in any probe
+  2/3 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+
+════ member_inquiry_by_last_name
+  VERIFIED    no_member_match            business     fired on: member does not exist
+  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
+  UNVERIFIED  session_timeout            escalate     never fired in any probe
+  2/3 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+
+════ member_open_new_share
+  UNVERIFIED  invalid_initial_deposit    business     never fired in any probe
+  VERIFIED    request_not_validated      business     fired on: deposit below the minimum
+  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
+  2/3 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+
+════ update_member_information
+  VERIFIED    invalid_email_format       business     fired on: e-mail in the wrong format
+  UNVERIFIED  validation_errors          business     never fired in any probe
+  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
+  UNVERIFIED  session_timed_out          escalate     never fired in any probe
+  UNVERIFIED  system_error               hard         never fired in any probe
+  2/5 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+
+════ Why some detectors stay UNVERIFIED, honestly
+
+13 of 19 declared detectors fire against the live application. The six that do
+not fall into two groups, and neither is evidence that the detector is wrong —
+only that this pass could not reach the state.
+
+  session_timeout / session_timed_out / system_error / settings_area_off_limits
+      These need a fault injected at a step the flow reaches by CLICKING, not by
+      navigating. `?inject=` is a URL parameter, so it can only be attached to a
+      navigation — and the only navigation in these capabilities is the entry
+      URL, before the state matters. The alternative is the System Settings
+      screen, which sets injection GLOBALLY on a host shared with other
+      candidates. Breaking someone else's demo to tick a box here is not a
+      trade worth making.
+
+  invalid_initial_deposit
+      Verified as shadowed rather than broken. The application's generic
+      "could not be validated" banner matches request_not_validated first, and
+      outcomes match in declaration order. Both are now classified `business`,
+      so the shadowing is harmless: a rejected deposit is reported as an answer
+      either way. Reordering would need a re-recording; reclassifying was the
+      cheaper correct fix.
+
+  validation_errors
+      Same shadowing shape as above, behind invalid_email_format.
+
+What would close the first group: a per-step fault hook in the replay engine
+that can attach `?inject=` to the request a click is about to make. That is a
+core change for the benefit of a test, so it is on the next-steps list rather
+than in this build.

@@ -40,6 +40,40 @@
     "baseUrl": "https://web-sample.interface-hiring.com",
     "product": "cornerstone-meridian-core",
     "productVersion": "4.2.1",
-    "environmentNote": "A credit-union member-servicing console hosted by interface.ai at web-sample.interface-hiring.com as the sanctioned target for this exercise. Every member record in it is seeded demo data and the operator logins are published demo credentials that the brief invites candidates to use freely."
+    "environmentNote": "A credit-union member-servicing console hosted by interface.ai at web-sample.interface-hiring.com as the sanctioned target for this exercise. Every member record in it is seeded demo data and the operator logins are published demo credentials that the brief invites candidates to use freely.",
+
+    "$probesComment": [
+      "How to provoke each declared outcome ON THIS DEPLOYMENT.",
+      "",
+      "Probes belong to the institution, not to the verification script: which",
+      "member number does not exist, which share is on hold, what an invalid",
+      "amount looks like - all of that is a property of the target. The script",
+      "used to hardcode the fixture app's answers, which meant it could only",
+      "ever verify the fixture.",
+      "",
+      "These are all NATURAL error paths. The host is shared with other",
+      "candidates and its System Settings screen sets fault injection globally,",
+      "so nothing here touches it; per-request ?inject= cannot reach a step the",
+      "flow arrives at by clicking, so the states below are provoked with",
+      "inputs instead - which is the more honest test anyway.",
+      "",
+      "Two notes on values that look odd. The amount is 1.000, not a word: the",
+      "input is typed `money`, so a non-numeric string is refused at pre-flight",
+      "and the browser never opens - a probe that cannot reach the application",
+      "verifies nothing. And the deliberately wrong password lives here rather",
+      "than in the environment precisely because it is invalid; a probe cannot",
+      "provoke a credential rejection using the credential that works."
+    ],
+    "probes": [
+      { "name": "member does not exist", "overrides": { "memberNumber": "999999", "lastName": "Nonexistent" } },
+      { "name": "amount exceeds balance", "overrides": { "amount": "99999.00" } },
+      { "name": "same source and destination", "overrides": { "toShareOption": "100234-S0001-6", "fromShareOption": "100234-S0001-6" } },
+      { "name": "amount the host will not accept", "overrides": { "amount": "1.000" } },
+      { "name": "source share is on HOLD", "overrides": { "fromShareOption": "100234-S0001" } },
+      { "name": "e-mail in the wrong format", "overrides": { "email": "definitely not an email" } },
+      { "name": "deposit below the minimum", "overrides": { "initialDeposit": "0.00" } },
+      { "name": "teller attempts a supervisor-only action", "overrides": {} },
+      { "name": "operator credentials rejected", "overrides": { "operatorPassword": "not-the-password" } }
+    ]
   }
 }

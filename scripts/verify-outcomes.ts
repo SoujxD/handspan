@@ -22,7 +22,15 @@ import { SessionLease } from '../src/control/lease.js';
 import { EvidenceRecorder } from '../src/evidence/recorder.js';
 import { replay } from '../src/replay/engine.js';
 import { detemplatize } from '../src/agent/compiler.js';
-import { buildRedactor, loadPolicy, newRunId, PATHS, runtimeConfig } from '../src/config.js';
+import {
+  buildRedactor,
+  fillSecretsFromEnvironment,
+  loadPolicy,
+  newRunId,
+  PATHS,
+  requireInstitution,
+  runtimeConfig,
+} from '../src/config.js';
 import { CapabilityStore } from '../src/catalog/store.js';
 import type { ReplayResult } from '../src/types/result.js';
 
@@ -41,10 +49,24 @@ for (const arg of process.argv.slice(3)) {
 const cfg = runtimeConfig();
 const store = new CapabilityStore(PATHS.artifacts);
 const cap = store.load(capabilityId);
-const setFault = (m: string) => fetch(`${cfg.targetAppBase}/__control/fault?mode=${m}`, { method: 'POST' });
+/** The bundled fixture exposes a fault endpoint; a hosted target does not. */
+const setFault = async (m: string): Promise<void> => {
+  if (m === 'none') return;
+  await fetch(`${cfg.targetAppBase}/__control/fault?mode=${m}`, { method: 'POST' }).catch(() => undefined);
+};
 
-/** Probes chosen to provoke states the mock application can actually produce. */
-const PROBES: Array<{ name: string; fault: string; overrides: Record<string, string> }> = [
+/**
+ * Probes come from the institution when it declares them.
+ *
+ * Which member number does not exist, which share is on hold, what an invalid
+ * amount looks like — all of that is a property of the deployment, not of this
+ * script. Hardcoding the fixture's answers here meant the pass could only ever
+ * verify the fixture, which is the opposite of the point.
+ */
+const institution = requireInstitution(cap.surface.recordedOnTenant);
+
+/** Fallback probes for the bundled fixture app, which has a fault endpoint. */
+const FIXTURE_PROBES: Array<{ name: string; fault: string; overrides: Record<string, string> }> = [
   { name: 'nonexistent record', fault: 'none', overrides: { memberId: '99999' } },
   { name: 'restricted record', fault: 'none', overrides: { memberId: '33417' } },
   // 77002 holds only a CERTIFICATE — the natural way to reach a
@@ -59,12 +81,31 @@ const PROBES: Array<{ name: string; fault: string; overrides: Record<string, str
   { name: 'blank search criteria', fault: 'none', overrides: { memberId: '' } },
 ];
 
+const PROBES: Array<{ name: string; fault: string; overrides: Record<string, string> }> =
+  institution.probes?.length
+    ? institution.probes.map((p) => ({ name: p.name, fault: 'none', overrides: p.overrides }))
+    : FIXTURE_PROBES;
+
 const fired = new Map<string, string[]>();
 const observed: string[] = [];
 
 console.log(`\n  Outcome verification — ${cap.id} v${cap.version}\n  ${'─'.repeat(88)}`);
 
+const declaredInputs = new Set(cap.inputs.map((p) => p.name));
+
 for (const probe of PROBES) {
+  /**
+   * Skip probes that cannot touch this capability.
+   *
+   * A probe overriding `email` says nothing about a funds transfer: with none
+   * of its overrides applying, it simply re-runs the happy path, costs eleven
+   * seconds and reports "success" against a state it never approached. An
+   * empty override set is the exception - that is the happy path on purpose,
+   * and it is how a permission-gated flow reaches its refusal.
+   */
+  const keys = Object.keys(probe.overrides);
+  if (keys.length && !keys.some((k) => declaredInputs.has(k))) continue;
+
   await setFault(probe.fault);
 
   const policy = loadPolicy();
@@ -74,7 +115,10 @@ for (const probe of PROBES) {
   const lease = new SessionLease(runId);
   const tenant = cap.tenants.find((t) => t.tenantId === cap.surface.recordedOnTenant)!;
 
-  const inputs: Record<string, string> = { memberId: '12345', ...extra, ...probe.overrides };
+  const seeded: Record<string, string> = { memberId: '12345', ...extra, ...probe.overrides };
+  // Same environment path every other entry point uses: a credential is never
+  // written into a probe table, and the operator identity is the deployment's.
+  const inputs: Record<string, string> = fillSecretsFromEnvironment(cap, seeded);
   for (const p of cap.inputs) {
     if (inputs[p.name] !== undefined) continue;
     if (/user|login/i.test(p.name)) inputs[p.name] = process.env['DEMO_USERNAME'] ?? 'teller01';

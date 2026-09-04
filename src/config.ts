@@ -112,6 +112,15 @@ export interface Institution {
   /** One true sentence about what this deployment is, for the model's
    *  environment header. See DiscoveryDeps.environmentNote. */
   environmentNote?: string;
+  /**
+   * Inputs that provoke this deployment's declared outcomes.
+   *
+   * Which member number does not exist, which share is on hold, what an
+   * invalid amount looks like — every one of those is a property of the
+   * target, so the verification pass reads them from here rather than
+   * hardcoding one application's answers and being unable to check any other.
+   */
+  probes?: Array<{ name: string; overrides: Record<string, string> }>;
 }
 
 /**
@@ -137,6 +146,7 @@ export function loadInstitutions(): Record<string, Institution> {
       product: v.product,
       productVersion: v.productVersion,
       ...(v.environmentNote ? { environmentNote: v.environmentNote } : {}),
+      ...(v.probes ? { probes: v.probes } : {}),
     };
   }
   return out;
