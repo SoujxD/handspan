@@ -1,0 +1,34 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-858659",
+    "capabilityId": "operator_sign_on",
+    "capabilityVersion": 1,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-04T17:14:07.641Z",
+    "finishedAt": "2026-09-04T17:14:07.641Z",
+    "durationMs": 0,
+    "stepsAttempted": 0,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-858659",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "invalid_input",
+    "message": "Input \"branch\" must be one of: MAIN-001 - Main Office, WEST-014 - Westside, EAST-022 - Eastgate (got \"MAIN-001\").",
+    "atStepId": null,
+    "stepIntent": null,
+    "expected": null,
+    "observed": null,
+    "remediation": "Supply a permitted value."
+  },
+  "partialOutputs": {},
+  "trace": [],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-858659/run.jsonl",
+      "capturedAt": "2026-09-04T17:14:06.477Z"
+    }
+  ]
+}

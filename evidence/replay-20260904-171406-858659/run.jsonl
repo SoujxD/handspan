@@ -1,0 +1,1 @@
+{"ts":"2026-09-04T17:14:07.642Z","level":"error","runId":"replay-[REDACTED:PAN]-858659","event":"replay_failed","kind":"invalid_input","message":"Input \"branch\" must be one of: MAIN-001 - Main Office, WEST-014 - Westside, EAST-022 - Eastgate (got \"MAIN-001\")."}

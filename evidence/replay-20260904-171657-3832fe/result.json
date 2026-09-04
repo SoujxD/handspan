@@ -1,0 +1,34 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-3832fe",
+    "capabilityId": "member_funds_transfer_between_shares",
+    "capabilityVersion": 2,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-04T17:16:58.679Z",
+    "finishedAt": "2026-09-04T17:16:58.680Z",
+    "durationMs": 1,
+    "stepsAttempted": 0,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-3832fe",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "invalid_input",
+    "message": "Missing required input(s): fromShareOption, toShareOption",
+    "atStepId": null,
+    "stepIntent": null,
+    "expected": null,
+    "observed": null,
+    "remediation": "Supply them, e.g. --input fromShareOption=<value>"
+  },
+  "partialOutputs": {},
+  "trace": [],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-3832fe/run.jsonl",
+      "capturedAt": "2026-09-04T17:16:57.544Z"
+    }
+  ]
+}

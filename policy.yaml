@@ -115,7 +115,14 @@ risk:
     # commits an action, not of the link that opens the form. It is also what
     # lets a blocked run hand a supervisor a filled-in form instead of an empty
     # screen — the handoff is worth more when the work is already done.
-    - "\\b(apply|post|place|release)\\s+(account\\s+)?hold\\b"
+    # Verified against the target's real control text, not guessed. The commit
+    # button reads "Apply Hold"; "Place Account Hold" is the ACTIONS link that
+    # merely opens the form. An earlier version of this pattern included
+    # `place`, which — with the optional `account` in the middle — matched the
+    # link and refused the flow at its front door. That contradicted the rule
+    # stated directly above it, and it made the handoff worse: a supervisor
+    # inherited a blank screen instead of a filled-in request.
+    - "\\b(apply|post|release|remove)\\s+(account\\s+)?hold\\b"
 
   # Actions that create durable state but are the whole point of the capability.
   # These are `confirmable`: allowed unattended only when the calling agent

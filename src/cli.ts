@@ -884,6 +884,69 @@ ${note}` : note;
     console.log(`  Now v${cap.version}, approval reset to draft.`);
   });
 
+/**
+ * Change an outcome's classification, with a reason.
+ *
+ * Discovery classifies each outcome from what one capability saw, so the same
+ * event lands differently across a set: a rejected sign-on came back `hard` in
+ * three capabilities, `escalate` in two and `business` in one. Each is
+ * arguable in isolation; together they are incoherent, and a caller switching
+ * on the result shape cannot be asked to guess.
+ *
+ * The classification is a product decision about what the caller should DO,
+ * which makes it a reviewer's call rather than the model's. Recorded as such,
+ * with the reason, and approval resets to draft.
+ */
+program
+  .command('reclassify-outcome')
+  .description("Change an outcome's classification. Records reviewer provenance and the reason.")
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .requiredOption('--code <name>', 'Outcome code to reclassify.')
+  .requiredOption('--to <classification>', 'business | recoverable | hard | escalate')
+  .requiredOption('--why <text>', 'Why. Recorded in governance notes.')
+  .option('--guidance <text>', 'Operator guidance, required when moving to escalate.')
+  .action((o: Record<string, unknown>) => {
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.load(String(o['capability']));
+    const code = String(o['code']);
+    const rule = cap.outcomes.find((x) => x.code === code);
+    if (!rule) {
+      console.error(`No outcome "${code}" in ${cap.id}. Declared: ${cap.outcomes.map((x) => x.code).join(', ')}`);
+      process.exit(2);
+      return;
+    }
+
+    const to = String(o['to']);
+    if (!['business', 'recoverable', 'hard', 'escalate'].includes(to)) {
+      console.error(`Unknown classification "${to}".`);
+      process.exit(2);
+      return;
+    }
+    if (to === 'recoverable' && !rule.recovery) {
+      // A recoverable outcome with no recovery is a run that loops until its
+      // budget runs out and then reports the wrong reason.
+      console.error(`"${code}" has no recovery action, so it cannot be recoverable. Declare one first.`);
+      process.exit(2);
+      return;
+    }
+
+    const from = rule.classification;
+    rule.classification = to as typeof rule.classification;
+    if (to === 'escalate' && !rule.operatorGuidance) {
+      rule.operatorGuidance = String(o['guidance'] ?? 'Resolve this manually, then hand control back.');
+    }
+
+    const note = `[reviewer] ${code}: ${from} -> ${to}. ${String(o['why'])}`;
+    cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}
+${note}` : note;
+    cap.version += 1;
+    cap.governance.approval = 'draft';
+    cap.provenance.contentHash = hashCapability(cap);
+    store.save(cap);
+
+    console.log(`  ${cap.id}: ${code} ${from} -> ${to}. Now v${cap.version}, approval reset to draft.`);
+  });
+
 program
   .command('approve')
   .description('Mark a capability approved for unattended execution.')

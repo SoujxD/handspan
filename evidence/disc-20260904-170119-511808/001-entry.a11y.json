@@ -1,0 +1,260 @@
+{
+  "capturedAt": "2026-09-04T17:01:20.951Z",
+  "url": "https://web-sample.interface-hiring.com/signon",
+  "frameUrls": [
+    "https://web-sample.interface-hiring.com/signon"
+  ],
+  "title": "Sign On - Meridian Core",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "textbox",
+      "name": "",
+      "label": "Operator ID:",
+      "labelSource": "table-cell",
+      "container": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "inputType": "text",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 414.515625,
+        "y": 96,
+        "width": 162,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "textbox",
+      "name": "",
+      "label": "Password:",
+      "labelSource": "table-cell",
+      "container": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "inputType": "password",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 414.515625,
+        "y": 119,
+        "width": 162,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "combobox",
+      "name": "",
+      "label": "[REDACTED:SECRET]",
+      "labelSource": "table-cell",
+      "value": "MAIN-001 - Main Office",
+      "container": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "select"
+      },
+      "bounds": {
+        "x": 414.515625,
+        "y": 142,
+        "width": 156,
+        "height": 19
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "button",
+      "name": "Sign On",
+      "label": "Sign On",
+      "labelSource": "accessible-name",
+      "container": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "inputType": "submit",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 414.515625,
+        "y": 180,
+        "width": 63.84375,
+        "height": 19
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 15,
+        "width": 758,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "heading",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "table-cell",
+      "value": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "h1"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 52,
+        "width": 730,
+        "height": 16
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "Operator ID:",
+      "rowKey": "Operator ID:",
+      "container": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 93,
+        "width": 84.515625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e8",
+      "role": "cell",
+      "name": "",
+      "label": "Operator ID:",
+      "labelSource": "table-cell",
+      "value": "Password:",
+      "rowKey": "Password:",
+      "columnHeader": "Operator ID:",
+      "container": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 116,
+        "width": 84.515625,
+        "height": 23
+      }
+    },
+    {
+      "handle": "e9",
+      "role": "cell",
+      "name": "",
+      "label": "Password:",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "rowKey": "[REDACTED:SECRET]",
+      "columnHeader": "Operator ID:",
+      "container": "OPERATOR SIGN ON",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 139,
+        "width": 84.515625,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e10",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "column-header",
+      "value": "NOT SIGNED ON | 09/04/2026 16:59:37",
+      "rowKey": "NOT SIGNED ON | 09/04/2026 16:59:37",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 252,
+        "width": 758,
+        "height": 20
+      }
+    },
+    {
+      "handle": "e11",
+      "role": "cell",
+      "name": "",
+      "label": "NOT SIGNED ON | 09/04/2026 16:59:37",
+      "labelSource": "table-cell",
+      "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 272,
+        "width": 758,
+        "height": 19
+      }
+    }
+  ],
+  "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nOPERATOR SIGN ON\nOperator ID:\nPassword:\n[REDACTED:SECRET]\nMAIN-001 - Main Office\nWEST-014 - Westside\nEAST-022 - Eastgate\nDemo operators: teller1 / password · super1 / password (supervisor)\nNOT SIGNED ON | 09/04/2026 16:59:37\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+  "lastStatus": 200
+}

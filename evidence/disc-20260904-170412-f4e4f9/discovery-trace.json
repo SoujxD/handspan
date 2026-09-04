@@ -1,0 +1,4034 @@
+{
+  "goal": "Record a MEMBER INQUIRY BY LAST NAME capability. Sign on as operator teller1 ([REDACTED:SECRET] is a secret parameter, already supplied). On the Member Inquiry / Selection screen, set the 'Search by' dropdown to Last Name, enter the last name 'Hopper' in the Value box, and run the search. From the results table extract the matched member's member number and the number of shares as typed outputs, then finish on the results screen.",
+  "entryUrl": "https://web-sample.interface-hiring.com/signon",
+  "tenantId": "meridian-demo",
+  "actions": [
+    {
+      "index": 0,
+      "tool": "type_text",
+      "intent": "Enter the operator ID in the Operator ID box on the sign-on screen.",
+      "exploratory": false,
+      "node": {
+        "handle": "e1",
+        "role": "textbox",
+        "name": "",
+        "label": "Operator ID:",
+        "labelSource": "table-cell",
+        "container": "OPERATOR SIGN ON",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "text",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 414.515625,
+          "y": 96,
+          "width": 162,
+          "height": 17
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "textbox",
+          "name": "",
+          "label": "Operator ID:",
+          "labelSource": "table-cell",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 96,
+            "width": 162,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "textbox",
+          "name": "",
+          "label": "Password:",
+          "labelSource": "table-cell",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "[REDACTED:SECRET]",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 119,
+            "width": 162,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "combobox",
+          "name": "",
+          "label": "[REDACTED:SECRET]",
+          "labelSource": "table-cell",
+          "value": "MAIN-001 - Main Office",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 142,
+            "width": 156,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "button",
+          "name": "Sign On",
+          "label": "Sign On",
+          "labelSource": "accessible-name",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 180,
+            "width": 63.84375,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "heading",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 52,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Operator ID:",
+          "rowKey": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 93,
+            "width": 84.515625,
+            "height": 23
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "Operator ID:",
+          "labelSource": "table-cell",
+          "value": "Password:",
+          "rowKey": "Password:",
+          "columnHeader": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 116,
+            "width": 84.515625,
+            "height": 23
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "Password:",
+          "labelSource": "table-cell",
+          "value": "[REDACTED:SECRET]",
+          "rowKey": "[REDACTED:SECRET]",
+          "columnHeader": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 139,
+            "width": 84.515625,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "rowKey": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 252,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 272,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/signon",
+      "risk": "safe",
+      "value": "teller1",
+      "parameterName": "operatorId",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/signon",
+        "title": "Sign On - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nOPERATOR SIGN ON\nOperator ID:\nPassword:\n[REDACTED:SECRET]\nMAIN-001 - Main Office\nWEST-014 - Westside\nEAST-022 - Eastgate\nDemo operators: teller1 / [REDACTED:SECRET] · super1 / [REDACTED:SECRET] (supervisor)\nNOT SIGNED ON | 09/04/2026 17:02:29\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "OPERATOR SIGN ON",
+          "Operator ID:",
+          "Password:",
+          "[REDACTED:SECRET]",
+          "Sign On",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "NOT SIGNED ON | 09/04/2026 17:02:29"
+        ],
+        "data": [
+          "teller1",
+          "MAIN-001 - Main Office",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "OPERATOR SIGN ON",
+          "Operator ID:",
+          "Password:",
+          "[REDACTED:SECRET]",
+          "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "tool": "type_text",
+      "intent": "Enter the operator [REDACTED:SECRET] in the Password box on the sign-on screen.",
+      "exploratory": false,
+      "node": {
+        "handle": "e2",
+        "role": "textbox",
+        "name": "",
+        "label": "Password:",
+        "labelSource": "table-cell",
+        "container": "OPERATOR SIGN ON",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "[REDACTED:SECRET]",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 414.515625,
+          "y": 119,
+          "width": 162,
+          "height": 17
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "textbox",
+          "name": "",
+          "label": "Operator ID:",
+          "labelSource": "table-cell",
+          "value": "teller1",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 96,
+            "width": 162,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "textbox",
+          "name": "",
+          "label": "Password:",
+          "labelSource": "table-cell",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "[REDACTED:SECRET]",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 119,
+            "width": 162,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "combobox",
+          "name": "",
+          "label": "[REDACTED:SECRET]",
+          "labelSource": "table-cell",
+          "value": "MAIN-001 - Main Office",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 142,
+            "width": 156,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "button",
+          "name": "Sign On",
+          "label": "Sign On",
+          "labelSource": "accessible-name",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 180,
+            "width": 63.84375,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "heading",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 52,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Operator ID:",
+          "rowKey": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 93,
+            "width": 84.515625,
+            "height": 23
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "Operator ID:",
+          "labelSource": "table-cell",
+          "value": "Password:",
+          "rowKey": "Password:",
+          "columnHeader": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 116,
+            "width": 84.515625,
+            "height": 23
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "Password:",
+          "labelSource": "table-cell",
+          "value": "[REDACTED:SECRET]",
+          "rowKey": "[REDACTED:SECRET]",
+          "columnHeader": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 139,
+            "width": 84.515625,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "rowKey": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 252,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 272,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/signon",
+      "risk": "sensitive",
+      "value": "[REDACTED:SECRET]",
+      "parameterName": "operatorPassword",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/signon",
+        "title": "Sign On - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nOPERATOR SIGN ON\nOperator ID:\nPassword:\n[REDACTED:SECRET]\nMAIN-001 - Main Office\nWEST-014 - Westside\nEAST-022 - Eastgate\nDemo operators: teller1 / [REDACTED:SECRET] · super1 / [REDACTED:SECRET] (supervisor)\nNOT SIGNED ON | 09/04/2026 17:02:29\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "OPERATOR SIGN ON",
+          "Operator ID:",
+          "Password:",
+          "[REDACTED:SECRET]",
+          "Sign On",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "NOT SIGNED ON | 09/04/2026 17:02:29"
+        ],
+        "data": [
+          "teller1",
+          "MAIN-001 - Main Office",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "OPERATOR SIGN ON",
+          "Operator ID:",
+          "Password:",
+          "[REDACTED:SECRET]",
+          "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "tool": "click",
+      "intent": "Sign on to the servicing console as the operator.",
+      "exploratory": false,
+      "node": {
+        "handle": "e4",
+        "role": "button",
+        "name": "Sign On",
+        "label": "Sign On",
+        "labelSource": "accessible-name",
+        "container": "OPERATOR SIGN ON",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "submit",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 414.515625,
+          "y": 180,
+          "width": 63.84375,
+          "height": 19
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "textbox",
+          "name": "",
+          "label": "Operator ID:",
+          "labelSource": "table-cell",
+          "value": "teller1",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 96,
+            "width": 162,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "textbox",
+          "name": "",
+          "label": "Password:",
+          "labelSource": "table-cell",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "[REDACTED:SECRET]",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 119,
+            "width": 162,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "combobox",
+          "name": "",
+          "label": "[REDACTED:SECRET]",
+          "labelSource": "table-cell",
+          "value": "MAIN-001 - Main Office",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 142,
+            "width": 156,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "button",
+          "name": "Sign On",
+          "label": "Sign On",
+          "labelSource": "accessible-name",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 414.515625,
+            "y": 180,
+            "width": 63.84375,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "heading",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 52,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Operator ID:",
+          "rowKey": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 93,
+            "width": 84.515625,
+            "height": 23
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "Operator ID:",
+          "labelSource": "table-cell",
+          "value": "Password:",
+          "rowKey": "Password:",
+          "columnHeader": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 116,
+            "width": 84.515625,
+            "height": 23
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "Password:",
+          "labelSource": "table-cell",
+          "value": "[REDACTED:SECRET]",
+          "rowKey": "[REDACTED:SECRET]",
+          "columnHeader": "Operator ID:",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 139,
+            "width": 84.515625,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "rowKey": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 252,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "NOT SIGNED ON | 09/04/2026 17:02:29",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 272,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/signon",
+      "risk": "safe",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/menu",
+        "title": "Main Menu - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMAIN MENU\nSigned on as J. TELLER (TELLER)\n1. Member Inquiry / Selection\n2. Funds Transfer\n3. Open New Share\n4. Update Member Information\n5. Place Account Hold\n8. System Settings (error injection)\n9. Sign Off\nType or click a menu option to continue.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:39 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "Signed on as J. TELLER (TELLER)",
+          "Member Inquiry / Selection",
+          "Funds Transfer",
+          "Open New Share",
+          "Update Member Information",
+          "Place Account Hold",
+          "System Settings (error injection)",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:39 | SID 4A2939FA"
+        ],
+        "data": [
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MAIN MENU",
+          "Member Inquiry / Selection",
+          "Funds Transfer",
+          "Open New Share",
+          "Update Member Information",
+          "Place Account Hold",
+          "System Settings (error injection)",
+          "Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:39 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "tool": "click",
+      "intent": "Open the Member Inquiry / Selection screen.",
+      "exploratory": false,
+      "node": {
+        "handle": "e5",
+        "role": "link",
+        "name": "Member Inquiry / Selection",
+        "label": "Member Inquiry / Selection",
+        "labelSource": "accessible-name",
+        "container": "Signed on as J. TELLER (TELLER)",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "href": "/members",
+          "tag": "a"
+        },
+        "bounds": {
+          "x": 364.875,
+          "y": 125,
+          "width": 151.21875,
+          "height": 13
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Main Menu",
+          "label": "Main Menu",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/menu",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 307,
+            "y": 42,
+            "width": 66.546875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Member Inquiry",
+          "label": "Member Inquiry",
+          "labelSource": "accessible-name",
+          "container": "Main Menu",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 393.03125,
+            "y": 42,
+            "width": 88.125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "System Settings",
+          "label": "System Settings",
+          "labelSource": "accessible-name",
+          "container": "Member Inquiry",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 500.640625,
+            "y": 42,
+            "width": 90.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "System Settings",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 610.484375,
+            "y": 42,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "link",
+          "name": "Member Inquiry / Selection",
+          "label": "Member Inquiry / Selection",
+          "labelSource": "accessible-name",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 364.875,
+            "y": 125,
+            "width": 151.21875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "link",
+          "name": "Funds Transfer",
+          "label": "Funds Transfer",
+          "labelSource": "accessible-name",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members?next=transfer",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 364.875,
+            "y": 142,
+            "width": 81.328125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "link",
+          "name": "Open New Share",
+          "label": "Open New Share",
+          "labelSource": "accessible-name",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members?next=open-share",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 364.875,
+            "y": 159,
+            "width": 92.890625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "link",
+          "name": "Update Member Information",
+          "label": "Update Member Information",
+          "labelSource": "accessible-name",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members?next=update",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 364.875,
+            "y": 176,
+            "width": 156.734375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "link",
+          "name": "Place Account Hold",
+          "label": "Place Account Hold",
+          "labelSource": "accessible-name",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members?next=hold",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 364.875,
+            "y": 193,
+            "width": 105.015625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "link",
+          "name": "System Settings (error injection)",
+          "label": "System Settings (error injection)",
+          "labelSource": "accessible-name",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 364.875,
+            "y": 210,
+            "width": 182.4375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 364.875,
+            "y": 227,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e13",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 40,
+            "width": 758,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e14",
+          "role": "cell",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MAIN MENU Signed on as J. TELLER (TELLER) Type or click a menu option to continue.",
+          "rowKey": "MAIN MENU Signed on as J. TELLER (TELLER) Type or click a menu option to continue.",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 57,
+            "width": 758,
+            "height": 235
+          }
+        },
+        {
+          "handle": "e15",
+          "role": "heading",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MAIN MENU",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 69,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e16",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "1.",
+          "rowKey": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 123,
+            "width": 32,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e17",
+          "role": "cell",
+          "name": "",
+          "label": "1.",
+          "labelSource": "table-cell",
+          "value": "Member Inquiry / Selection",
+          "rowKey": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 359,
+            "y": 123,
+            "width": 304,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e18",
+          "role": "cell",
+          "name": "",
+          "label": "1.",
+          "labelSource": "table-cell",
+          "value": "2.",
+          "rowKey": "2.",
+          "columnHeader": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 140,
+            "width": 32,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e19",
+          "role": "cell",
+          "name": "",
+          "label": "2.",
+          "labelSource": "table-cell",
+          "value": "Funds Transfer",
+          "rowKey": "2.",
+          "columnHeader": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 359,
+            "y": 140,
+            "width": 304,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e20",
+          "role": "cell",
+          "name": "",
+          "label": "2.",
+          "labelSource": "table-cell",
+          "value": "3.",
+          "rowKey": "3.",
+          "columnHeader": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 157,
+            "width": 32,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e21",
+          "role": "cell",
+          "name": "",
+          "label": "3.",
+          "labelSource": "table-cell",
+          "value": "Open New Share",
+          "rowKey": "3.",
+          "columnHeader": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 359,
+            "y": 157,
+            "width": 304,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e22",
+          "role": "cell",
+          "name": "",
+          "label": "3.",
+          "labelSource": "table-cell",
+          "value": "4.",
+          "rowKey": "4.",
+          "columnHeader": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 174,
+            "width": 32,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e23",
+          "role": "cell",
+          "name": "",
+          "label": "4.",
+          "labelSource": "table-cell",
+          "value": "Update Member Information",
+          "rowKey": "4.",
+          "columnHeader": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 359,
+            "y": 174,
+            "width": 304,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e24",
+          "role": "cell",
+          "name": "",
+          "label": "4.",
+          "labelSource": "table-cell",
+          "value": "5.",
+          "rowKey": "5.",
+          "columnHeader": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 191,
+            "width": 32,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e25",
+          "role": "cell",
+          "name": "",
+          "label": "5.",
+          "labelSource": "table-cell",
+          "value": "Place Account Hold",
+          "rowKey": "5.",
+          "columnHeader": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 359,
+            "y": 191,
+            "width": 304,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e26",
+          "role": "cell",
+          "name": "",
+          "label": "5.",
+          "labelSource": "table-cell",
+          "value": "8.",
+          "rowKey": "8.",
+          "columnHeader": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 208,
+            "width": 32,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e27",
+          "role": "cell",
+          "name": "",
+          "label": "8.",
+          "labelSource": "table-cell",
+          "value": "System Settings (error injection)",
+          "rowKey": "8.",
+          "columnHeader": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 359,
+            "y": 208,
+            "width": 304,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e28",
+          "role": "cell",
+          "name": "",
+          "label": "8.",
+          "labelSource": "table-cell",
+          "value": "9.",
+          "rowKey": "9.",
+          "columnHeader": "1.",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 225,
+            "width": 32,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e29",
+          "role": "cell",
+          "name": "",
+          "label": "9.",
+          "labelSource": "table-cell",
+          "value": "Sign Off",
+          "rowKey": "9.",
+          "columnHeader": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 359,
+            "y": 225,
+            "width": 304,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e30",
+          "role": "cell",
+          "name": "",
+          "label": "MAIN MENU Signed on as J. TELLER (TELLER) Type or click a menu option to continue.",
+          "labelSource": "table-cell",
+          "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:39 | SID 4A2939FA",
+          "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:39 | SID 4A2939FA",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 292,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e31",
+          "role": "cell",
+          "name": "",
+          "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:39 | SID 4A2939FA",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 312,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/menu",
+      "risk": "safe",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/members",
+        "title": "Member Inquiry - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:43 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Search",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:43 | SID 4A2939FA"
+        ],
+        "data": [
+          "Member Number",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:43 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "tool": "click",
+      "intent": "Probe: submit the search with the Value box empty to observe the validation message.",
+      "exploratory": true,
+      "node": {
+        "handle": "e7",
+        "role": "button",
+        "name": "Search",
+        "label": "Search",
+        "labelSource": "accessible-name",
+        "container": "MEMBER INQUIRY / SELECTION",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "submit",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 630.890625,
+          "y": 138,
+          "width": 58.078125,
+          "height": 19
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Main Menu",
+          "label": "Main Menu",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/menu",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 307,
+            "y": 42,
+            "width": 66.546875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Member Inquiry",
+          "label": "Member Inquiry",
+          "labelSource": "accessible-name",
+          "container": "Main Menu",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 393.03125,
+            "y": 42,
+            "width": 88.125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "System Settings",
+          "label": "System Settings",
+          "labelSource": "accessible-name",
+          "container": "Member Inquiry",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 500.640625,
+            "y": 42,
+            "width": 90.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "System Settings",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 610.484375,
+            "y": 42,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "combobox",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Member Number",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 113,
+            "width": 119,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "textbox",
+          "name": "",
+          "label": "Value:",
+          "labelSource": "table-cell",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 139,
+            "width": 218,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 630.890625,
+            "y": 138,
+            "width": 58.078125,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 40,
+            "width": 758,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "heading",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 69,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Search by:",
+          "rowKey": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 110,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Value:",
+          "rowKey": "Value:",
+          "columnHeader": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 135,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e13",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:43 | SID 4A2939FA",
+          "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:43 | SID 4A2939FA",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 210,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e14",
+          "role": "cell",
+          "name": "",
+          "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:43 | SID 4A2939FA",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 230,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/members",
+      "risk": "safe",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/members?by=number&q=",
+        "title": "Member Inquiry - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:47 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Search",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:47 | SID 4A2939FA"
+        ],
+        "data": [
+          "Member Number",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:47 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "tool": "navigate",
+      "intent": "Probe: search a last name that will not exist to capture the exact no-results wording.",
+      "exploratory": true,
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Main Menu",
+          "label": "Main Menu",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/menu",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 307,
+            "y": 42,
+            "width": 66.546875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Member Inquiry",
+          "label": "Member Inquiry",
+          "labelSource": "accessible-name",
+          "container": "Main Menu",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 393.03125,
+            "y": 42,
+            "width": 88.125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "System Settings",
+          "label": "System Settings",
+          "labelSource": "accessible-name",
+          "container": "Member Inquiry",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 500.640625,
+            "y": 42,
+            "width": 90.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "System Settings",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 610.484375,
+            "y": 42,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "combobox",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Member Number",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 113,
+            "width": 119,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "textbox",
+          "name": "",
+          "label": "Value:",
+          "labelSource": "table-cell",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 139,
+            "width": 218,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 630.890625,
+            "y": 138,
+            "width": 58.078125,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 40,
+            "width": 758,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "heading",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 69,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Search by:",
+          "rowKey": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 110,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Value:",
+          "rowKey": "Value:",
+          "columnHeader": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 135,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e13",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:47 | SID 4A2939FA",
+          "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:47 | SID 4A2939FA",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 210,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e14",
+          "role": "cell",
+          "name": "",
+          "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:47 | SID 4A2939FA",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 230,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/members?by=number&q=",
+      "risk": "safe",
+      "navigateUrl": "https://web-sample.interface-hiring.com/members?by=name&q=Zzzznotreal",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/members?by=name&q=Zzzznotreal",
+        "title": "Member Inquiry - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nNo member records matched your search.\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:52 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Search",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:52 | SID 4A2939FA"
+        ],
+        "data": [
+          "Last Name",
+          "Zzzznotreal",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:52 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "tool": "navigate",
+      "intent": "Return to the clean Member Inquiry / Selection screen to run the real search.",
+      "exploratory": true,
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Main Menu",
+          "label": "Main Menu",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/menu",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 307,
+            "y": 42,
+            "width": 66.546875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Member Inquiry",
+          "label": "Member Inquiry",
+          "labelSource": "accessible-name",
+          "container": "Main Menu",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 393.03125,
+            "y": 42,
+            "width": 88.125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "System Settings",
+          "label": "System Settings",
+          "labelSource": "accessible-name",
+          "container": "Member Inquiry",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 500.640625,
+            "y": 42,
+            "width": 90.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "System Settings",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 610.484375,
+            "y": 42,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "combobox",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 113,
+            "width": 119,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "textbox",
+          "name": "",
+          "label": "Value:",
+          "labelSource": "table-cell",
+          "value": "Zzzznotreal",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 139,
+            "width": 218,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 630.890625,
+            "y": 138,
+            "width": 58.078125,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 40,
+            "width": 758,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "heading",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 69,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Search by:",
+          "rowKey": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 110,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Value:",
+          "rowKey": "Value:",
+          "columnHeader": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 135,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e13",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:52 | SID 4A2939FA",
+          "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:52 | SID 4A2939FA",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 223,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e14",
+          "role": "cell",
+          "name": "",
+          "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:52 | SID 4A2939FA",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 243,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/members?by=name&q=Zzzznotreal",
+      "risk": "safe",
+      "navigateUrl": "https://web-sample.interface-hiring.com/members",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/members",
+        "title": "Member Inquiry - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Search",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA"
+        ],
+        "data": [
+          "Member Number",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "tool": "select_option",
+      "intent": "Set the Search by dropdown to Last Name.",
+      "exploratory": false,
+      "node": {
+        "handle": "e5",
+        "role": "combobox",
+        "name": "",
+        "label": "Search by:",
+        "labelSource": "table-cell",
+        "value": "Member Number",
+        "container": "MEMBER INQUIRY / SELECTION",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "tag": "select"
+        },
+        "bounds": {
+          "x": 401.28125,
+          "y": 113,
+          "width": 119,
+          "height": 19
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Main Menu",
+          "label": "Main Menu",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/menu",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 307,
+            "y": 42,
+            "width": 66.546875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Member Inquiry",
+          "label": "Member Inquiry",
+          "labelSource": "accessible-name",
+          "container": "Main Menu",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 393.03125,
+            "y": 42,
+            "width": 88.125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "System Settings",
+          "label": "System Settings",
+          "labelSource": "accessible-name",
+          "container": "Member Inquiry",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 500.640625,
+            "y": 42,
+            "width": 90.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "System Settings",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 610.484375,
+            "y": 42,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "combobox",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Member Number",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 113,
+            "width": 119,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "textbox",
+          "name": "",
+          "label": "Value:",
+          "labelSource": "table-cell",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 139,
+            "width": 218,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 630.890625,
+            "y": 138,
+            "width": 58.078125,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 40,
+            "width": 758,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "heading",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 69,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Search by:",
+          "rowKey": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 110,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Value:",
+          "rowKey": "Value:",
+          "columnHeader": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 135,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e13",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 210,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e14",
+          "role": "cell",
+          "name": "",
+          "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 230,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/members",
+      "risk": "safe",
+      "value": "Last Name",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/members",
+        "title": "Member Inquiry - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Search",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA"
+        ],
+        "data": [
+          "Last Name",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "tool": "type_text",
+      "intent": "Enter the member's last name in the Value box.",
+      "exploratory": false,
+      "node": {
+        "handle": "e6",
+        "role": "textbox",
+        "name": "",
+        "label": "Value:",
+        "labelSource": "table-cell",
+        "container": "MEMBER INQUIRY / SELECTION",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "text",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 401.28125,
+          "y": 139,
+          "width": 218,
+          "height": 17
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Main Menu",
+          "label": "Main Menu",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/menu",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 307,
+            "y": 42,
+            "width": 66.546875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Member Inquiry",
+          "label": "Member Inquiry",
+          "labelSource": "accessible-name",
+          "container": "Main Menu",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 393.03125,
+            "y": 42,
+            "width": 88.125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "System Settings",
+          "label": "System Settings",
+          "labelSource": "accessible-name",
+          "container": "Member Inquiry",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 500.640625,
+            "y": 42,
+            "width": 90.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "System Settings",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 610.484375,
+            "y": 42,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "combobox",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 113,
+            "width": 119,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "textbox",
+          "name": "",
+          "label": "Value:",
+          "labelSource": "table-cell",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 139,
+            "width": 218,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 630.890625,
+            "y": 138,
+            "width": 58.078125,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 40,
+            "width": 758,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "heading",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 69,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Search by:",
+          "rowKey": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 110,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Value:",
+          "rowKey": "Value:",
+          "columnHeader": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 135,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e13",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 210,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e14",
+          "role": "cell",
+          "name": "",
+          "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 230,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/members",
+      "risk": "safe",
+      "value": "Hopper",
+      "parameterName": "lastName",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/members",
+        "title": "Member Inquiry - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Search",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA"
+        ],
+        "data": [
+          "Last Name",
+          "Hopper",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "tool": "click",
+      "intent": "Run the member search by last name.",
+      "exploratory": false,
+      "node": {
+        "handle": "e7",
+        "role": "button",
+        "name": "Search",
+        "label": "Search",
+        "labelSource": "accessible-name",
+        "container": "MEMBER INQUIRY / SELECTION",
+        "framePath": [],
+        "ordinal": 0,
+        "visible": true,
+        "enabled": true,
+        "hints": {
+          "inputType": "submit",
+          "tag": "input"
+        },
+        "bounds": {
+          "x": 630.890625,
+          "y": 138,
+          "width": 58.078125,
+          "height": 19
+        }
+      },
+      "siblings": [
+        {
+          "handle": "e1",
+          "role": "link",
+          "name": "Main Menu",
+          "label": "Main Menu",
+          "labelSource": "accessible-name",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/menu",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 307,
+            "y": 42,
+            "width": 66.546875,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e2",
+          "role": "link",
+          "name": "Member Inquiry",
+          "label": "Member Inquiry",
+          "labelSource": "accessible-name",
+          "container": "Main Menu",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 393.03125,
+            "y": 42,
+            "width": 88.125,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e3",
+          "role": "link",
+          "name": "System Settings",
+          "label": "System Settings",
+          "labelSource": "accessible-name",
+          "container": "Member Inquiry",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/settings",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 500.640625,
+            "y": 42,
+            "width": 90.359375,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e4",
+          "role": "link",
+          "name": "Sign Off",
+          "label": "Sign Off",
+          "labelSource": "accessible-name",
+          "container": "System Settings",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "href": "/signoff",
+            "tag": "a"
+          },
+          "bounds": {
+            "x": 610.484375,
+            "y": 42,
+            "width": 44.625,
+            "height": 13
+          }
+        },
+        {
+          "handle": "e5",
+          "role": "combobox",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Last Name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "select"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 113,
+            "width": 119,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e6",
+          "role": "textbox",
+          "name": "",
+          "label": "Value:",
+          "labelSource": "table-cell",
+          "value": "Hopper",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 401.28125,
+            "y": 139,
+            "width": 218,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e7",
+          "role": "button",
+          "name": "Search",
+          "label": "Search",
+          "labelSource": "accessible-name",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          },
+          "bounds": {
+            "x": 630.890625,
+            "y": 138,
+            "width": 58.078125,
+            "height": 19
+          }
+        },
+        {
+          "handle": "e8",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 15,
+            "width": 758,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e9",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "table-cell",
+          "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 40,
+            "width": 758,
+            "height": 17
+          }
+        },
+        {
+          "handle": "e10",
+          "role": "heading",
+          "name": "",
+          "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "labelSource": "table-cell",
+          "value": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "h1"
+          },
+          "bounds": {
+            "x": 315,
+            "y": 69,
+            "width": 730,
+            "height": 16
+          }
+        },
+        {
+          "handle": "e11",
+          "role": "cell",
+          "name": "",
+          "label": "",
+          "labelSource": "none",
+          "value": "Search by:",
+          "rowKey": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 110,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e12",
+          "role": "cell",
+          "name": "",
+          "label": "Search by:",
+          "labelSource": "table-cell",
+          "value": "Value:",
+          "rowKey": "Value:",
+          "columnHeader": "Search by:",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 327,
+            "y": 135,
+            "width": 71.28125,
+            "height": 25
+          }
+        },
+        {
+          "handle": "e13",
+          "role": "cell",
+          "name": "",
+          "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "labelSource": "column-header",
+          "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 1,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 210,
+            "width": 758,
+            "height": 20
+          }
+        },
+        {
+          "handle": "e14",
+          "role": "cell",
+          "name": "",
+          "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:02:55 | SID 4A2939FA",
+          "labelSource": "table-cell",
+          "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+          "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "framePath": [],
+          "ordinal": 0,
+          "visible": true,
+          "enabled": true,
+          "hints": {
+            "tag": "td"
+          },
+          "bounds": {
+            "x": 301,
+            "y": 230,
+            "width": 758,
+            "height": 19
+          }
+        }
+      ],
+      "url": "https://web-sample.interface-hiring.com/members",
+      "risk": "safe",
+      "after": {
+        "url": "https://web-sample.interface-hiring.com/members?by=name&q=Hopper",
+        "title": "Member Inquiry - Meridian Core",
+        "textExcerpt": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nMember No. Name Shares\n101555 [REDACTED:SECRET] 8 Select\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 17:03:25 | SID 4A2939FA\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+        "chrome": [
+          "Main Menu",
+          "Member Inquiry",
+          "System Settings",
+          "Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Search",
+          "Select",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "Member No.",
+          "Name",
+          "101555",
+          "[REDACTED:SECRET]",
+          "Shares",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:03:25 | SID 4A2939FA"
+        ],
+        "data": [
+          "Last Name",
+          "Hopper",
+          "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+          "Main Menu · Member Inquiry · System Settings · Sign Off",
+          "MEMBER INQUIRY / SELECTION",
+          "Search by:",
+          "Value:",
+          "Member No.",
+          "Name",
+          "Shares",
+          "101555",
+          "[REDACTED:SECRET]",
+          "Select",
+          "OPR TELLER1 | BR MAIN-001 | 09/04/2026 17:03:25 | SID 4A2939FA",
+          "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    {
+      "kind": "business_outcome",
+      "note": "Searching a last name with no match shows exactly: \"No member records matched your search.\" on the Member Inquiry / Selection screen, with no results table. This is a legitimate business answer.",
+      "atUrl": "https://web-sample.interface-hiring.com/members?by=name&q=Hopper"
+    },
+    {
+      "kind": "observation",
+      "note": "Submitting Search with the Value box empty simply re-renders the inquiry screen (URL gains ?by=number&q=) with no error message and no results table — no validation text is displayed.",
+      "atUrl": "https://web-sample.interface-hiring.com/members?by=name&q=Hopper"
+    },
+    {
+      "kind": "observation",
+      "note": "Results table columns are \"Member No.\", \"Name\", \"Shares\", plus a Select link per row. A last-name search may return multiple rows; this capability extracts from the first matched row.",
+      "atUrl": "https://web-sample.interface-hiring.com/members?by=name&q=Hopper"
+    }
+  ],
+  "entryState": {
+    "url": "https://web-sample.interface-hiring.com/signon",
+    "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nOPERATOR SIGN ON\nOperator ID:\nPassword:\n[REDACTED:SECRET]\nMAIN-001 - Main Office\nWEST-014 - Westside\nEAST-022 - Eastgate\nDemo operators: teller1 / [REDACTED:SECRET] · super1 / [REDACTED:SECRET] (supervisor)\nNOT SIGNED ON | 09/04/2026 17:02:29\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+  },
+  "stoppedBecause": "finished",
+  "llmCalls": 11,
+  "usage": {
+    "inputTokens": 79456,
+    "outputTokens": 3220,
+    "cacheReadTokens": 67826
+  },
+  "finish": {
+    "capabilityId": "member_inquiry_by_last_name",
+    "name": "Member Inquiry by Last Name",
+    "description": "Signs on to the Meridian Core servicing console with the supplied operator credentials, opens Member Inquiry / Selection, searches by Last Name, and returns the matched member's member number and share count from the results table. If no member matches, reports a no_member_match business outcome.",
+    "inputs": [
+      {
+        "name": "operatorId",
+        "type": "string",
+        "description": "Operator ID used to sign on to the console.",
+        "required": true,
+        "sensitivity": "internal",
+        "example": "teller1"
+      },
+      {
+        "name": "operatorPassword",
+        "type": "string",
+        "description": "Password for the operator ID.",
+        "required": true,
+        "sensitivity": "secret"
+      },
+      {
+        "name": "lastName",
+        "type": "string",
+        "description": "Member last name to search for.",
+        "required": true,
+        "sensitivity": "pii",
+        "example": "Hopper"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "memberNumber",
+        "type": "string",
+        "description": "Member number of the first matched member in the results table.",
+        "extractionKind": "regexOnPageText",
+        "pattern": "(\\d+)\\s+[^\\n]+,\\s*[^\\n]+?\\s+\\d+\\s*Select",
+        "transform": "trim",
+        "sensitivity": "internal"
+      },
+      {
+        "name": "shares",
+        "type": "number",
+        "description": "Number of shares shown for the matched member.",
+        "extractionKind": "regexOnPageText",
+        "pattern": "\\d+\\s+[^\\n]+,\\s*[^\\n]+?\\s+(\\d+)\\s*Select",
+        "transform": "trim",
+        "sensitivity": "internal"
+      },
+      {
+        "name": "memberName",
+        "type": "string",
+        "description": "Displayed member name (Last, First) of the matched row.",
+        "extractionKind": "regexOnPageText",
+        "pattern": "\\d+\\s+([A-Za-z'\\-]+,\\s*[A-Za-z'\\- ]+?)\\s+\\d+\\s*Select",
+        "transform": "trim",
+        "sensitivity": "pii"
+      }
+    ],
+    "successCheckpoint": {
+      "kind": "regexPresent",
+      "value": "Member No\\.\\s*Name\\s*Shares"
+    },
+    "businessOutcomes": [
+      {
+        "code": "no_member_match",
+        "title": "No member records matched the search",
+        "classification": "business",
+        "detectKind": "textPresent",
+        "detectValue": "No member records matched your search.",
+        "operatorGuidance": ""
+      },
+      {
+        "code": "signon_failed",
+        "title": "Operator sign-on rejected",
+        "classification": "hard",
+        "detectKind": "regexPresent",
+        "detectValue": "Invalid operator|sign[- ]on failed|Invalid [REDACTED:SECRET]"
+      },
+      {
+        "code": "session_timeout",
+        "title": "Session expired and operator must sign on again",
+        "classification": "escalate",
+        "detectKind": "regexPresent",
+        "detectValue": "session (has )?(expired|timed out)",
+        "operatorGuidance": "Re-run the capability; if it recurs, check operator credentials and console session limits."
+      }
+    ]
+  }
+}

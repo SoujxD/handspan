@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "id": "member_share_balance_lookup",
-  "version": 2,
-  "name": "Member Share Balance / Status Lookup",
-  "description": "Signs on to the Meridian Core servicing console with the supplied operator credentials, searches Member Inquiry by member number, opens the member record, and reads one named share's Balance, Status and Type from the SHARES / BALANCES grid. Read-only: performs no transfer, hold, share opening or member maintenance. Returns shareBalance (money), shareStatus (e.g. OPEN or \"HOLD [HOLD]\") and shareType (e.g. Regular Shares, Share Draft (Checking), Money Market, Certificate). If the member number does not exist the run reports the business outcome member_not_found instead of values.",
+  "id": "member_inquiry_by_last_name",
+  "version": 1,
+  "name": "Member Inquiry by Last Name",
+  "description": "Signs on to the Meridian Core servicing console with the supplied operator credentials, opens Member Inquiry / Selection, searches by Last Name, and returns the matched member's member number and share count from the results table. If no member matches, reports a no_member_match business outcome.",
   "surface": {
     "kind": "legacy_web",
     "product": "cornerstone-meridian-core",
@@ -15,7 +15,7 @@
     {
       "name": "operatorId",
       "type": "string",
-      "description": "Operator sign-on id for the servicing console (e.g. a teller id).",
+      "description": "Operator ID used to sign on to the console.",
       "required": true,
       "sensitivity": "internal",
       "example": "teller1"
@@ -23,69 +23,42 @@
     {
       "name": "operatorPassword",
       "type": "string",
-      "description": "Password for the operator id. Never logged or shown.",
+      "description": "Password for the operator ID.",
       "required": true,
       "sensitivity": "secret"
     },
     {
-      "name": "memberNumber",
+      "name": "lastName",
       "type": "string",
-      "description": "Member number to look up in the Member Inquiry Value box, with Search by set to Member Number.",
+      "description": "Member last name to search for.",
       "required": true,
       "sensitivity": "pii",
-      "example": "100234"
-    },
-    {
-      "name": "shareId",
-      "type": "string",
-      "description": "Full share identifier exactly as it appears in the Share ID column of the SHARES / BALANCES grid. Must be the whole id — share ids share prefixes (100234-S0001 vs 100234-S0001-5).",
-      "required": true,
-      "sensitivity": "pii",
-      "example": "100234-S0001"
+      "example": "Hopper"
     }
   ],
   "outputs": [
     {
-      "name": "shareBalance",
-      "type": "money",
-      "description": "Current balance of the requested share, from the Balance column of its row in the SHARES / BALANCES grid.",
-      "sensitivity": "pii",
-      "extraction": {
-        "via": "fromTableCell",
-        "rowMatch": "{{shareId}}",
-        "columnLabel": "Balance",
-        "matchMode": "contains",
-        "framePath": []
-      },
-      "transform": "stripCurrency",
-      "required": true
-    },
-    {
-      "name": "shareStatus",
+      "name": "memberNumber",
       "type": "string",
-      "description": "Status of the requested share, from the Status column of its row. Observed values: \"OPEN\" and \"HOLD [HOLD]\".",
+      "description": "Member number of the first matched member in the results table.",
       "sensitivity": "internal",
       "extraction": {
-        "via": "fromTableCell",
-        "rowMatch": "{{shareId}}",
-        "columnLabel": "Status",
-        "matchMode": "contains",
-        "framePath": []
+        "via": "regexOnPageText",
+        "pattern": "(\\d+)\\s+[^\\n]+,\\s*[^\\n]+?\\s+\\d+\\s*Select",
+        "group": 1
       },
       "transform": "trim",
       "required": true
     },
     {
-      "name": "shareType",
-      "type": "string",
-      "description": "Share type of the requested share, from the Type column of its row (Regular Shares, Share Draft (Checking), Money Market, Certificate).",
+      "name": "shares",
+      "type": "number",
+      "description": "Number of shares shown for the matched member.",
       "sensitivity": "internal",
       "extraction": {
-        "via": "fromTableCell",
-        "rowMatch": "{{shareId}}",
-        "columnLabel": "Type",
-        "matchMode": "contains",
-        "framePath": []
+        "via": "regexOnPageText",
+        "pattern": "\\d+\\s+[^\\n]+,\\s*[^\\n]+?\\s+(\\d+)\\s*Select",
+        "group": 1
       },
       "transform": "trim",
       "required": true
@@ -93,14 +66,12 @@
     {
       "name": "memberName",
       "type": "string",
-      "description": "Name shown on the MEMBER RECORD header, useful to confirm the right member was opened.",
+      "description": "Displayed member name (Last, First) of the matched row.",
       "sensitivity": "pii",
       "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Name:",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
+        "via": "regexOnPageText",
+        "pattern": "\\d+\\s+([A-Za-z'\\-]+,\\s*[A-Za-z'\\- ]+?)\\s+\\d+\\s*Select",
+        "group": 1
       },
       "transform": "trim",
       "required": true
@@ -169,7 +140,7 @@
     },
     {
       "id": "s03",
-      "intent": "Sign on to the servicing console with the supplied operator credentials.",
+      "intent": "Sign on to the servicing console as the operator.",
       "act": {
         "action": "click",
         "target": {
@@ -208,7 +179,7 @@
     },
     {
       "id": "s04",
-      "intent": "Open the Member Inquiry / Selection screen to look up the member.",
+      "intent": "Open the Member Inquiry / Selection screen.",
       "act": {
         "action": "click",
         "target": {
@@ -247,7 +218,35 @@
     },
     {
       "id": "s05",
-      "intent": "Enter the member number to look up in the Value box of the Member Inquiry panel.",
+      "intent": "Set the Search by dropdown to Last Name.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Search by:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Search by:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "literal",
+          "value": "Last Name"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Enter the member's last name in the Value box.",
       "act": {
         "action": "type",
         "target": {
@@ -265,7 +264,7 @@
         },
         "value": {
           "from": "secret",
-          "ref": "memberNumber"
+          "ref": "lastName"
         },
         "clearFirst": true
       },
@@ -276,8 +275,8 @@
       }
     },
     {
-      "id": "s06",
-      "intent": "Search for the member by member number.",
+      "id": "s07",
+      "intent": "Run the member search by last name.",
       "act": {
         "action": "click",
         "target": {
@@ -303,46 +302,16 @@
         "attempts": 1,
         "backoffMs": 750
       }
-    },
-    {
-      "id": "s07",
-      "intent": "Open the matched member's record from the search results.",
-      "act": {
-        "action": "click",
-        "target": {
-          "description": "link \"Select\" in the \"MEMBER INQUIRY / SELECTION\" panel",
-          "role": "link",
-          "name": "Select",
-          "nameMatch": "normalized",
-          "labelMatch": "normalized",
-          "container": "MEMBER INQUIRY / SELECTION",
-          "framePath": [],
-          "hints": {
-            "href": "/members/100234",
-            "tag": "a"
-          }
-        }
-      },
-      "risk": "safe",
-      "checkpoint": {
-        "kind": "urlMatches",
-        "pattern": "/members/[^/]+(?:[?#].*)?$"
-      },
-      "retry": {
-        "attempts": 1,
-        "backoffMs": 750
-      }
     }
   ],
   "successCheckpoint": {
-    "kind": "textPresent",
-    "text": "SHARES / BALANCES",
-    "caseSensitive": false
+    "kind": "regexPresent",
+    "pattern": "Member No\\.\\s*Name\\s*Shares"
   },
   "outcomes": [
     {
-      "code": "member_not_found",
-      "title": "No member matched the member number",
+      "code": "no_member_match",
+      "title": "No member records matched the search",
       "classification": "business",
       "detect": {
         "kind": "textPresent",
@@ -354,30 +323,28 @@
       "origin": "discovered"
     },
     {
-      "code": "invalid_operator_credentials",
-      "title": "Sign-on rejected",
+      "code": "signon_failed",
+      "title": "Operator sign-on rejected",
       "classification": "hard",
       "detect": {
-        "kind": "textPresent",
-        "text": "Invalid operator ID or password.",
-        "caseSensitive": false
+        "kind": "regexPresent",
+        "pattern": "Invalid operator|sign[- ]on failed|Invalid password"
       },
       "scope": "global",
       "extract": [],
       "origin": "discovered"
     },
     {
-      "code": "settings_area_off_limits",
-      "title": "System Settings area refused to automation",
+      "code": "session_timeout",
+      "title": "Session expired and operator must sign on again",
       "classification": "escalate",
       "detect": {
-        "kind": "textPresent",
-        "text": "This area is off-limits to automation",
-        "caseSensitive": false
+        "kind": "regexPresent",
+        "pattern": "session (has )?(expired|timed out)"
       },
       "scope": "global",
       "extract": [],
-      "operatorGuidance": "Inferred/observed from the automation policy refusal on /settings (the System Settings error-injection page). The capability must never follow the System Settings link; if error injection is suspected, a human must inspect it.",
+      "operatorGuidance": "Re-run the capability; if it recurs, check operator credentials and console session limits.",
       "origin": "discovered"
     }
   ],
@@ -407,16 +374,16 @@
   "governance": {
     "approval": "draft",
     "stability": {
-      "runs": 3,
-      "successes": 3
+      "runs": 0,
+      "successes": 0
     }
   },
   "provenance": {
-    "discoveredAt": "2026-09-04T16:19:27.358Z",
+    "discoveredAt": "2026-09-04T17:05:30.777Z",
     "model": "claude-opus-5",
-    "effort": "high",
-    "discoveryRunId": "disc-20260904-161707-5c5064",
-    "contentHash": "d3b35b32d25b9232c8a4d2d825c7f131",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-170412-f4e4f9",
+    "contentHash": "75273023d482c7e6ea7e8a89ebc3109a",
     "generator": "handspan"
   }
 }

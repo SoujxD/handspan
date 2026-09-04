@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "id": "member_funds_transfer_between_shares",
+  "id": "update_member_information",
   "version": 2,
-  "name": "Member Funds Transfer Between Own Shares",
-  "description": "Signs on to the Meridian Core servicing console as an operator, looks up a member by member number, opens Funds Transfer for that member, and posts a transfer of a given amount from one of the member's shares to another of the member's own shares. Returns the confirmation number, posted timestamp, amount posted and the new balances of the source and destination shares. Reports legitimate non-posting outcomes such as member not found, source share on hold, insufficient balance, invalid amount, or same source and destination share.",
+  "name": "Update Member Contact Information",
+  "description": "Signs on to the Meridian Core servicing console as an operator, looks up a member by member number, opens the Update Member Information action, sets the e-mail, phone and mailing address, and saves. Returns the confirmation that the member's contact information was updated (with timestamp). Reports \"no member records matched\" and e-mail format validation as business outcomes.",
   "surface": {
     "kind": "legacy_web",
     "product": "cornerstone-meridian-core",
@@ -23,128 +23,75 @@
     {
       "name": "operatorPassword",
       "type": "string",
-      "description": "Password for the operator sign-on.",
+      "description": "Password for the operator ID.",
       "required": true,
       "sensitivity": "secret"
     },
     {
       "name": "memberNumber",
       "type": "string",
-      "description": "Member number to search for in the Member Inquiry / Selection screen.",
-      "required": true,
-      "sensitivity": "pii",
-      "example": "100234"
-    },
-    {
-      "name": "fromShareOption",
-      "type": "string",
-      "description": "Visible option text of the source share in the 'From Share' dropdown, formatted '<share id> - <type> ($balance)'. Must be a share whose status is OPEN; HOLD shares cannot be debited.",
-      "required": true,
-      "sensitivity": "pii",
-      "example": "100234-S0001-19 - Regular Shares ($99.00)"
-    },
-    {
-      "name": "toShareOption",
-      "type": "string",
-      "description": "Visible option text of the destination share in the 'To Share' dropdown, formatted '<share id> - <type> ($balance)'. Must differ from the source share.",
-      "required": true,
-      "sensitivity": "pii",
-      "example": "100234-S0001-6 - Regular Shares ($34.99)"
-    },
-    {
-      "name": "amount",
-      "type": "money",
-      "description": "Dollar amount to transfer, as a plain figure such as 25.00 (no currency symbol).",
+      "description": "Member number to service.",
       "required": true,
       "sensitivity": "internal",
-      "example": "25.00"
+      "example": "102777"
     },
     {
-      "name": "memo",
+      "name": "email",
       "type": "string",
-      "description": "Memo text recorded with the transfer.",
-      "required": false,
-      "sensitivity": "internal",
-      "example": "Member requested share to share transfer"
+      "description": "New e-mail address for the member; must be a valid e-mail format.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "member102777@example.com"
+    },
+    {
+      "name": "phone",
+      "type": "string",
+      "description": "New phone number for the member.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "555-0102"
+    },
+    {
+      "name": "mailingAddress",
+      "type": "string",
+      "description": "New mailing address for the member.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "12 Example St, Springfield"
     }
   ],
   "outputs": [
     {
-      "name": "confirmationNumber",
+      "name": "confirmationMessage",
       "type": "string",
-      "description": "Confirmation number issued for the posted transfer.",
+      "description": "The confirmation sentence including the effective date/time of the update.",
       "sensitivity": "internal",
       "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Confirmation:",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
+        "via": "regexOnPageText",
+        "pattern": "(Member\\s+\\d+\\s+contact information has been updated as of [^.]+)",
+        "group": 1
       },
       "transform": "trim",
       "required": true
     },
     {
-      "name": "postedAt",
+      "name": "updatedAt",
       "type": "string",
-      "description": "Date and time the transfer posted.",
+      "description": "Date and time the update was recorded.",
       "sensitivity": "internal",
       "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Posted:",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
+        "via": "regexOnPageText",
+        "pattern": "has been updated as of ([0-9/]+ [0-9:]+)",
+        "group": 1
       },
       "transform": "trim",
-      "required": true
-    },
-    {
-      "name": "amountPosted",
-      "type": "money",
-      "description": "Amount actually posted, as shown on the Transfer Posted screen.",
-      "sensitivity": "internal",
-      "extraction": {
-        "via": "fromLabelledCell",
-        "label": "Amount:",
-        "labelMatch": "normalized",
-        "framePath": [],
-        "direction": "right"
-      },
-      "transform": "stripCurrency",
-      "required": true
-    },
-    {
-      "name": "sourceNewBalance",
-      "type": "money",
-      "description": "New balance of the source share after posting (first '(new balance)' line).",
-      "sensitivity": "pii",
-      "extraction": {
-        "via": "regexOnPageText",
-        "pattern": "\\$([0-9,]+\\.[0-9]{2}) \\(new balance\\)",
-        "group": 1
-      },
-      "transform": "stripCurrency",
-      "required": true
-    },
-    {
-      "name": "destinationNewBalance",
-      "type": "money",
-      "description": "New balance of the destination share after posting (second '(new balance)' line).",
-      "sensitivity": "pii",
-      "extraction": {
-        "via": "regexOnPageText",
-        "pattern": "\\(new balance\\)[\\s\\S]*?\\$([0-9,]+\\.[0-9]{2}) \\(new balance\\)",
-        "group": 1
-      },
-      "transform": "stripCurrency",
       "required": true
     }
   ],
   "steps": [
     {
       "id": "s01",
-      "intent": "Enter the operator ID in the Operator Sign On panel.",
+      "intent": "Enter the operator ID in the sign-on panel.",
       "act": {
         "action": "type",
         "target": {
@@ -174,7 +121,7 @@
     },
     {
       "id": "s02",
-      "intent": "Enter the operator password in the Operator Sign On panel.",
+      "intent": "Enter the operator password.",
       "act": {
         "action": "type",
         "target": {
@@ -204,7 +151,7 @@
     },
     {
       "id": "s03",
-      "intent": "Sign on to the servicing console as the operator.",
+      "intent": "Sign on to the servicing console.",
       "act": {
         "action": "click",
         "target": {
@@ -243,7 +190,7 @@
     },
     {
       "id": "s04",
-      "intent": "Open the Member Inquiry / Selection screen to look up the member.",
+      "intent": "Open Member Inquiry / Selection to look up the member.",
       "act": {
         "action": "click",
         "target": {
@@ -282,7 +229,7 @@
     },
     {
       "id": "s05",
-      "intent": "Enter the member number to service in the Member Inquiry search Value box.",
+      "intent": "Enter the member number to service.",
       "act": {
         "action": "type",
         "target": {
@@ -299,8 +246,8 @@
           }
         },
         "value": {
-          "from": "secret",
-          "ref": "memberNumber"
+          "from": "param",
+          "name": "memberNumber"
         },
         "clearFirst": true
       },
@@ -312,7 +259,7 @@
     },
     {
       "id": "s06",
-      "intent": "Search for the member record by member number.",
+      "intent": "Search for the member record.",
       "act": {
         "action": "click",
         "target": {
@@ -341,7 +288,7 @@
     },
     {
       "id": "s07",
-      "intent": "Select the matched member record to open the member detail screen.",
+      "intent": "Select the member record to open the member detail screen.",
       "act": {
         "action": "click",
         "target": {
@@ -353,7 +300,7 @@
           "container": "MEMBER INQUIRY / SELECTION",
           "framePath": [],
           "hints": {
-            "href": "/members/100234",
+            "href": "/members/102777",
             "tag": "a"
           }
         }
@@ -370,27 +317,27 @@
     },
     {
       "id": "s08",
-      "intent": "Open the Funds Transfer screen for this member.",
+      "intent": "Open the Update Member Information action for this member.",
       "act": {
         "action": "click",
         "target": {
-          "description": "link \"Funds Transfer\" in the \"ACTIONS\" panel",
+          "description": "link \"Update Member Information\" in the \"Open New Share\" panel",
           "role": "link",
-          "name": "Funds Transfer",
+          "name": "Update Member Information",
           "nameMatch": "normalized",
           "labelMatch": "normalized",
-          "container": "ACTIONS",
+          "container": "Open New Share",
           "framePath": [],
           "hints": {
-            "href": "/members/100234/transfer",
+            "href": "/members/102777/update",
             "tag": "a"
           }
         }
       },
-      "risk": "confirmable",
+      "risk": "safe",
       "checkpoint": {
         "kind": "urlMatches",
-        "pattern": "/members/[^/]+/transfer(?:[?#].*)?$"
+        "pattern": "/members/[^/]+/update(?:[?#].*)?$"
       },
       "retry": {
         "attempts": 1,
@@ -399,72 +346,16 @@
     },
     {
       "id": "s09",
-      "intent": "Choose the source share to debit in the From Share dropdown.",
-      "act": {
-        "action": "select",
-        "target": {
-          "description": "combobox labelled \"From Share:\" in the \"Member 100234 - Lovelace, Ada\" panel",
-          "role": "combobox",
-          "nameMatch": "normalized",
-          "label": "From Share:",
-          "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
-          "framePath": [],
-          "hints": {
-            "tag": "select"
-          }
-        },
-        "value": {
-          "from": "secret",
-          "ref": "fromShareOption"
-        }
-      },
-      "risk": "safe",
-      "retry": {
-        "attempts": 2,
-        "backoffMs": 500
-      }
-    },
-    {
-      "id": "s10",
-      "intent": "Choose the destination share to credit in the To Share dropdown.",
-      "act": {
-        "action": "select",
-        "target": {
-          "description": "combobox labelled \"To Share:\" in the \"Member 100234 - Lovelace, Ada\" panel",
-          "role": "combobox",
-          "nameMatch": "normalized",
-          "label": "To Share:",
-          "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
-          "framePath": [],
-          "hints": {
-            "tag": "select"
-          }
-        },
-        "value": {
-          "from": "secret",
-          "ref": "toShareOption"
-        }
-      },
-      "risk": "safe",
-      "retry": {
-        "attempts": 2,
-        "backoffMs": 500
-      }
-    },
-    {
-      "id": "s11",
-      "intent": "Enter the dollar amount to move between the member's shares.",
+      "intent": "Set the member's e-mail address.",
       "act": {
         "action": "type",
         "target": {
-          "description": "textbox labelled \"Amount:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "description": "textbox labelled \"E-mail:\" in the \"Member 102777 - Johnson, Katherine\" panel",
           "role": "textbox",
           "nameMatch": "normalized",
-          "label": "Amount:",
+          "label": "E-mail:",
           "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
+          "container": "Member 102777 - Johnson, Katherine",
           "framePath": [],
           "hints": {
             "inputType": "text",
@@ -472,108 +363,89 @@
           }
         },
         "value": {
-          "from": "param",
-          "name": "amount"
+          "from": "secret",
+          "ref": "email"
         },
         "clearFirst": true
       },
-      "risk": "safe",
-      "retry": {
-        "attempts": 2,
-        "backoffMs": 500
-      }
-    },
-    {
-      "id": "s12",
-      "intent": "Record the memo describing the reason for the transfer.",
-      "act": {
-        "action": "type",
-        "target": {
-          "description": "textbox labelled \"Memo:\" in the \"Member 100234 - Lovelace, Ada\" panel",
-          "role": "textbox",
-          "nameMatch": "normalized",
-          "label": "Memo:",
-          "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
-          "framePath": [],
-          "hints": {
-            "inputType": "text",
-            "tag": "input"
-          }
-        },
-        "value": {
-          "from": "param",
-          "name": "memo"
-        },
-        "clearFirst": true
-      },
-      "risk": "safe",
-      "retry": {
-        "attempts": 2,
-        "backoffMs": 500
-      }
-    },
-    {
-      "id": "s13",
-      "intent": "Submit the transfer details to reach the review/confirmation screen.",
-      "act": {
-        "action": "click",
-        "target": {
-          "description": "button \"Continue\" in the \"Member 100234 - Lovelace, Ada\" panel",
-          "role": "button",
-          "name": "Continue",
-          "nameMatch": "normalized",
-          "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
-          "framePath": [],
-          "hints": {
-            "inputType": "submit",
-            "tag": "input"
-          }
-        }
-      },
-      "risk": "safe",
-      "checkpoint": {
-        "kind": "all",
-        "of": [
-          {
-            "kind": "urlMatches",
-            "pattern": "/members/[^/]+/transfer/review(?:[?#].*)?$"
-          },
-          {
-            "kind": "textPresent",
-            "text": "{{fromShareOption}}",
-            "caseSensitive": false
-          },
-          {
-            "kind": "textPresent",
-            "text": "{{toShareOption}}",
-            "caseSensitive": false
-          },
-          {
-            "kind": "textPresent",
-            "text": "{{amount}}",
-            "caseSensitive": false
-          }
-        ]
-      },
+      "risk": "sensitive",
       "retry": {
         "attempts": 1,
         "backoffMs": 750
       }
     },
     {
-      "id": "s14",
-      "intent": "Post the transfer between the member's own shares as authorised.",
+      "id": "s10",
+      "intent": "Set the member's phone number.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Phone:\" in the \"Member 102777 - Johnson, Katherine\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Phone:",
+          "labelMatch": "normalized",
+          "container": "Member 102777 - Johnson, Katherine",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "phone"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s11",
+      "intent": "Set the member's mailing address.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Mailing Address:\" in the \"Member 102777 - Johnson, Katherine\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Mailing Address:",
+          "labelMatch": "normalized",
+          "container": "Member 102777 - Johnson, Katherine",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "mailingAddress"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s12",
+      "intent": "Save the updated member contact information.",
       "act": {
         "action": "click",
         "target": {
-          "description": "button \"Post Transfer\" in the \"CONFIRM FUNDS TRANSFER\" panel",
+          "description": "button \"Save Changes\" in the \"Member 102777 - Johnson, Katherine\" panel",
           "role": "button",
-          "name": "Post Transfer",
+          "name": "Save Changes",
           "nameMatch": "normalized",
           "labelMatch": "normalized",
-          "container": "CONFIRM FUNDS TRANSFER",
+          "container": "Member 102777 - Johnson, Katherine",
           "framePath": [],
           "hints": {
             "inputType": "submit",
@@ -583,18 +455,9 @@
       },
       "risk": "confirmable",
       "checkpoint": {
-        "kind": "all",
-        "of": [
-          {
-            "kind": "urlMatches",
-            "pattern": "/members/[^/]+/transfer/post(?:[?#].*)?$"
-          },
-          {
-            "kind": "textPresent",
-            "text": "TRANSACTION COMPLETE",
-            "caseSensitive": false
-          }
-        ]
+        "kind": "textPresent",
+        "text": "CHANGES SAVED",
+        "caseSensitive": false
       },
       "retry": {
         "attempts": 1,
@@ -604,17 +467,17 @@
   ],
   "successCheckpoint": {
     "kind": "textPresent",
-    "text": "TRANSACTION COMPLETE",
+    "text": "contact information has been updated as of",
     "caseSensitive": false
   },
   "outcomes": [
     {
-      "code": "insufficient_available_balance",
-      "title": "Source share does not have enough available balance",
+      "code": "invalid_email_format",
+      "title": "E-mail address rejected by validation",
       "classification": "business",
       "detect": {
         "kind": "textPresent",
-        "text": "Insufficient available balance in the source share.",
+        "text": "E-mail address is not in a valid format.",
         "caseSensitive": false
       },
       "scope": "global",
@@ -622,12 +485,12 @@
       "origin": "discovered"
     },
     {
-      "code": "source_share_on_hold",
-      "title": "Source share is on HOLD and cannot be debited",
+      "code": "validation_errors",
+      "title": "Form validation prevented the save",
       "classification": "business",
       "detect": {
         "kind": "textPresent",
-        "text": "Source share is HOLD and cannot be debited.",
+        "text": "Please correct the following:",
         "caseSensitive": false
       },
       "scope": "global",
@@ -635,39 +498,37 @@
       "origin": "discovered"
     },
     {
-      "code": "invalid_amount",
-      "title": "Amount is missing or not a valid dollar figure",
-      "classification": "business",
-      "detect": {
-        "kind": "textPresent",
-        "text": "Amount must be a valid dollar figure",
-        "caseSensitive": false
-      },
-      "scope": "global",
-      "extract": [],
-      "origin": "discovered"
-    },
-    {
-      "code": "same_source_and_destination",
-      "title": "Source and destination shares are the same",
-      "classification": "business",
-      "detect": {
-        "kind": "textPresent",
-        "text": "Source and destination shares must differ.",
-        "caseSensitive": false
-      },
-      "scope": "global",
-      "extract": [],
-      "origin": "discovered"
-    },
-    {
-      "code": "invalid_operator_credentials",
+      "code": "signon_failed",
       "title": "Operator sign-on rejected",
       "classification": "hard",
       "detect": {
-        "kind": "textPresent",
-        "text": "Invalid operator ID or password.",
-        "caseSensitive": false
+        "kind": "regexPresent",
+        "pattern": "(invalid operator|sign[- ]?on failed|incorrect password)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Verify the operator ID/password and branch for this institution, then re-run.",
+      "origin": "discovered"
+    },
+    {
+      "code": "session_timed_out",
+      "title": "Operator session expired",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(session (has )?(expired|timed out)|please sign on again)"
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "system_error",
+      "title": "Core system error while saving",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(system (error|unavailable)|core (is )?unavailable|unable to process your request)"
       },
       "scope": "global",
       "extract": [],
@@ -700,17 +561,17 @@
   "governance": {
     "approval": "draft",
     "stability": {
-      "runs": 5,
-      "successes": 5
+      "runs": 0,
+      "successes": 0
     },
-    "notes": "[reviewer] checkpoint on s13: Reaching the review screen is not the same as the review screen agreeing with the inputs. Before the irreversible post step runs, assert it restates the from-share, to-share and amount this invocation was actually given."
+    "notes": "[reviewer] signon_failed: escalate -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome."
   },
   "provenance": {
-    "discoveredAt": "2026-09-04T16:36:28.407Z",
+    "discoveredAt": "2026-09-04T17:10:02.353Z",
     "model": "claude-opus-5",
-    "effort": "high",
-    "discoveryRunId": "disc-20260904-163212-68eb6c",
-    "contentHash": "57e27dd594dc9c1b1e6ad3f20fa83abd",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-170820-bbab38",
+    "contentHash": "2894de67c7c93a50c171acc665983582",
     "generator": "handspan"
   }
 }

@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "id": "member_funds_transfer_between_shares",
-  "version": 2,
-  "name": "Member Funds Transfer Between Own Shares",
-  "description": "Signs on to the Meridian Core servicing console as an operator, looks up a member by member number, opens Funds Transfer for that member, and posts a transfer of a given amount from one of the member's shares to another of the member's own shares. Returns the confirmation number, posted timestamp, amount posted and the new balances of the source and destination shares. Reports legitimate non-posting outcomes such as member not found, source share on hold, insufficient balance, invalid amount, or same source and destination share.",
+  "id": "member_open_new_share",
+  "version": 3,
+  "name": "Open New Share for Member",
+  "description": "Signs on to the Meridian Core servicing console as an operator, looks up a member by member number, runs the Open New Share action for a chosen share type and initial deposit, confirms on the CONFIRM NEW SHARE review screen and commits. Returns the confirmation number, new share ID, share type description and opening balance. This writes data: it creates a real new share account on the member record.",
   "surface": {
     "kind": "legacy_web",
     "product": "cornerstone-meridian-core",
@@ -23,56 +23,46 @@
     {
       "name": "operatorPassword",
       "type": "string",
-      "description": "Password for the operator sign-on.",
+      "description": "Password for the operator ID.",
       "required": true,
       "sensitivity": "secret"
     },
     {
       "name": "memberNumber",
       "type": "string",
-      "description": "Member number to search for in the Member Inquiry / Selection screen.",
+      "description": "Member number to service.",
       "required": true,
       "sensitivity": "pii",
-      "example": "100234"
+      "example": "102777"
     },
     {
-      "name": "fromShareOption",
-      "type": "string",
-      "description": "Visible option text of the source share in the 'From Share' dropdown, formatted '<share id> - <type> ($balance)'. Must be a share whose status is OPEN; HOLD shares cannot be debited.",
+      "name": "shareType",
+      "type": "enum",
+      "description": "Visible option text of the share type to open in the Share Type dropdown.",
       "required": true,
-      "sensitivity": "pii",
-      "example": "100234-S0001-19 - Regular Shares ($99.00)"
+      "sensitivity": "public",
+      "enumValues": [
+        "S0001 - Regular Shares",
+        "S0070 - Share Draft (Checking)",
+        "MMKT - Money Market",
+        "CERT - Certificate"
+      ],
+      "example": "MMKT - Money Market"
     },
     {
-      "name": "toShareOption",
-      "type": "string",
-      "description": "Visible option text of the destination share in the 'To Share' dropdown, formatted '<share id> - <type> ($balance)'. Must differ from the source share.",
-      "required": true,
-      "sensitivity": "pii",
-      "example": "100234-S0001-6 - Regular Shares ($34.99)"
-    },
-    {
-      "name": "amount",
+      "name": "initialDeposit",
       "type": "money",
-      "description": "Dollar amount to transfer, as a plain figure such as 25.00 (no currency symbol).",
+      "description": "Initial deposit amount in dollars, e.g. 5.00. Must be a valid dollar figure.",
       "required": true,
       "sensitivity": "internal",
-      "example": "25.00"
-    },
-    {
-      "name": "memo",
-      "type": "string",
-      "description": "Memo text recorded with the transfer.",
-      "required": false,
-      "sensitivity": "internal",
-      "example": "Member requested share to share transfer"
+      "example": "5.00"
     }
   ],
   "outputs": [
     {
       "name": "confirmationNumber",
       "type": "string",
-      "description": "Confirmation number issued for the posted transfer.",
+      "description": "Confirmation number for the share opening.",
       "sensitivity": "internal",
       "extraction": {
         "via": "fromLabelledCell",
@@ -85,13 +75,13 @@
       "required": true
     },
     {
-      "name": "postedAt",
+      "name": "newShareId",
       "type": "string",
-      "description": "Date and time the transfer posted.",
+      "description": "Identifier of the newly created share.",
       "sensitivity": "internal",
       "extraction": {
         "via": "fromLabelledCell",
-        "label": "Posted:",
+        "label": "New Share ID:",
         "labelMatch": "normalized",
         "framePath": [],
         "direction": "right"
@@ -100,42 +90,31 @@
       "required": true
     },
     {
-      "name": "amountPosted",
-      "type": "money",
-      "description": "Amount actually posted, as shown on the Transfer Posted screen.",
-      "sensitivity": "internal",
+      "name": "shareTypeDescription",
+      "type": "string",
+      "description": "Description of the opened share type.",
+      "sensitivity": "public",
       "extraction": {
         "via": "fromLabelledCell",
-        "label": "Amount:",
+        "label": "Type:",
         "labelMatch": "normalized",
         "framePath": [],
         "direction": "right"
       },
-      "transform": "stripCurrency",
+      "transform": "trim",
       "required": true
     },
     {
-      "name": "sourceNewBalance",
+      "name": "openingBalance",
       "type": "money",
-      "description": "New balance of the source share after posting (first '(new balance)' line).",
-      "sensitivity": "pii",
+      "description": "Opening balance of the new share.",
+      "sensitivity": "internal",
       "extraction": {
-        "via": "regexOnPageText",
-        "pattern": "\\$([0-9,]+\\.[0-9]{2}) \\(new balance\\)",
-        "group": 1
-      },
-      "transform": "stripCurrency",
-      "required": true
-    },
-    {
-      "name": "destinationNewBalance",
-      "type": "money",
-      "description": "New balance of the destination share after posting (second '(new balance)' line).",
-      "sensitivity": "pii",
-      "extraction": {
-        "via": "regexOnPageText",
-        "pattern": "\\(new balance\\)[\\s\\S]*?\\$([0-9,]+\\.[0-9]{2}) \\(new balance\\)",
-        "group": 1
+        "via": "fromLabelledCell",
+        "label": "Opening Balance:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
       },
       "transform": "stripCurrency",
       "required": true
@@ -144,7 +123,7 @@
   "steps": [
     {
       "id": "s01",
-      "intent": "Enter the operator ID in the Operator Sign On panel.",
+      "intent": "Enter the operator ID in the Operator ID box on the sign-on screen.",
       "act": {
         "action": "type",
         "target": {
@@ -174,7 +153,7 @@
     },
     {
       "id": "s02",
-      "intent": "Enter the operator password in the Operator Sign On panel.",
+      "intent": "Enter the operator password in the Password box.",
       "act": {
         "action": "type",
         "target": {
@@ -204,7 +183,7 @@
     },
     {
       "id": "s03",
-      "intent": "Sign on to the servicing console as the operator.",
+      "intent": "Sign on to the servicing console.",
       "act": {
         "action": "click",
         "target": {
@@ -243,7 +222,7 @@
     },
     {
       "id": "s04",
-      "intent": "Open the Member Inquiry / Selection screen to look up the member.",
+      "intent": "Open Member Inquiry / Selection to look up the member.",
       "act": {
         "action": "click",
         "target": {
@@ -282,7 +261,7 @@
     },
     {
       "id": "s05",
-      "intent": "Enter the member number to service in the Member Inquiry search Value box.",
+      "intent": "Enter the member number to service in the Value box of Member Inquiry.",
       "act": {
         "action": "type",
         "target": {
@@ -312,7 +291,7 @@
     },
     {
       "id": "s06",
-      "intent": "Search for the member record by member number.",
+      "intent": "Search for the member record.",
       "act": {
         "action": "click",
         "target": {
@@ -341,7 +320,7 @@
     },
     {
       "id": "s07",
-      "intent": "Select the matched member record to open the member detail screen.",
+      "intent": "Select the matched member to open their record.",
       "act": {
         "action": "click",
         "target": {
@@ -353,7 +332,7 @@
           "container": "MEMBER INQUIRY / SELECTION",
           "framePath": [],
           "hints": {
-            "href": "/members/100234",
+            "href": "/members/102777",
             "tag": "a"
           }
         }
@@ -370,27 +349,37 @@
     },
     {
       "id": "s08",
-      "intent": "Open the Funds Transfer screen for this member.",
+      "intent": "Start the Open New Share action for this member.",
       "act": {
         "action": "click",
         "target": {
-          "description": "link \"Funds Transfer\" in the \"ACTIONS\" panel",
+          "description": "link \"Open New Share\" in the \"Funds Transfer\" panel",
           "role": "link",
-          "name": "Funds Transfer",
+          "name": "Open New Share",
           "nameMatch": "normalized",
           "labelMatch": "normalized",
-          "container": "ACTIONS",
+          "container": "Funds Transfer",
           "framePath": [],
           "hints": {
-            "href": "/members/100234/transfer",
+            "href": "/members/102777/open-share",
             "tag": "a"
           }
         }
       },
       "risk": "confirmable",
       "checkpoint": {
-        "kind": "urlMatches",
-        "pattern": "/members/[^/]+/transfer(?:[?#].*)?$"
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members/[^/]+/open-share(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "CERT - Certificate",
+            "caseSensitive": false
+          }
+        ]
       },
       "retry": {
         "attempts": 1,
@@ -399,24 +388,24 @@
     },
     {
       "id": "s09",
-      "intent": "Choose the source share to debit in the From Share dropdown.",
+      "intent": "Choose the share type to open in the Share Type dropdown.",
       "act": {
         "action": "select",
         "target": {
-          "description": "combobox labelled \"From Share:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "description": "combobox labelled \"Share Type:\" in the \"Member 102777 - Johnson, Katherine\" panel",
           "role": "combobox",
           "nameMatch": "normalized",
-          "label": "From Share:",
+          "label": "Share Type:",
           "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
+          "container": "Member 102777 - Johnson, Katherine",
           "framePath": [],
           "hints": {
             "tag": "select"
           }
         },
         "value": {
-          "from": "secret",
-          "ref": "fromShareOption"
+          "from": "param",
+          "name": "shareType"
         }
       },
       "risk": "safe",
@@ -427,24 +416,24 @@
     },
     {
       "id": "s10",
-      "intent": "Choose the destination share to credit in the To Share dropdown.",
+      "intent": "Choose the share type to open in the Share Type dropdown.",
       "act": {
         "action": "select",
         "target": {
-          "description": "combobox labelled \"To Share:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "description": "combobox labelled \"Share Type:\" in the \"Member 102777 - Johnson, Katherine\" panel",
           "role": "combobox",
           "nameMatch": "normalized",
-          "label": "To Share:",
+          "label": "Share Type:",
           "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
+          "container": "Member 102777 - Johnson, Katherine",
           "framePath": [],
           "hints": {
             "tag": "select"
           }
         },
         "value": {
-          "from": "secret",
-          "ref": "toShareOption"
+          "from": "param",
+          "name": "shareType"
         }
       },
       "risk": "safe",
@@ -455,16 +444,16 @@
     },
     {
       "id": "s11",
-      "intent": "Enter the dollar amount to move between the member's shares.",
+      "intent": "Enter the initial deposit amount for the new share.",
       "act": {
         "action": "type",
         "target": {
-          "description": "textbox labelled \"Amount:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "description": "textbox labelled \"Initial Deposit:\" in the \"Member 102777 - Johnson, Katherine\" panel",
           "role": "textbox",
           "nameMatch": "normalized",
-          "label": "Amount:",
+          "label": "Initial Deposit:",
           "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
+          "container": "Member 102777 - Johnson, Katherine",
           "framePath": [],
           "hints": {
             "inputType": "text",
@@ -473,7 +462,7 @@
         },
         "value": {
           "from": "param",
-          "name": "amount"
+          "name": "initialDeposit"
         },
         "clearFirst": true
       },
@@ -485,46 +474,16 @@
     },
     {
       "id": "s12",
-      "intent": "Record the memo describing the reason for the transfer.",
-      "act": {
-        "action": "type",
-        "target": {
-          "description": "textbox labelled \"Memo:\" in the \"Member 100234 - Lovelace, Ada\" panel",
-          "role": "textbox",
-          "nameMatch": "normalized",
-          "label": "Memo:",
-          "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
-          "framePath": [],
-          "hints": {
-            "inputType": "text",
-            "tag": "input"
-          }
-        },
-        "value": {
-          "from": "param",
-          "name": "memo"
-        },
-        "clearFirst": true
-      },
-      "risk": "safe",
-      "retry": {
-        "attempts": 2,
-        "backoffMs": 500
-      }
-    },
-    {
-      "id": "s13",
-      "intent": "Submit the transfer details to reach the review/confirmation screen.",
+      "intent": "Continue to the confirmation review screen for the new share.",
       "act": {
         "action": "click",
         "target": {
-          "description": "button \"Continue\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "description": "button \"Continue\" in the \"Member 102777 - Johnson, Katherine\" panel",
           "role": "button",
           "name": "Continue",
           "nameMatch": "normalized",
           "labelMatch": "normalized",
-          "container": "Member 100234 - Lovelace, Ada",
+          "container": "Member 102777 - Johnson, Katherine",
           "framePath": [],
           "hints": {
             "inputType": "submit",
@@ -534,28 +493,8 @@
       },
       "risk": "safe",
       "checkpoint": {
-        "kind": "all",
-        "of": [
-          {
-            "kind": "urlMatches",
-            "pattern": "/members/[^/]+/transfer/review(?:[?#].*)?$"
-          },
-          {
-            "kind": "textPresent",
-            "text": "{{fromShareOption}}",
-            "caseSensitive": false
-          },
-          {
-            "kind": "textPresent",
-            "text": "{{toShareOption}}",
-            "caseSensitive": false
-          },
-          {
-            "kind": "textPresent",
-            "text": "{{amount}}",
-            "caseSensitive": false
-          }
-        ]
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+/open-share/review(?:[?#].*)?$"
       },
       "retry": {
         "attempts": 1,
@@ -563,17 +502,17 @@
       }
     },
     {
-      "id": "s14",
-      "intent": "Post the transfer between the member's own shares as authorised.",
+      "id": "s13",
+      "intent": "Commit the new share by clicking Open Share.",
       "act": {
         "action": "click",
         "target": {
-          "description": "button \"Post Transfer\" in the \"CONFIRM FUNDS TRANSFER\" panel",
+          "description": "button \"Open Share\" in the \"CONFIRM NEW SHARE\" panel",
           "role": "button",
-          "name": "Post Transfer",
+          "name": "Open Share",
           "nameMatch": "normalized",
           "labelMatch": "normalized",
-          "container": "CONFIRM FUNDS TRANSFER",
+          "container": "CONFIRM NEW SHARE",
           "framePath": [],
           "hints": {
             "inputType": "submit",
@@ -587,11 +526,11 @@
         "of": [
           {
             "kind": "urlMatches",
-            "pattern": "/members/[^/]+/transfer/post(?:[?#].*)?$"
+            "pattern": "/members/[^/]+/open-share/post(?:[?#].*)?$"
           },
           {
             "kind": "textPresent",
-            "text": "TRANSACTION COMPLETE",
+            "text": "NEW SHARE ESTABLISHED",
             "caseSensitive": false
           }
         ]
@@ -604,17 +543,17 @@
   ],
   "successCheckpoint": {
     "kind": "textPresent",
-    "text": "TRANSACTION COMPLETE",
+    "text": "NEW SHARE ESTABLISHED",
     "caseSensitive": false
   },
   "outcomes": [
     {
-      "code": "insufficient_available_balance",
-      "title": "Source share does not have enough available balance",
+      "code": "invalid_initial_deposit",
+      "title": "Initial deposit rejected as not a valid dollar figure",
       "classification": "business",
       "detect": {
         "kind": "textPresent",
-        "text": "Insufficient available balance in the source share.",
+        "text": "Initial deposit must be a valid dollar figure.",
         "caseSensitive": false
       },
       "scope": "global",
@@ -622,55 +561,29 @@
       "origin": "discovered"
     },
     {
-      "code": "source_share_on_hold",
-      "title": "Source share is on HOLD and cannot be debited",
-      "classification": "business",
-      "detect": {
-        "kind": "textPresent",
-        "text": "Source share is HOLD and cannot be debited.",
-        "caseSensitive": false
-      },
-      "scope": "global",
-      "extract": [],
-      "origin": "discovered"
-    },
-    {
-      "code": "invalid_amount",
-      "title": "Amount is missing or not a valid dollar figure",
-      "classification": "business",
-      "detect": {
-        "kind": "textPresent",
-        "text": "Amount must be a valid dollar figure",
-        "caseSensitive": false
-      },
-      "scope": "global",
-      "extract": [],
-      "origin": "discovered"
-    },
-    {
-      "code": "same_source_and_destination",
-      "title": "Source and destination shares are the same",
-      "classification": "business",
-      "detect": {
-        "kind": "textPresent",
-        "text": "Source and destination shares must differ.",
-        "caseSensitive": false
-      },
-      "scope": "global",
-      "extract": [],
-      "origin": "discovered"
-    },
-    {
-      "code": "invalid_operator_credentials",
-      "title": "Operator sign-on rejected",
+      "code": "request_not_validated",
+      "title": "Open New Share request failed validation",
       "classification": "hard",
       "detect": {
         "kind": "textPresent",
-        "text": "Invalid operator ID or password.",
+        "text": "The request could not be validated",
         "caseSensitive": false
       },
       "scope": "global",
       "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "signon_failed",
+      "title": "Operator sign-on rejected",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(Invalid operator|sign[- ]on failed|Invalid credentials)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Verify the operator ID/password and branch, then re-run.",
       "origin": "discovered"
     }
   ],
@@ -700,17 +613,17 @@
   "governance": {
     "approval": "draft",
     "stability": {
-      "runs": 5,
-      "successes": 5
+      "runs": 1,
+      "successes": 1
     },
-    "notes": "[reviewer] checkpoint on s13: Reaching the review screen is not the same as the review screen agreeing with the inputs. Before the irreversible post step runs, assert it restates the from-share, to-share and amount this invocation was actually given."
+    "notes": "[reviewer] signon_failed: escalate -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] invalid_initial_deposit: hard -> business. A deposit the application rejects is an answer the caller needs, not an application fault. It exits 0 with the reason attached so a calling agent can correct the amount and retry, rather than treating it as an outage."
   },
   "provenance": {
-    "discoveredAt": "2026-09-04T16:36:28.407Z",
+    "discoveredAt": "2026-09-04T17:07:58.772Z",
     "model": "claude-opus-5",
-    "effort": "high",
-    "discoveryRunId": "disc-20260904-163212-68eb6c",
-    "contentHash": "57e27dd594dc9c1b1e6ad3f20fa83abd",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-170543-481467",
+    "contentHash": "b5b62fbb94be44bafcfbda85447acf8d",
     "generator": "handspan"
   }
 }

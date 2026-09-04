@@ -1,0 +1,340 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "operator_sign_on",
+  "version": 2,
+  "name": "Operator Sign On",
+  "description": "Establishes an operator session on the Meridian Core member-servicing console: enters operator ID, password and branch on the OPERATOR SIGN ON screen and lands on the MAIN MENU. Returns the signed-on operator display name/role, the operator code, the branch code and the session id. Use it as the session-establishment prerequisite for other servicing capabilities. If the credentials are rejected it reports invalid_credentials rather than failing.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "recordedOnTenant": "meridian-demo",
+    "entryUrl": "{{baseUrl}}/signon"
+  },
+  "inputs": [
+    {
+      "name": "operatorId",
+      "type": "string",
+      "description": "Operator ID to sign on with, e.g. teller1",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller1"
+    },
+    {
+      "name": "operatorPassword",
+      "type": "string",
+      "description": "Password for the operator ID",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "branch",
+      "type": "enum",
+      "description": "Branch to sign on at, as shown in the Branch dropdown",
+      "required": true,
+      "sensitivity": "public",
+      "enumValues": [
+        "MAIN-001 - Main Office",
+        "WEST-014 - Westside",
+        "EAST-022 - Eastgate"
+      ],
+      "example": "MAIN-001 - Main Office"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "signedOnAs",
+      "type": "string",
+      "description": "Operator display name and role shown on the main menu",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "Signed on as ([^\\n]+)",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "operatorCode",
+      "type": "string",
+      "description": "Operator code from the status line",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "OPR\\s+(\\S+)",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "branchCode",
+      "type": "string",
+      "description": "Branch code from the status line",
+      "sensitivity": "public",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "BR\\s+(\\S+)",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "sessionId",
+      "type": "string",
+      "description": "Session identifier (SID) from the status line",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "SID\\s+(\\S+)",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Return to a clean operator sign-on screen to begin the recorded flow.",
+      "act": {
+        "action": "navigate",
+        "url": "{{baseUrl}}/signon"
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/signon(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the operator ID in the Operator ID box of the Operator Sign On panel.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Operator ID:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Operator ID:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "operatorId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Enter the operator password in the Password box of the Operator Sign On panel.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "operatorPassword"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Select the branch the operator is signing on at.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Branch:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Branch:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "branch"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Submit the sign-on to establish the operator session and reach the Main Menu.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign On\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/menu(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Signed on as J.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "regexPresent",
+    "pattern": "Signed on as .*\\(.*\\)"
+  },
+  "outcomes": [
+    {
+      "code": "invalid_credentials",
+      "title": "Operator ID or password rejected",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Invalid operator ID or password.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "account_locked",
+      "title": "Operator profile locked or disabled",
+      "classification": "escalate",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "operator (profile )?(is )?(locked|disabled|suspended)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Wording inferred, not observed. Have a supervisor unlock or re-enable the operator profile in security administration.",
+      "origin": "discovered"
+    },
+    {
+      "code": "session_timed_out",
+      "title": "Session expired before reaching the main menu",
+      "classification": "escalate",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "session (has )?(timed out|expired)"
+      },
+      "scope": "global",
+      "recovery": {
+        "do": "click",
+        "target": {
+          "description": "button labelled \"Sign On\" that dismisses this state",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {}
+        }
+      },
+      "extract": [],
+      "origin": "discovered",
+      "operatorGuidance": "Sign on again in the parked session, then hand control back."
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "meridian-demo",
+      "displayName": "MERIDIAN CORE demo host (interface.ai)",
+      "baseUrl": "https://web-sample.interface-hiring.com",
+      "productVersion": "4.2.1",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "sensitive",
+    "requiresConfirmation": false,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300",
+      "https://web-sample.interface-hiring.com"
+    ]
+  },
+  "governance": {
+    "approval": "draft",
+    "stability": {
+      "runs": 0,
+      "successes": 0
+    },
+    "notes": "[reviewer] session_timed_out: recoverable -> escalate. A session that expires mid-flow has a human remedy - sign on again and hand control back - so it escalates rather than failing. It is deliberately not classified recoverable: the engine has no recovery kind that can re-run the sign-on steps, and a recovery that discarded a half-filled form would be worse than stopping. See ADAPTATION.md."
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-04T17:12:03.576Z",
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-171041-ef7a07",
+    "contentHash": "22006e155632ab8e9e4aabfe07784420",
+    "generator": "handspan"
+  }
+}
