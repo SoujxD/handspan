@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handspan · MERIDIAN CORE</title>
+<style>
+  :root {
+    --bg: #f7f6f3; --panel: #fff; --ink: #1b1a18; --muted: #6b6862;
+    --line: #e2ded6; --accent: #1b4f8a;
+    --ok: #1f6d4a; --outcome: #8a6a1b; --escalate: #7a4bbd; --fail: #a02020;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16151a; --panel: #1e1d23; --ink: #eceaf0; --muted: #9a96a3;
+      --line: #322f3a; --accent: #7aa7dd;
+      --ok: #62c398; --outcome: #d9b45c; --escalate: #b593e8; --fail: #e07a7a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 14px/1.55 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 18px 24px 14px; border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 17px; letter-spacing: -0.01em; }
+  h1 small { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 13px; }
+  nav { display: flex; gap: 2px; padding: 0 24px; border-bottom: 1px solid var(--line); }
+  nav button { appearance: none; border: 0; background: none; color: var(--muted);
+    padding: 10px 14px; font: inherit; cursor: pointer; border-bottom: 2px solid transparent; }
+  nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  main { padding: 20px 24px 60px; max-width: 1180px; }
+  section[hidden] { display: none; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+          padding: 14px 16px; margin-bottom: 14px; }
+  .lede { font-size: 15px; line-height: 1.6; margin: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; padding: 6px 10px 6px 0;
+       border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr.click { cursor: pointer; }
+  tr.click:hover td { background: rgba(127,127,127,.07); }
+  .mono { font-family: var(--mono); font-size: 12.5px; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px;
+          font-weight: 600; border: 1px solid currentColor; }
+  .s-success  { color: var(--ok); }
+  .s-outcome  { color: var(--outcome); }
+  .s-escalated{ color: var(--escalate); }
+  .s-failure  { color: var(--fail); }
+  .muted { color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  pre { font-family: var(--mono); font-size: 12px; background: var(--bg);
+        border: 1px solid var(--line); border-radius: 6px; padding: 10px; overflow-x: auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .stat b { display: block; font-size: 21px; font-weight: 650; letter-spacing: -0.02em; }
+  .stat span { color: var(--muted); font-size: 12px; }
+  .back { background: none; border: 1px solid var(--line); border-radius: 6px; color: var(--ink);
+          padding: 4px 10px; font: inherit; cursor: pointer; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Handspan <small>driving MERIDIAN CORE — Cornerstone Financial Systems v4.2.1</small></h1>
+</header>
+
+<nav>
+  <button data-tab="catalog" aria-selected="true">Catalog</button>
+  <button data-tab="runs" aria-selected="false">Runs</button>
+  <button data-tab="chat" aria-selected="false">Chat</button>
+  <button data-tab="adaptation" aria-selected="false">Adaptation ledger</button>
+</nav>
+
+<main>
+  <section id="catalog"></section>
+  <section id="runs" hidden></section>
+  <section id="chat" hidden>
+    <div class="card"><p class="lede">
+      A conversational front door over the API. The model may only pick a capability and bind
+      typed arguments — it cannot invent a step, cannot reach a browser, and never sees a
+      credential, because secret inputs are stripped from the schema it is given. Anything that
+      commits money or changes a record stops here and waits for <em>you</em>.
+    </p></div>
+    <div class="card">
+      <div id="log" style="min-height:180px"></div>
+      <form id="ask" style="display:flex;gap:8px;margin-top:12px">
+        <input id="msg" placeholder="e.g. what is the balance of share 100234-S0001 for member 100234?"
+               style="flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:6px;
+                      background:var(--panel);color:var(--ink);font:inherit">
+        <button style="padding:8px 16px;border:1px solid var(--line);border-radius:6px;
+                       background:var(--accent);color:#fff;font:inherit;cursor:pointer">Send</button>
+      </form>
+    </div>
+  </section>
+  <section id="adaptation" hidden></section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ms = (n) => n == null ? '—' : (n < 1000 ? n + ' ms' : (n / 1000).toFixed(1) + ' s');
+
+async function get(path) {
+  const r = await fetch(path);
+  if (!r.ok) throw new Error(path + ' → ' + r.status);
+  return r.json();
+}
+
+// ---- catalog ---------------------------------------------------------------
+async function renderCatalog() {
+  const { tools } = await get('/capabilities');
+  const rows = await Promise.all(tools.map(async (t) => {
+    const { artifact } = await get('/capabilities/' + encodeURIComponent(t.name));
+    return artifact;
+  }));
+
+  $('#catalog').innerHTML = `
+    <div class="card"><p class="lede">
+      ${rows.length} capabilities, each recorded once by a real discovery run and replayed
+      with no model in the loop. An agent invokes one by name with typed arguments; it never
+      learns that a browser is involved.
+    </p></div>
+    <div class="card scroll"><table>
+      <thead><tr><th>capability</th><th>v</th><th>approval</th><th>max risk</th>
+        <th>inputs</th><th>outputs</th><th>declared outcomes</th></tr></thead>
+      <tbody>${rows.map((c) => `
+        <tr>
+          <td><b>${esc(c.id)}</b><div class="muted">${esc(c.name)}</div></td>
+          <td class="mono">${c.version}</td>
+          <td>${esc(c.governance.approval)}</td>
+          <td>${c.policy.requiresConfirmation
+                ? '<span class="pill s-outcome">' + esc(c.policy.maxRisk) + '</span>'
+                : esc(c.policy.maxRisk)}</td>
+          <td class="mono">${c.inputs.map((i) => esc(i.name) + (i.sensitivity === 'secret' ? '*' : '')).join('<br>')}</td>
+          <td class="mono">${c.outputs.map((o) => esc(o.name)).join('<br>')}</td>
+          <td>${c.outcomes.map((o) =>
+                `<span class="pill s-${o.classification === 'business' ? 'outcome'
+                   : o.classification === 'escalate' ? 'escalated'
+                   : o.classification === 'hard' ? 'failure' : 'success'}">${esc(o.code)}</span>`
+              ).join(' ') || '<span class="muted">none</span>'}</td>
+        </tr>`).join('')}</tbody>
+    </table>
+    <p class="muted" style="margin:10px 0 0">* supplied from the server's environment. A secret
+      sent in a request body is ignored and the caller is told so.</p>
+    </div>`;
+}
+
+// ---- runs ------------------------------------------------------------------
+let pollTimer = null;
+
+async function renderRuns() {
+  const { runs } = await get('/runs?limit=60');
+  $('#runs').innerHTML = `
+    <div class="card"><p class="lede">
+      Discovery and replay history, read straight out of <span class="mono">/evidence</span> —
+      the same files a reviewer would open. Colour is the result <em>shape</em>, not a status
+      string: a business outcome is an answer, not an error.
+    </p></div>
+    <div class="card scroll"><table>
+      <thead><tr><th>run</th><th>kind</th><th>capability</th><th>result</th>
+        <th>detail</th><th>steps</th><th>took</th><th>model calls</th></tr></thead>
+      <tbody>${runs.map((r) => `
+        <tr class="click" data-run="${esc(r.runId)}">
+          <td class="mono">${esc(r.runId)}</td>
+          <td>${esc(r.kind)}</td>
+          <td class="mono">${esc(r.capabilityId ?? '—')}</td>
+          <td>${r.status ? `<span class="pill s-${esc(r.status)}">${esc(r.status)}</span>` : '<span class="muted">—</span>'}</td>
+          <td class="muted">${esc((r.detail ?? '').slice(0, 60))}</td>
+          <td class="mono">${r.steps ?? '—'}</td>
+          <td class="mono">${ms(r.durationMs)}</td>
+          <td class="mono">${r.llmCalls ?? '—'}</td>
+        </tr>`).join('')}</tbody>
+    </table></div>`;
+
+  for (const tr of document.querySelectorAll('#runs tr.click')) {
+    tr.onclick = () => renderRun(tr.dataset.run);
+  }
+}
+
+async function renderRun(id) {
+  clearInterval(pollTimer);
+  const run = await get('/runs/' + encodeURIComponent(id));
+  const r = run.result;
+  const outputs = r && r.status === 'success' ? r.outputs : (r && r.status === 'outcome' ? r.details : null);
+
+  $('#runs').innerHTML = `
+    <button class="back">← all runs</button>
+    <div class="card">
+      <h2 style="margin:0 0 6px;font-size:15px" class="mono">${esc(run.runId)}</h2>
+      <div class="muted">${esc(run.capabilityId ?? '')} ${run.capabilityVersion ? 'v' + run.capabilityVersion : ''}
+        · ${esc(run.tenantId ?? '')} · ${ms(run.durationMs)}
+        ${r ? `· <span class="pill s-${esc(r.status)}">${esc(r.status)}</span>` : ''}
+        ${r ? `· <b>${r.meta.llmCalls}</b> model calls` : ''}</div>
+    </div>
+
+    ${outputs ? `<div class="card"><h3 style="margin:0 0 8px;font-size:13px">Typed outputs</h3>
+      <table><tbody>${Object.entries(outputs).map(([k, v]) => `
+        <tr><td class="mono">${esc(k)}</td>
+            <td class="mono">${esc(v && typeof v === 'object' ? v.value : v)}</td>
+            <td class="muted">${v && v.sensitivity ? esc(v.sensitivity) + (v.redacted ? ' · scrubbed from evidence' : '') : ''}</td></tr>`).join('')}
+      </tbody></table></div>` : ''}
+
+    ${r && r.status === 'failure' ? `<div class="card">
+      <h3 style="margin:0 0 8px;font-size:13px" class="s-failure">Failure</h3>
+      <table><tbody>
+        <tr><td class="muted">kind</td><td class="mono">${esc(r.failure.kind)}</td></tr>
+        <tr><td class="muted">at step</td><td class="mono">${esc(r.failure.atStepId ?? '—')}</td></tr>
+        <tr><td class="muted">expected</td><td>${esc(r.failure.expected ?? '')}</td></tr>
+        <tr><td class="muted">observed</td><td>${esc(r.failure.observed ?? '')}</td></tr>
+        <tr><td class="muted">remediation</td><td>${esc(r.failure.remediation ?? '')}</td></tr>
+      </tbody></table></div>` : ''}
+
+    ${r && r.status === 'escalated' ? `<div class="card">
+      <h3 style="margin:0 0 8px;font-size:13px" class="s-escalated">Escalated to a human</h3>
+      <table><tbody>
+        <tr><td class="muted">reason</td><td>${esc(r.reason)}</td></tr>
+        <tr><td class="muted">guidance</td><td>${esc(r.guidance)}</td></tr>
+        <tr><td class="muted">intervention</td><td class="mono">${esc(r.interventionId)}</td></tr>
+      </tbody></table></div>` : ''}
+
+    ${r && r.trace ? `<div class="card scroll">
+      <h3 style="margin:0 0 8px;font-size:13px">Step trace</h3>
+      <table><thead><tr><th>step</th><th>intent</th><th>score</th><th>took</th><th>checkpoint</th></tr></thead>
+      <tbody>${r.trace.map((t) => `
+        <tr><td class="mono">${esc(t.stepId)}</td>
+            <td>${esc(t.intent ?? '')}</td>
+            <td class="mono">${t.resolution && t.resolution.score != null ? Math.round(t.resolution.score) : '—'}</td>
+            <td class="mono">${ms(t.durationMs)}</td>
+            <td>${t.checkpointPassed === false ? '<span class="s-failure">failed</span>'
+                  : t.checkpointPassed ? '<span class="s-success">passed</span>' : '<span class="muted">—</span>'}</td>
+        </tr>`).join('')}</tbody></table></div>` : ''}
+
+    <div class="card scroll">
+      <h3 style="margin:0 0 8px;font-size:13px">Evidence on disk (${run.evidence.length} files)</h3>
+      <div class="mono muted">${run.evidence.map((f) => esc(f.name) + '  ' + f.bytes + 'B').join('<br>')}</div>
+    </div>`;
+
+  $('#runs .back').onclick = () => { renderRuns(); startPolling(); };
+}
+
+// ---- adaptation ------------------------------------------------------------
+async function renderAdaptation() {
+  const a = await get('/adaptation');
+  const usd = (n) => '$' + n.toFixed(2);
+
+  $('#adaptation').innerHTML = `
+    <div class="card"><p class="lede">${esc(a.headline)}</p></div>
+
+    <div class="grid" style="margin-bottom:14px">
+      <div class="stat"><b>${a.diff.configLines}</b><span>lines of configuration</span></div>
+      <div class="stat"><b>${a.diff.coreLines}</b><span>lines of core, all generic</span></div>
+      <div class="stat"><b>${usd(a.discovery.totalEstimatedUsd)}</b><span>to record ${a.coverage.length} capabilities</span></div>
+      <div class="stat"><b>${a.replay.totalLlmCalls}</b><span>model calls in ${a.replay.runs} replays</span></div>
+    </div>
+
+    <div class="card scroll"><h3 style="margin:0 0 8px;font-size:13px">Where the diff went</h3>
+      <table><thead><tr><th>bucket</th><th>files</th><th>lines</th><th>what it means</th></tr></thead>
+      <tbody>${a.diff.buckets.map((b) => `
+        <tr><td class="mono">${esc(b.bucket)}</td><td class="mono">${b.files}</td>
+            <td class="mono">${b.lines}</td><td class="muted">${esc(b.means)}</td></tr>`).join('')}
+      </tbody></table></div>
+
+    <div class="card scroll"><h3 style="margin:0 0 8px;font-size:13px">Every core edit, so the claim can be checked</h3>
+      <table><tbody>${a.diff.coreEdits.map((e) => `
+        <tr><td class="mono">${esc(e.file)}</td><td class="mono">${e.lines} lines</td></tr>`).join('')}
+      </tbody></table></div>
+
+    <div class="card scroll"><h3 style="margin:0 0 8px;font-size:13px">What each capability cost to record</h3>
+      <table><thead><tr><th>capability</th><th>model calls</th><th>actions</th>
+        <th>input tokens</th><th>cached</th><th>cost</th></tr></thead>
+      <tbody>${a.discovery.runs.map((d) => `
+        <tr><td class="mono">${esc(d.capabilityId ?? d.runId + ' (did not finish)')}</td>
+            <td class="mono">${d.modelCalls}</td><td class="mono">${d.actions}</td>
+            <td class="mono">${d.inputTokens.toLocaleString()}</td>
+            <td class="mono">${d.cachedTokens.toLocaleString()}</td>
+            <td class="mono">${usd(d.estimatedUsd)}</td></tr>`).join('')}
+      </tbody></table>
+      <p class="muted" style="margin:10px 0 0">${esc(a.discovery.note)}</p></div>`;
+}
+
+// ---- chat ------------------------------------------------------------------
+const history = [];
+let pending = null;
+
+function bubble(who, html, cls) {
+  const d = document.createElement('div');
+  d.style.cssText = 'margin-bottom:12px';
+  d.innerHTML = `<div class="muted" style="font-size:11.5px;text-transform:uppercase;
+    letter-spacing:.04em;margin-bottom:3px">${esc(who)}</div><div class="${cls || ''}">${html}</div>`;
+  $('#log').appendChild(d);
+  d.scrollIntoView({ block: 'nearest' });
+  return d;
+}
+
+async function send(text) {
+  bubble('you', esc(text));
+  history.push({ role: 'user', content: text });
+  const thinking = bubble('handspan', '<span class="muted">working…</span>');
+
+  const r = await fetch('/chat', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ message: text, history: history.slice(0, -1) }),
+  }).then((x) => x.json());
+
+  thinking.remove();
+  render(r);
+}
+
+function render(r) {
+  if (r.type === 'say') {
+    bubble('handspan', esc(r.text));
+    history.push({ role: 'assistant', content: r.text });
+    return;
+  }
+
+  if (r.type === 'confirm') {
+    pending = r;
+    const rows = Object.entries(r.args)
+      .map(([k, v]) => `<tr><td class="muted">${esc(k)}</td><td class="mono">${esc(v)}</td></tr>`).join('');
+    const d = bubble('handspan', `
+      ${esc(r.text)}
+      <div class="card" style="margin:10px 0 0;background:var(--bg)">
+        <b class="s-outcome">This commits state and needs your authorisation.</b>
+        <table style="margin-top:8px"><tbody>
+          <tr><td class="muted">capability</td><td class="mono">${esc(r.capabilityId)}</td></tr>
+          ${rows}
+        </tbody></table>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button id="yes" style="padding:6px 14px;border:1px solid var(--line);border-radius:6px;
+            background:var(--accent);color:#fff;font:inherit;cursor:pointer">Authorise</button>
+          <button id="no" class="back" style="margin:0">Cancel</button>
+        </div>
+      </div>`);
+    d.querySelector('#no').onclick = () => { pending = null; bubble('you', 'Cancelled.'); };
+    d.querySelector('#yes').onclick = async () => {
+      d.querySelector('#yes').disabled = true;
+      bubble('you', 'Authorised.');
+      const res = await fetch('/chat', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ confirmed: true, capabilityId: r.capabilityId, tenantId: r.tenantId, args: r.args }),
+      }).then((x) => x.json());
+      pending = null;
+      render(res);
+    };
+    return;
+  }
+
+  if (r.type === 'result') {
+    const shape = r.result ? r.result.status : 'failure';
+    bubble('handspan', `
+      <span class="pill s-${esc(shape)}">${esc(shape)}</span>
+      <span class="muted mono" style="margin-left:8px">HTTP ${r.httpStatus} ·
+        ${r.result ? r.result.meta.llmCalls : '?'} model calls in the run</span>
+      <div style="margin-top:8px">${esc(r.text)}</div>
+      <div class="muted mono" style="margin-top:6px;font-size:11.5px">run ${esc(r.runId)}</div>`);
+    history.push({ role: 'assistant', content: r.text });
+    return;
+  }
+
+  bubble('handspan', esc(r.error || 'Something went wrong.'), 's-failure');
+}
+
+$('#ask').onsubmit = (e) => {
+  e.preventDefault();
+  const v = $('#msg').value.trim();
+  if (!v) return;
+  $('#msg').value = '';
+  send(v).catch((err) => bubble('handspan', esc(err.message), 's-failure'));
+};
+
+// ---- tabs ------------------------------------------------------------------
+function startPolling() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(() => {
+    if (!$('#runs').hidden && !document.querySelector('#runs .back')) renderRuns().catch(() => {});
+  }, 3000);
+}
+
+for (const b of document.querySelectorAll('nav button')) {
+  b.onclick = () => {
+    for (const o of document.querySelectorAll('nav button')) o.setAttribute('aria-selected', String(o === b));
+    for (const s of document.querySelectorAll('main section')) s.hidden = s.id !== b.dataset.tab;
+    ({ catalog: renderCatalog, runs: renderRuns, adaptation: renderAdaptation,
+       chat: async () => {} })[b.dataset.tab]()
+      .catch((e) => { document.getElementById(b.dataset.tab).innerHTML =
+        '<div class="card s-failure">' + esc(e.message) + '</div>'; });
+  };
+}
+
+renderCatalog().catch((e) => { $('#catalog').innerHTML = '<div class="card s-failure">' + esc(e.message) + '</div>'; });
+startPolling();
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"ts":"2026-09-04T17:33:44.099Z","level":"error","runId":"replay-[REDACTED:PAN]-8ef65b","event":"replay_failed","kind":"policy_denied","message":"Capability \"member_share_balance_lookup\" is in state \"draft\" and may not run unattended."}

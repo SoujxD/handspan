@@ -23,6 +23,7 @@ import {
   requireAnthropicKey,
   runtimeConfig,
   requireInstitution,
+  fillSecretsFromEnvironment,
   observationRedactionHook,
 } from './config.js';
 import { EvidenceRecorder } from './evidence/recorder.js';
@@ -717,7 +718,7 @@ program
   .option('--guidance <text>', 'For `escalate`: what the operator should do.')
   .action((o: Record<string, unknown>) => {
     const store = new CapabilityStore(PATHS.artifacts);
-    const cap = store.load(String(o['capability']));
+    const cap = store.loadForEdit(String(o['capability']));
     const classification = String(o['class']) as 'business' | 'recoverable' | 'hard' | 'escalate';
 
     if (!['business', 'recoverable', 'hard', 'escalate'].includes(classification)) {
@@ -822,7 +823,7 @@ program
   .requiredOption('--why <text>', 'Why a reviewer added this. Recorded in governance notes.')
   .action((o: Record<string, unknown>) => {
     const store = new CapabilityStore(PATHS.artifacts);
-    const cap = store.load(String(o['capability']));
+    const cap = store.loadForEdit(String(o['capability']));
     const stepId = String(o['step']);
     const step = cap.steps.find((x) => x.id === stepId);
     if (!step) {
@@ -907,7 +908,7 @@ program
   .option('--guidance <text>', 'Operator guidance, required when moving to escalate.')
   .action((o: Record<string, unknown>) => {
     const store = new CapabilityStore(PATHS.artifacts);
-    const cap = store.load(String(o['capability']));
+    const cap = store.loadForEdit(String(o['capability']));
     const code = String(o['code']);
     const rule = cap.outcomes.find((x) => x.code === code);
     if (!rule) {
@@ -932,6 +933,16 @@ program
 
     const from = rule.classification;
     rule.classification = to as typeof rule.classification;
+
+    // Only a `recoverable` outcome ever applies a recovery. Leaving one
+    // attached to any other classification is dead weight, and the validator
+    // rejects it outright - so the artifact would be written and then silently
+    // fail to load, leaving the previous version running.
+    let droppedRecovery = false;
+    if (to !== 'recoverable' && rule.recovery) {
+      delete rule.recovery;
+      droppedRecovery = true;
+    }
     if (to === 'escalate' && !rule.operatorGuidance) {
       rule.operatorGuidance = String(o['guidance'] ?? 'Resolve this manually, then hand control back.');
     }
@@ -944,7 +955,71 @@ ${note}` : note;
     cap.provenance.contentHash = hashCapability(cap);
     store.save(cap);
 
+    if (droppedRecovery) {
+      console.log(`  Dropped ${code}'s recovery action: only a recoverable outcome applies one.`);
+    }
     console.log(`  ${cap.id}: ${code} ${from} -> ${to}. Now v${cap.version}, approval reset to draft.`);
+  });
+
+/**
+ * Correct an input's description or example.
+ *
+ * These two fields are not decoration: they are the entire contract a calling
+ * agent has for what to put in a field. Discovery fills them from what it
+ * happened to type, and on a combobox that means the full visible option text
+ * — "100234-S0001-19 - Regular Shares ($99.00)" — which embeds a balance that
+ * changes between runs. Replay works either way because the surface matches an
+ * option by value before label, but a router reading that example asks the
+ * user for dropdown text instead of a share id.
+ *
+ * A reviewer fixing the contract is cheaper and more honest than re-recording
+ * an artifact to get better prose out of the model.
+ */
+program
+  .command('revise-input')
+  .description("Correct an input's description or example. Records reviewer provenance.")
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .requiredOption('--input <name>', 'Input parameter name.')
+  .option('--description <text>', 'Replacement description.')
+  .option('--example <text>', 'Replacement example value.')
+  .requiredOption('--why <text>', 'Why. Recorded in governance notes.')
+  .action((o: Record<string, unknown>) => {
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.loadForEdit(String(o['capability']));
+    const name = String(o['input']);
+    const input = cap.inputs.find((i) => i.name === name);
+    if (!input) {
+      console.error(`No input "${name}" on ${cap.id}. Inputs: ${cap.inputs.map((i) => i.name).join(', ')}`);
+      process.exit(2);
+      return;
+    }
+    if (o['description'] === undefined && o['example'] === undefined) {
+      console.error('Nothing to change. Pass --description and/or --example.');
+      process.exit(2);
+      return;
+    }
+    if (input.sensitivity === 'secret' && o['example'] !== undefined) {
+      // An example is written into the artifact, which is committed.
+      console.error(`"${name}" is a secret input; it must not carry an example value.`);
+      process.exit(2);
+      return;
+    }
+
+    const before = { description: input.description, example: input.example };
+    if (o['description'] !== undefined) input.description = String(o['description']);
+    if (o['example'] !== undefined) input.example = String(o['example']);
+
+    const note = `[reviewer] input ${name}: ${String(o['why'])}`;
+    cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}
+${note}` : note;
+    cap.version += 1;
+    cap.governance.approval = 'draft';
+    cap.provenance.contentHash = hashCapability(cap);
+    store.save(cap);
+
+    console.log(`  ${cap.id}: revised input "${name}".`);
+    if (before.example !== input.example) console.log(`    example: ${before.example} -> ${input.example}`);
+    console.log(`  Now v${cap.version}, approval reset to draft.`);
   });
 
 program
@@ -1041,42 +1116,6 @@ function parseInputs(pairs: string[] = []): Record<string, string> {
   return out;
 }
 
-/**
- * Let `secret`-classified inputs come from the environment.
- *
- * A password passed as `--input password=...` is written to shell history and
- * is visible in `ps` to every other process on the machine, which is a poor
- * ending for a system whose whole redaction story is that credentials never
- * come to rest anywhere. `HANDSPAN_INPUT_PASSWORD` is read from the process
- * environment (and therefore from the gitignored `.env`) instead.
- *
- * Deliberately narrow in two ways. Only `secret` inputs are eligible — every
- * other parameter is the *meaning* of the call, and quietly defaulting a member
- * id from an environment variable would be a genuinely dangerous convenience.
- * And an explicit `--input` always wins, so a caller can still override.
- *
- * An explicit CLI value stays supported rather than being removed: the mock
- * app's credentials are fixtures, and a demo that requires editing a dotfile
- * before anything runs is a worse demo.
- */
-export function fillSecretsFromEnvironment(
-  cap: { inputs: Array<{ name: string; sensitivity: string }> },
-  supplied: Record<string, string>,
-): Record<string, string> {
-  const out = { ...supplied };
-
-  for (const p of cap.inputs) {
-    if (p.sensitivity !== 'secret' || out[p.name] !== undefined) continue;
-    const key = `HANDSPAN_INPUT_${p.name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase()}`;
-    const value = process.env[key];
-    if (value) {
-      out[p.name] = value;
-      // Name the variable, never the value.
-      console.log(`  ${p.name} supplied from ${key}`);
-    }
-  }
-  return out;
-}
 
 /** Never print a secret input back to the terminal. */
 function redactInputs(

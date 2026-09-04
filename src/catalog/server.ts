@@ -28,12 +28,20 @@ import type { Server } from 'node:http';
 import { CapabilityStore, toToolDefinition } from './store.js';
 import {
   PATHS,
+  PROJECT_ROOT,
   buildRedactor,
+  boundInputNames,
+  fillSecretsFromEnvironment,
   loadPolicy,
   newRunId,
   observationRedactionHook,
   runtimeConfig,
 } from '../config.js';
+import { listRuns, readRun } from './runs.js';
+import { chat, describeResult, type ChatTurn } from './chat.js';
+import { computeAdaptation } from './adaptation.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { EvidenceRecorder } from '../evidence/recorder.js';
 import { SessionLease } from '../control/lease.js';
 import { PlaywrightSurface } from '../surface/web/playwright-surface.js';
@@ -41,6 +49,10 @@ import { replay } from '../replay/engine.js';
 import { detemplatize } from '../agent/compiler.js';
 import { exitCodeFor, type ReplayResult } from '../types/result.js';
 import { startOperatorConsole, operatorBaseUrl } from '../operator/server.js';
+
+/** The vendor build and institution this catalog fronts. */
+const PRODUCT = 'cornerstone-meridian-core';
+const DEFAULT_TENANT = 'meridian-demo';
 
 export async function startCatalog(port = runtimeConfig().catalogPort): Promise<Server> {
   const store = new CapabilityStore(PATHS.artifacts);
@@ -65,36 +77,58 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
     }
   });
 
-  app.post('/capabilities/:id/invoke', async (req, res) => {
-    const id = String(req.params['id']);
-    const body = (req.body ?? {}) as Record<string, unknown>;
+  /**
+   * One invocation path, used by the HTTP route and by the chatbot alike.
+   *
+   * Extracted so there is exactly one place where a capability meets the
+   * replay engine. The brief's warning is that the wrapper becomes a way
+   * around the guardrails; the structural answer is that there is no second
+   * path to be lax about.
+   */
+  async function invokeCapability(
+    id: string,
+    body: Record<string, unknown>,
+  ): Promise<{ result: ReplayResult; runId: string; rejectedSecrets: string[] }> {
+    const cap = store.load(id);
+    const tenantId = String(body['tenantId'] ?? cap.surface.recordedOnTenant);
+    const tenant = cap.tenants.find((t) => t.tenantId === tenantId);
+    if (!tenant) throw new Error(`Unknown tenant "${tenantId}" for capability "${id}".`);
 
-    let result: ReplayResult;
+    /**
+     * Secrets are read from this process's environment, never from the request.
+     *
+     * A caller — and the chatbot in particular — has no business holding an
+     * operator credential, and anything in a request body ends up in an access
+     * log and, through the bot, in a model transcript. The CLI already worked
+     * this way; the HTTP surface did not, which made the wrapper quietly a way
+     * around a guarantee the core enforces.
+     */
+    const bound = new Set(boundInputNames());
+    const serverSupplied = (name: string, sensitivity: string): boolean =>
+      sensitivity === 'secret' || bound.has(name);
+
+    const supplied: Record<string, string> = {};
+    for (const p of cap.inputs) {
+      if (serverSupplied(p.name, p.sensitivity)) continue;
+      const v = body[p.name];
+      if (v !== undefined) supplied[p.name] = String(v);
+    }
+    const rejectedSecrets = cap.inputs
+      .filter((p) => serverSupplied(p.name, p.sensitivity) && body[p.name] !== undefined)
+      .map((p) => p.name);
+    const inputs = fillSecretsFromEnvironment(cap, supplied);
+
+    const policy = loadPolicy();
+    const redactor = buildRedactor(policy);
+    const runId = newRunId('replay');
+    const evidence = new EvidenceRecorder(runId, PATHS.evidence, redactor, false);
+    const lease = new SessionLease(runId);
+
+    await startOperatorConsole().catch(() => undefined);
+
     let surface: PlaywrightSurface | undefined;
-
+    let result: ReplayResult;
     try {
-      const cap = store.load(id);
-      const tenantId = String(body['tenantId'] ?? cap.surface.recordedOnTenant);
-      const tenant = cap.tenants.find((t) => t.tenantId === tenantId);
-      if (!tenant) {
-        res.status(400).json({ error: `Unknown tenant "${tenantId}" for capability "${id}".` });
-        return;
-      }
-
-      const inputs: Record<string, string> = {};
-      for (const p of cap.inputs) {
-        const v = body[p.name];
-        if (v !== undefined) inputs[p.name] = String(v);
-      }
-
-      const policy = loadPolicy();
-      const redactor = buildRedactor(policy);
-      const runId = newRunId('replay');
-      const evidence = new EvidenceRecorder(runId, PATHS.evidence, redactor, false);
-      const lease = new SessionLease(runId);
-
-      await startOperatorConsole().catch(() => undefined);
-
       surface = await PlaywrightSurface.launch({
         lease,
         headless: runtimeConfig().headless,
@@ -122,17 +156,144 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
 
       store.recordRun(cap, result);
       evidence.saveJson('result', result);
-    } catch (e) {
-      res.status(500).json({ error: (e as Error).message });
-      await surface?.close();
-      return;
     } finally {
       // Escalated runs keep the session alive for the operator; everything
       // else releases the browser.
       if (surface && result! && result!.status !== 'escalated') await surface.close();
+      else if (surface && !result!) await surface.close();
     }
 
-    res.status(httpStatusFor(result!)).json(result!);
+    return { result, runId, rejectedSecrets };
+  }
+
+  app.post('/capabilities/:id/invoke', async (req, res) => {
+    const id = String(req.params['id']);
+    try {
+      const { result, runId, rejectedSecrets } = await invokeCapability(
+        id,
+        (req.body ?? {}) as Record<string, unknown>,
+      );
+      // Lets a dashboard or a caller follow this run in the evidence trail.
+      res.setHeader('x-handspan-run-id', runId);
+      if (rejectedSecrets.length) {
+        // Told, not silently dropped: a caller that sent a credential should
+        // learn that this surface refuses to accept one.
+        res.setHeader('x-handspan-ignored-secret-inputs', rejectedSecrets.join(','));
+      }
+      res.status(httpStatusFor(result)).json(result);
+    } catch (e) {
+      res.status(500).json({ error: (e as Error).message });
+    }
+  });
+
+  /**
+   * Read-only surfaces the dashboard and chatbot need.
+   *
+   * There is no SSE stream. Deliberately: a poll every couple of seconds shows
+   * a run advancing just as well for a demo, needs no reconnection handling,
+   * and cannot leave a socket open against a browser that navigated away. The
+   * brief asks for both surfaces to be intentionally simple, and a stream
+   * would be the more impressive-looking of two things that do the same job.
+   */
+  app.get('/runs', (req, res) => {
+    const limit = Math.min(500, Number(req.query['limit'] ?? 100) || 100);
+    const kind = req.query['kind'] as string | undefined;
+    let runs = listRuns(PATHS.evidence, limit);
+    if (kind) runs = runs.filter((r) => r.kind === kind);
+    res.json({ count: runs.length, runs });
+  });
+
+  app.get('/runs/:id', (req, res) => {
+    const run = readRun(PATHS.evidence, String(req.params['id']));
+    if (!run) {
+      res.status(404).json({ error: `No run "${String(req.params['id'])}".` });
+      return;
+    }
+    res.json(run);
+  });
+
+  app.get('/adaptation', (_req, res) => {
+    res.json(
+      computeAdaptation({
+        projectRoot: PROJECT_ROOT,
+        evidenceDir: PATHS.evidence,
+        artifactsDir: PATHS.artifacts,
+        product: 'cornerstone-meridian-core',
+        tenantId: 'meridian-demo',
+      }),
+    );
+  });
+
+  /** The dashboard. One file, no build step, no framework. */
+  app.get('/', (_req, res) => {
+    res.type('html').send(readFileSync(join(PROJECT_ROOT, 'src', 'catalog', 'dashboard.html'), 'utf8'));
+  });
+
+  /**
+   * The chatbot turn.
+   *
+   * It goes through the same `POST /capabilities/:id/invoke` path as any other
+   * caller — same policy gate, same confirmation rule, same evidence. The bot
+   * is a driver over the API, not a second way in, which is the thing the
+   * brief warns about: don't let the wrapper become a way around the guardrails.
+   */
+  app.post('/chat', async (req, res) => {
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    try {
+      // Second turn: the HUMAN authorised a commit. The token is minted here,
+      // in code, from their action - never by the model, which by this point
+      // has already had its say and is not consulted again.
+      if (body['confirmed'] === true && typeof body['capabilityId'] === 'string') {
+        const capabilityId = body['capabilityId'];
+        const cap = store.load(capabilityId);
+        const args = (body['args'] ?? {}) as Record<string, unknown>;
+        const invocation = await invokeCapability(capabilityId, {
+          ...args,
+          tenantId: body['tenantId'] ?? cap.surface.recordedOnTenant,
+          confirm: capabilityId,
+        });
+        res.json({
+          type: 'result',
+          capabilityId,
+          runId: invocation.runId,
+          httpStatus: httpStatusFor(invocation.result),
+          text: describeResult(invocation.result, cap.name),
+          result: invocation.result,
+        });
+        return;
+      }
+
+      const reply = await chat({
+        store,
+        product: PRODUCT,
+        defaultTenantId: DEFAULT_TENANT,
+        history: Array.isArray(body['history']) ? (body['history'] as ChatTurn[]) : [],
+        message: String(body['message'] ?? ''),
+      });
+
+      if (reply.type !== 'invoked') {
+        res.json(reply);
+        return;
+      }
+
+      const cap = store.load(reply.capabilityId);
+      const invocation = await invokeCapability(reply.capabilityId, {
+        ...reply.args,
+        tenantId: DEFAULT_TENANT,
+      });
+      res.json({
+        type: 'result',
+        capabilityId: reply.capabilityId,
+        runId: invocation.runId,
+        httpStatus: httpStatusFor(invocation.result),
+        text: describeResult(invocation.result, cap.name),
+        result: invocation.result,
+        modelCalls: reply.modelCalls,
+      });
+    } catch (e) {
+      res.status(500).json({ type: 'error', error: (e as Error).message });
+    }
   });
 
   return new Promise((resolve) => {

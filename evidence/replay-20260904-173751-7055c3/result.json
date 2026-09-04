@@ -1,0 +1,358 @@
+{
+  "status": "success",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-7055c3",
+    "capabilityId": "update_member_information",
+    "capabilityVersion": 3,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-04T17:37:52.978Z",
+    "finishedAt": "2026-09-04T17:38:03.186Z",
+    "durationMs": 10208,
+    "stepsAttempted": 12,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-7055c3",
+    "llmCalls": 0
+  },
+  "outputs": {
+    "confirmationMessage": {
+      "value": "Member 102777 contact information has been updated as of 09/04/2026 17:36:18",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "updatedAt": {
+      "value": "09/04/2026 17:36:18",
+      "sensitivity": "internal",
+      "redacted": false
+    }
+  },
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator ID in the sign-on panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:37:53.134Z",
+      "durationMs": 487,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Operator ID:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator [REDACTED:SECRET].",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-04T17:37:53.622Z",
+      "durationMs": 445,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Password:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign on to the servicing console.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:37:54.071Z",
+      "durationMs": 1117,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "button",
+          "label": "Sign On",
+          "name": "Sign On",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open Member Inquiry / Selection to look up the member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:37:55.189Z",
+      "durationMs": 1094,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 31,
+        "observed": {
+          "role": "link",
+          "label": "Member Inquiry / Selection",
+          "name": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)"
+        }
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member number to service.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:37:56.283Z",
+      "durationMs": 478,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "textbox",
+          "label": "Value:",
+          "name": "",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Search for the member record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:37:56.761Z",
+      "durationMs": 1049,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": 20,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "button",
+          "label": "Search",
+          "name": "Search",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Select the member record to open the member detail screen.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:37:57.811Z",
+      "durationMs": 1132,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 22,
+        "observed": {
+          "role": "link",
+          "label": "Select",
+          "name": "Select",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s08",
+      "intent": "Open the Update Member Information action for this member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:37:58.944Z",
+      "durationMs": 1137,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 84,
+        "observed": {
+          "role": "link",
+          "label": "Update Member Information",
+          "name": "Update Member Information",
+          "container": "Open New Share"
+        }
+      }
+    },
+    {
+      "stepId": "s09",
+      "intent": "Set the member's e-mail address.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-04T17:38:00.082Z",
+      "durationMs": 717,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 50,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 17,
+        "observed": {
+          "role": "textbox",
+          "label": "E-mail:",
+          "name": "",
+          "container": "Member 102777 - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s10",
+      "intent": "Set the member's phone number.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-04T17:38:00.800Z",
+      "durationMs": 440,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 50,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 17,
+        "observed": {
+          "role": "textbox",
+          "label": "[REDACTED:SECRET]",
+          "name": "",
+          "container": "Member 102777 - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s11",
+      "intent": "Set the member's mailing address.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-04T17:38:01.240Z",
+      "durationMs": 744,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 50,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 17,
+        "observed": {
+          "role": "textbox",
+          "label": "Mailing [REDACTED:SECRET]",
+          "name": "",
+          "container": "Member 102777 - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s12",
+      "intent": "Save the updated member contact information.",
+      "action": "click",
+      "risk": "confirmable",
+      "startedAt": "2026-09-04T17:38:01.986Z",
+      "durationMs": 1058,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 17,
+        "observed": {
+          "role": "button",
+          "label": "Save Changes",
+          "name": "Save Changes",
+          "container": "Member 102777 - [REDACTED:SECRET]"
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-7055c3/run.jsonl",
+      "capturedAt": "2026-09-04T17:37:51.798Z"
+    }
+  ]
+}

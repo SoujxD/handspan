@@ -1,0 +1,34 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-8ef65b",
+    "capabilityId": "member_share_balance_lookup",
+    "capabilityVersion": 2,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-04T17:33:44.098Z",
+    "finishedAt": "2026-09-04T17:33:44.099Z",
+    "durationMs": 1,
+    "stepsAttempted": 0,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-8ef65b",
+    "llmCalls": 0
+  },
+  "failure": {
+    "kind": "policy_denied",
+    "message": "Capability \"member_share_balance_lookup\" is in state \"draft\" and may not run unattended.",
+    "atStepId": null,
+    "stepIntent": null,
+    "expected": null,
+    "observed": null,
+    "remediation": "Have a reviewer set governance.approval to \"approved\" after checking the steps."
+  },
+  "partialOutputs": {},
+  "trace": [],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-8ef65b/run.jsonl",
+      "capturedAt": "2026-09-04T17:33:42.574Z"
+    }
+  ]
+}

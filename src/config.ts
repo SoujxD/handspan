@@ -185,3 +185,65 @@ export function requireAnthropicKey(): string {
   }
   return key;
 }
+
+/**
+ * Let `secret`-classified inputs come from the environment.
+ *
+ * A password passed as `--input password=...` is written to shell history and
+ * is visible in `ps` to every other process on the machine, which is a poor
+ * ending for a system whose whole redaction story is that credentials never
+ * come to rest anywhere. `HANDSPAN_INPUT_PASSWORD` is read from the process
+ * environment (and therefore from the gitignored `.env`) instead.
+ *
+ * Deliberately narrow in two ways. Only `secret` inputs are eligible — every
+ * other parameter is the *meaning* of the call, and quietly defaulting a member
+ * id from an environment variable would be a genuinely dangerous convenience.
+ * And an explicit `--input` always wins, so a caller can still override.
+ *
+ * An explicit CLI value stays supported rather than being removed: the mock
+ * app's credentials are fixtures, and a demo that requires editing a dotfile
+ * before anything runs is a worse demo.
+ */
+/**
+ * Inputs the DEPLOYMENT supplies, not the caller.
+ *
+ * The obvious one is the operator identity. If a caller can set `operatorId`,
+ * then a chatbot can be talked into running as `super1`, and the whole
+ * teller-versus-supervisor distinction the target enforces becomes decorative
+ * — the escalation path would be a formality anyone could route around by
+ * asking nicely. Which identity the automation acts as is a property of how it
+ * was deployed, in the same way its credential is.
+ *
+ * Configured rather than hardcoded, because a different institution may name
+ * the field differently, and a deployment that genuinely wants per-call
+ * identity can set this to empty and defend that choice.
+ */
+export function boundInputNames(): string[] {
+  const raw = process.env['HANDSPAN_BOUND_INPUTS'] ?? 'operatorId';
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export function fillSecretsFromEnvironment(
+  cap: { inputs: Array<{ name: string; sensitivity: string }> },
+  supplied: Record<string, string>,
+): Record<string, string> {
+  const out = { ...supplied };
+
+  const bound = new Set(boundInputNames());
+
+  for (const p of cap.inputs) {
+    if (p.sensitivity !== 'secret' && !bound.has(p.name)) continue;
+    if (out[p.name] !== undefined) continue;
+    const key = `HANDSPAN_INPUT_${p.name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase()}`;
+    const value = process.env[key];
+    if (value) {
+      out[p.name] = value;
+      // Name the variable, never the value.
+      console.log(`  ${p.name} supplied from ${key}`);
+    }
+  }
+  return out;
+}

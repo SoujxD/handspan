@@ -611,19 +611,20 @@
     ]
   },
   "governance": {
-    "approval": "draft",
+    "approval": "approved",
     "stability": {
-      "runs": 1,
-      "successes": 1
+      "runs": 4,
+      "successes": 4
     },
-    "notes": "[reviewer] signon_failed: escalate -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] invalid_initial_deposit: hard -> business. A deposit the application rejects is an answer the caller needs, not an application fault. It exits 0 with the reason attached so a calling agent can correct the amount and retry, rather than treating it as an outage."
+    "notes": "Reviewed against MERIDIAN CORE: targets are semantic, outcome classifications normalised by hand, checkpoints assert the caller's own values where the flow commits state.",
+    "reviewedBy": "soujanya"
   },
   "provenance": {
     "discoveredAt": "2026-09-04T17:07:58.772Z",
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-170543-481467",
-    "contentHash": "b5b62fbb94be44bafcfbda85447acf8d",
+    "contentHash": "7bd2acf92dab8193602f7cdb1d90b69f",
     "generator": "handspan"
   }
 }

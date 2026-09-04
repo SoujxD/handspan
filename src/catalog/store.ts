@@ -15,7 +15,7 @@
 
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type Capability, parseCapability } from '../types/artifact.js';
+import { type Capability, parseCapability, validateCapability } from '../types/artifact.js';
 import type { ReplayResult } from '../types/result.js';
 import { hashCapability } from '../agent/compiler.js';
 
@@ -26,7 +26,28 @@ export class CapabilityStore {
     return join(this.dir, `${id}.v${version}.json`);
   }
 
+  /**
+   * Write an artifact, refusing to write one that would not load back.
+   *
+   * The compiler validates what the model produces, but every reviewer command
+   * — declare-outcome, reclassify-outcome, assert-checkpoint, revise-input,
+   * approve — writes through here, and none of them validated.
+   *
+   * That was not theoretical. Moving an outcome from `recoverable` to
+   * `escalate` left its now-meaningless recovery action attached; the file was
+   * written happily, `list()` then dropped it as unparseable, and production
+   * silently kept running the previous version. The command reported success.
+   * A reviewer's change having no effect is worse than a reviewer's change
+   * being rejected, because nothing anywhere says so.
+   */
   save(cap: Capability): string {
+    const problems = validateCapability(cap);
+    if (problems.length) {
+      throw new Error(
+        `Refusing to write ${cap.id} v${cap.version} — it would not load back:\n` +
+          problems.map((p) => `  - ${p}`).join('\n'),
+      );
+    }
     const path = this.fileFor(cap.id, cap.version);
     writeFileSync(path, `${JSON.stringify(cap, null, 2)}\n`, 'utf8');
     return path;
@@ -75,6 +96,28 @@ export class CapabilityStore {
       }
     }
     return cap;
+  }
+
+  /**
+   * The version a REVIEWER edits: the newest one, approved or not.
+   *
+   * `load` deliberately prefers the newest *approved* version, because that is
+   * what should run. Applying that same rule to an edit is wrong, and was: two
+   * successive reviewer commands each branched off the approved v2 and wrote
+   * v3, so the second silently discarded the first. The fix that had been
+   * applied was simply gone, with no error anywhere — the edit reported
+   * success and the artifact reported the old value.
+   *
+   * Running wants the reviewed version. Editing wants the latest. They are
+   * different questions and now have different methods.
+   */
+  loadForEdit(id: string): Capability {
+    const versions = this.list()
+      .filter((c) => c.id === id)
+      .sort((a, b) => b.version - a.version);
+    const newest = versions[0];
+    if (!newest) throw new Error(`No capability "${id}" in ${this.dir}.`);
+    return this.load(id, newest.version);
   }
 
   /** Artifacts on disk that failed validation, with the reason. */
@@ -256,8 +299,24 @@ export function toToolDefinition(cap: Capability): ToolDefinition {
     .map((o) => `  - "${o.code}": ${o.title}`)
     .join('\n');
 
+  /**
+   * Lead with what this capability DOES.
+   *
+   * Discovery writes a description that narrates the flow, and every flow on a
+   * target like this one starts the same way — "signs on to the servicing
+   * console, looks up a member by member number, …" — so the first ninety
+   * characters are identical across the whole catalog and the distinguishing
+   * clause is buried.
+   *
+   * A tool description is the routing surface: it is the only thing a calling
+   * agent chooses with. Asked to move money, the router picked the balance
+   * lookup, and nothing near the front of the text told it otherwise. The
+   * capability's own short name is already distinctive, so it goes first —
+   * cheaper and far more reliable than re-recording seven artifacts hoping for
+   * better prose.
+   */
   const description =
-    `${cap.description}\n\n` +
+    `${cap.name}. ${cap.description}\n\n` +
     `Returns: ${cap.outputs.map((o) => `${o.name} (${o.type})`).join(', ') || 'no data outputs'}.\n` +
     (outcomeLines
       ? `May instead return one of these business outcomes, which are valid answers and not errors:\n${outcomeLines}\n`

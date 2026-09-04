@@ -1,0 +1,163 @@
+{
+  "status": "success",
+  "meta": {
+    "runId": "replay-[REDACTED:PAN]-07b4de",
+    "capabilityId": "operator_sign_on",
+    "capabilityVersion": 2,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-04T17:45:33.863Z",
+    "finishedAt": "2026-09-04T17:45:57.470Z",
+    "durationMs": 23607,
+    "stepsAttempted": 5,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-[REDACTED:PAN]-07b4de",
+    "llmCalls": 0
+  },
+  "outputs": {
+    "signedOnAs": {
+      "value": "J. TELLER (TELLER)",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "operatorCode": {
+      "value": "TELLER1",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "branchCode": {
+      "value": "MAIN-001",
+      "sensitivity": "public",
+      "redacted": false
+    },
+    "sessionId": {
+      "value": "F5E48B5A",
+      "sensitivity": "internal",
+      "redacted": false
+    }
+  },
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Return to a clean operator sign-on screen to begin the recorded flow.",
+      "action": "navigate",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:45:34.028Z",
+      "durationMs": 1000,
+      "status": "ok"
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator ID in the Operator ID box of the Operator Sign On panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:45:35.029Z",
+      "durationMs": 487,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Operator ID:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Enter the operator [REDACTED:SECRET] in the Password box of the Operator Sign On panel.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-04T17:45:35.521Z",
+      "durationMs": 464,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Password:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Select the branch the operator is signing on at.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:45:35.986Z",
+      "durationMs": 20286,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "combobox",
+          "label": "[REDACTED:SECRET]",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Submit the sign-on to establish the operator session and reach the Main Menu.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-04T17:45:56.273Z",
+      "durationMs": 1039,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "button",
+          "label": "Sign On",
+          "name": "Sign On",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-07b4de/run.jsonl",
+      "capturedAt": "2026-09-04T17:45:32.696Z"
+    }
+  ]
+}

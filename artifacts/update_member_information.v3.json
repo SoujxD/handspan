@@ -560,19 +560,20 @@
     ]
   },
   "governance": {
-    "approval": "draft",
+    "approval": "approved",
     "stability": {
-      "runs": 1,
-      "successes": 1
+      "runs": 4,
+      "successes": 4
     },
-    "notes": "[reviewer] signon_failed: escalate -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] session_timed_out: hard -> escalate. A session that expires mid-flow has a human remedy - sign on again and hand control back - so it escalates rather than failing. It is deliberately not classified recoverable: the engine has no recovery kind that can re-run the sign-on steps, and a recovery that discarded a half-filled form would be worse than stopping. See ADAPTATION.md."
+    "notes": "Reviewed against MERIDIAN CORE: targets are semantic, outcome classifications normalised by hand, checkpoints assert the caller's own values where the flow commits state.",
+    "reviewedBy": "soujanya"
   },
   "provenance": {
     "discoveredAt": "2026-09-04T17:10:02.353Z",
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-170820-bbab38",
-    "contentHash": "2365455f5c895dc39b864689e8f799c0",
+    "contentHash": "390346883681d220086819b9c32dcaf9",
     "generator": "handspan"
   }
 }
