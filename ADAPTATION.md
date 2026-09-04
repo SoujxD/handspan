@@ -138,6 +138,23 @@ declared detectors were dead because they were written from remembered phrasing.
 | permission denied, session expired mid-flow | 403/440 | **escalate** | Both have a human remedy, and the app says so itself: *"A supervisor must sign on."* |
 | application error | 500 | **hard** | The target is broken, not the automation. Its own reference code is captured |
 
+**These detectors are verified firing, not merely declared.**
+`npx tsx scripts/verify-outcomes.ts <capability>` replays each capability
+against inputs chosen to provoke each declared outcome and reports which ones
+actually matched. **13 of 19 fire against the live application, including 5/5 on
+funds transfer** — see `evidence/VERIFY-OUTCOMES-meridian.txt`, which also
+explains, per detector, why the other six could not be reached.
+
+Probes live in `institutions.json`, not in the script: which member number does
+not exist and which share is on HOLD are properties of the deployment. Hardcoding
+one application's answers meant the pass could only ever verify that application.
+
+That pass found a real defect, not just missing coverage. The host's generic
+*"could not be validated"* banner matched `request_not_validated` before the
+specific `invalid_initial_deposit`, and outcomes match in declaration order — so
+a rejected deposit was reported as a **hard application fault** instead of a
+business answer. Both are now `business`, which makes the shadowing harmless.
+
 **Session timeout is escalate, not recoverable, and that is a cut line.** The
 brief suggests recovery-by-re-authentication. `?inject=timeout` genuinely
 destroys the session server-side, so recovery means re-running sign-on, and the
@@ -240,11 +257,13 @@ match a freshly minted one. The failure mode is not an error, it is the wrong
 cached page served silently — worse than a dead network. If I build it, it gets
 scoped to the read-only capabilities and documented as such.
 
-**Outcome verification against the live target.** `verify-outcomes` exists and
-runs against the fixture. Pointing it at MERIDIAN with `?inject=` per request
-would turn "these detectors are grounded in observed text" into "these detectors
-are verified firing". The wording is already captured in the recon dump; this is
-the highest-value next hour.
+**A per-step fault hook.** Four detectors — session timeout, server error, and
+the two off-limits guards — stay unverified because provoking them needs a fault
+injected at a step the flow reaches by *clicking*, and `?inject=` can only ride
+a navigation. The global alternative is the shared host's System Settings screen,
+which would break other candidates' demos to tick a box here. Closing this
+properly means a per-step fault hook in the replay engine: a core change for the
+benefit of a test, which is why it is listed here rather than built.
 
 **A `drift --all` fleet sweep.** Drift detection and reviewed repair exist and
 are proven on the fixture. What is missing is the fleet question — *the vendor

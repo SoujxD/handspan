@@ -98,3 +98,62 @@ npx tsx scripts/agent-invoke-demo.ts member_savings_balance 12345
 It prints the published tool definitions, then two invocations — one returning
 `success` with typed outputs, one returning the `member_not_found` **business
 outcome at HTTP 200** — both with `meta.llmCalls: 0`.
+
+---
+
+# MERIDIAN CORE (the adaptation project)
+
+Evidence from driving `web-sample.interface-hiring.com` — a hosted credit-union
+servicing console this system had never seen. Write-up: [ADAPTATION.md](../ADAPTATION.md).
+
+| What | Where |
+|---|---|
+| **Surface recon**, run before anything was recorded | [`recon/SURFACE-NOTES.md`](./recon/SURFACE-NOTES.md) and the `recon-*` node dumps |
+| **Outcome verification** against the live application | [`VERIFY-OUTCOMES-meridian.txt`](./VERIFY-OUTCOMES-meridian.txt) |
+| **Discovery runs**, one per capability | `disc-2026090*` |
+| **Replay runs**, every one reporting `llmCalls: 0` | `replay-2026090*` |
+
+## What the recon pass settled, before a token was spent
+
+Measured across 17 screens through the real perception layer:
+
+- Links (84) and buttons (8) are **100% accessible-name**; textboxes (11) and
+  comboboxes (8) are **100% adjacent-table-cell**. Every data-entry field on the
+  application. Without that rung of the ladder, no form here is addressable
+  without a selector.
+- The two share pickers — the one place a resolver tie looked plausible — score
+  **70 against a runner-up of 30** over 19 candidates. A 40-point margin against
+  a required 12.
+- The hidden per-transaction token needs no handling: `perception.ts` drops
+  hidden inputs, so the model never sees it, and clicking the real submit button
+  makes the browser carry it.
+- Every exceptional state provoked and read off the page, with its HTTP status.
+
+That last one is why the pass exists. On this system's first verification
+against its own fixture, **8 of 8 declared detectors were dead** — every one
+written from remembered phrasing rather than observed text.
+
+## Two leaks this evidence directory caught
+
+**A failing replay leaked a member's name.** On the success path it is scrubbed,
+because it is an output classified `pii` and extraction registers it. The failure
+path dumps the screen *without* extracting anything — so a failure leaked exactly
+what a success protected, and failures are when a dump is most wanted. Now
+registered structurally from an `onObserve` hook on the surface, before the first
+write, rather than at the twelve snapshot call sites.
+
+**Then registering off labels over-matched.** In a header row each cell's derived
+label is the *previous* header cell, so `Status` is labelled `Balance`, got
+registered as regulated, and scrubbed the word out of every log line —
+`shareStatus` came back as `share[REDACTED]`. Column headers are page furniture
+and are excluded.
+
+`npx tsx scripts/audit-evidence.ts` greps every persisted file for all five seed
+members' rendered names, addresses and e-mails. It reports CLEAN.
+
+## No screenshots in the recon dump
+
+Deliberate. A text redactor cannot clean pixels, and evidence that leaks a
+member's details is not evidence you can ship. The node dumps and the measured
+summary are what that pass is for; replay runs still capture screenshots, where
+sensitive regions are masked in the browser before the pixels are taken.
