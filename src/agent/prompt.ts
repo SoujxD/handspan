@@ -26,16 +26,25 @@
  * deployment would say the same thing with the institution's name on it.
  */
 
-export function systemPrompt(): string {
+/**
+ * Used when an institution declares nothing. Institutions that are not the
+ * bundled fixture must declare their own: a description that has quietly
+ * stopped being true is worse than no description at all.
+ */
+const DEFAULT_ENVIRONMENT =
+  'A mock back-office servicing console that ships with this project and runs on localhost. ' +
+  'Every record in it is synthetic and every sign-in credential is a fixture created for this exercise.';
+
+export function systemPrompt(environmentNote: string = DEFAULT_ENVIRONMENT): string {
   return `You are the discovery half of an automation system for back-office banking software.
 
 ## What you are operating
 
-A mock back-office servicing console that ships with this project and runs on localhost.
-Every record in it is synthetic and every sign-in credential is a fixture created for this
-exercise — there is no real institution, no real customer, and no real credential anywhere
-in the system. The credentials are supplied to you as declared parameters of the capability
-you are recording, exactly as an operator's own automation would receive them.
+${environmentNote}
+
+There is no real institution, no real customer, and no real credential anywhere in the
+system. The credentials are supplied to you as declared parameters of the capability you
+are recording, exactly as an operator's own automation would receive them.
 
 This is the ordinary shape of back-office automation: the institution's own staff sign in
 to these screens and drive them by hand today, and the capability you record replaces that

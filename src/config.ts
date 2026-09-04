@@ -11,17 +11,19 @@
 import 'dotenv/config';
 import Anthropic from '@anthropic-ai/sdk';
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PolicyEngine } from './safety/policy.js';
-import { Redactor } from './safety/redaction.js';
+import { Redactor, registerRegulatedValues } from './safety/redaction.js';
+import type { SurfaceSnapshot } from './types/surface.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const PROJECT_ROOT = resolve(here, '..');
 
 export const PATHS = {
   policy: join(PROJECT_ROOT, 'policy.yaml'),
+  institutions: join(PROJECT_ROOT, 'institutions.json'),
   artifacts: join(PROJECT_ROOT, 'artifacts'),
   evidence: join(PROJECT_ROOT, 'evidence'),
 };
@@ -69,9 +71,87 @@ export function buildRedactor(policy: PolicyEngine): Redactor {
   return r;
 }
 
+/**
+ * The observation hook every surface is launched with.
+ *
+ * Registers a screen's regulated values for scrubbing before the caller can
+ * write anything about that screen. Built here for the same reason the policy
+ * engine is: every entry point must get the identical one, or the guarantee
+ * holds in `replay` and quietly does not in `discover`.
+ */
+export function observationRedactionHook(
+  policy: PolicyEngine,
+  redactor: Redactor,
+): (snapshot: SurfaceSnapshot) => void {
+  const isRegulated = (label: string): boolean =>
+    policy.classify({ kind: 'type', fieldLabel: label }) === 'sensitive';
+  return (snapshot) => {
+    registerRegulatedValues(snapshot.nodes, isRegulated, redactor);
+  };
+}
+
 export function newRunId(prefix: 'disc' | 'replay' | 'verify' | 'drift' | 'repair'): string {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
   return `${prefix}-${stamp}-${randomUUID().slice(0, 6)}`;
+}
+
+/**
+ * An institution this system may drive.
+ *
+ * `product` names the vendor build rather than the institution, because a
+ * recording is product-scoped: two credit unions running the same software
+ * share one artifact and differ only by a tenant binding.
+ */
+export interface Institution {
+  tenantId: string;
+  displayName: string;
+  /** Absolute URL, or a path resolved against the local fixture app. */
+  baseUrl: string;
+  product: string;
+  productVersion: string;
+  /** One true sentence about what this deployment is, for the model's
+   *  environment header. See DiscoveryDeps.environmentNote. */
+  environmentNote?: string;
+}
+
+/**
+ * Load the institution registry.
+ *
+ * This used to come from `target-app/data.ts` — the fixture application's own
+ * module — which meant the list of institutions the system could drive was a
+ * property of the mock. An institution that was not part of the fixture could
+ * not be named at all. Reading it from a data file instead is what makes
+ * onboarding a new deployment a configuration change.
+ */
+export function loadInstitutions(): Record<string, Institution> {
+  const raw = JSON.parse(readFileSync(PATHS.institutions, 'utf8')) as Record<string, unknown>;
+  const base = runtimeConfig().targetAppBase;
+  const out: Record<string, Institution> = {};
+  for (const [tenantId, value] of Object.entries(raw)) {
+    if (tenantId.startsWith('$') || typeof value !== 'object' || value === null) continue;
+    const v = value as Omit<Institution, 'tenantId'>;
+    out[tenantId] = {
+      tenantId,
+      displayName: v.displayName,
+      baseUrl: v.baseUrl.startsWith('/') ? `${base}${v.baseUrl}` : v.baseUrl,
+      product: v.product,
+      productVersion: v.productVersion,
+      ...(v.environmentNote ? { environmentNote: v.environmentNote } : {}),
+    };
+  }
+  return out;
+}
+
+export function requireInstitution(tenantId: string): Institution {
+  const all = loadInstitutions();
+  const hit = all[tenantId];
+  if (!hit) {
+    throw new Error(
+      `Unknown institution "${tenantId}". Known: ${Object.keys(all).join(', ')}.\n` +
+        `Add it to institutions.json, and its origin to policy.yaml.`,
+    );
+  }
+  return hit;
 }
 
 /**

@@ -1,0 +1,212 @@
+{
+  "capturedAt": "2026-09-04T16:12:42.495Z",
+  "url": "https://web-sample.interface-hiring.com/members/100234?inject=server",
+  "frameUrls": [
+    "https://web-sample.interface-hiring.com/members/100234?inject=server"
+  ],
+  "title": "Application Error - Meridian Core",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "link",
+      "name": "Main Menu",
+      "label": "Main Menu",
+      "labelSource": "accessible-name",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 307,
+        "y": 42,
+        "width": 66.546875,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "link",
+      "name": "Member Inquiry",
+      "label": "Member Inquiry",
+      "labelSource": "accessible-name",
+      "container": "Main Menu",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 393.03125,
+        "y": 42,
+        "width": 88.125,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "link",
+      "name": "System Settings",
+      "label": "System Settings",
+      "labelSource": "accessible-name",
+      "container": "Member Inquiry",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/settings",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 500.640625,
+        "y": 42,
+        "width": 90.359375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "link",
+      "name": "Sign Off",
+      "label": "Sign Off",
+      "labelSource": "accessible-name",
+      "container": "System Settings",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/signoff",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 610.484375,
+        "y": 42,
+        "width": 44.625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "link",
+      "name": "Return to previous screen",
+      "label": "Return to previous screen",
+      "labelSource": "accessible-name",
+      "container": "ERR-632B4F63",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 333,
+        "y": 178,
+        "width": 142.71875,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 15,
+        "width": 758,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "table-cell",
+      "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 40,
+        "width": 758,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e8",
+      "role": "cell",
+      "name": "",
+      "label": "APPLICATION ERROR An unexpected error occurred while processing your request. Reference: ERR-632B4F63 Please contact the Help Desk if the problem persists. Return to previous screen",
+      "labelSource": "table-cell",
+      "value": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 16:10:58 | SID 0942A01A",
+      "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 16:10:58 | SID 0942A01A",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 221,
+        "width": 758,
+        "height": 20
+      }
+    },
+    {
+      "handle": "e9",
+      "role": "cell",
+      "name": "",
+      "label": "OPR TELLER1 | BR MAIN-001 | 09/04/2026 16:10:58 | SID 0942A01A",
+      "labelSource": "table-cell",
+      "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 241,
+        "width": 758,
+        "height": 19
+      }
+    }
+  ],
+  "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nAPPLICATION ERROR\nAn unexpected error occurred while processing your request.\nReference: ERR-632B4F63\nPlease contact the Help Desk if the problem persists.\nReturn to previous screen\nOPR TELLER1 | BR MAIN-001 | 09/04/2026 16:10:58 | SID 0942A01A\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+  "lastStatus": 500
+}

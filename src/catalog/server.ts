@@ -26,7 +26,14 @@
 import express from 'express';
 import type { Server } from 'node:http';
 import { CapabilityStore, toToolDefinition } from './store.js';
-import { PATHS, buildRedactor, loadPolicy, newRunId, runtimeConfig } from '../config.js';
+import {
+  PATHS,
+  buildRedactor,
+  loadPolicy,
+  newRunId,
+  observationRedactionHook,
+  runtimeConfig,
+} from '../config.js';
 import { EvidenceRecorder } from '../evidence/recorder.js';
 import { SessionLease } from '../control/lease.js';
 import { PlaywrightSurface } from '../surface/web/playwright-surface.js';
@@ -92,6 +99,7 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
         lease,
         headless: runtimeConfig().headless,
         defaultTimeoutMs: policy.limits.defaultActionTimeoutMs,
+        onObserve: observationRedactionHook(policy, redactor),
       });
 
       await surface.act({ kind: 'navigate', url: detemplatize(cap.surface.entryUrl, tenant.baseUrl) });

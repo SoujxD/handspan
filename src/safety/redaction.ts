@@ -167,3 +167,86 @@ export const DEFAULT_PATTERNS: RedactionPattern[] = [
   { name: 'ssn', regex: '\\b\\d{3}-\\d{2}-\\d{4}\\b', replacement: '[REDACTED:SSN]' },
   { name: 'anthropic_key', regex: 'sk-ant-[A-Za-z0-9_\\-]{8,}', replacement: '[REDACTED:CREDENTIAL]' },
 ];
+
+/**
+ * Register the regulated values visible on a screen, before anything is
+ * written about that screen.
+ *
+ * The redactor has two mechanisms and they cover different things. Patterns
+ * catch values with a recognisable shape — an SSN, a card number, an email.
+ * Runtime registration catches values with no shape at all, and it is the only
+ * thing that can: a member's name and street address look exactly like prose.
+ *
+ * Until now, registration happened when a value was *extracted*, because an
+ * artifact output classified `pii` declares it regulated. That leaves two
+ * holes, and both were live:
+ *
+ *   - A failing replay writes a debug dump of the screen without extracting
+ *     anything, so it persisted a member's name that a successful run scrubbed.
+ *     Failures are when a dump is most wanted and most dangerous.
+ *   - Discovery has no artifact yet, so nothing has declared anything, and the
+ *     trace is written from screens full of member data.
+ *
+ * The fix is structural and is what policy.yaml's `sensitiveNamePatterns`
+ * already describes: a value whose LABEL says it is regulated is regulated,
+ * whatever it looks like. The label is on the screen; use it.
+ *
+ * Called after every observation, in both loops, so registration precedes the
+ * first write rather than trailing it.
+ */
+export function registerRegulatedValues(
+  nodes: ReadonlyArray<{
+    role: string;
+    label?: string;
+    value?: string;
+    columnHeader?: string;
+  }>,
+  isRegulatedLabel: (label: string) => boolean,
+  redactor: Redactor,
+): number {
+  let registered = 0;
+
+  /**
+   * A column header is a label, not a value.
+   *
+   * In a header row each cell's derived label is the PREVIOUS header cell, so
+   * the cell reading "Status" is labelled "Balance" and matches the regulated
+   * pattern. Registering it scrubs the word "Status" out of every log line in
+   * the run — which is how `shareStatus` came back as `share[REDACTED]`.
+   *
+   * Any text that serves as a column header somewhere in this snapshot is
+   * therefore excluded: it is part of the page's furniture, not member data.
+   */
+  const headerTexts = new Set(
+    nodes.map((n) => n.columnHeader?.trim()).filter((h): h is string => !!h),
+  );
+
+  for (const n of nodes) {
+    const text = (n.value ?? '').trim();
+    // Short values are skipped: a two-character cell is as likely to be a
+    // status flag as a name, and registering it would scrub half the log.
+    if (text.length < 4) continue;
+
+    // Either axis may carry the label — a form field is labelled by its
+    // neighbouring cell, a grid cell by its column header.
+    if (headerTexts.has(text)) continue;
+
+    const labels = [n.label, n.columnHeader].filter((l): l is string => !!l);
+    if (!labels.some(isRegulatedLabel)) continue;
+
+    redactor.registerSecret(text);
+    registered++;
+
+    // The audit caught a balance registered as the string it was scraped from
+    // ("$55,023.10") but stored as the coerced number 55023.1, which passed
+    // through untouched. Register the numeric forms too.
+    const numeric = text.replace(/[$,]/g, '');
+    if (numeric !== text && /^-?\d+(\.\d+)?$/.test(numeric)) {
+      redactor.registerSecret(numeric);
+      redactor.registerSecret(String(Number(numeric)));
+      registered += 2;
+    }
+  }
+
+  return registered;
+}

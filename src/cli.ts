@@ -22,6 +22,8 @@ import {
   newRunId,
   requireAnthropicKey,
   runtimeConfig,
+  requireInstitution,
+  observationRedactionHook,
 } from './config.js';
 import { EvidenceRecorder } from './evidence/recorder.js';
 import { SessionLease } from './control/lease.js';
@@ -44,7 +46,6 @@ import {
 import { exitCodeFor, summarize, type ReplayResult } from './types/result.js';
 import { operatorBaseUrl, startOperatorConsole } from './operator/server.js';
 import { startCatalog } from './catalog/server.js';
-import { TENANTS } from '../target-app/data.js';
 
 const program = new Command();
 program
@@ -73,17 +74,19 @@ program
     const evidence = new EvidenceRecorder(runId, PATHS.evidence, redactor);
     const lease = new SessionLease(runId);
 
-    const tenant = TENANTS[o.tenant];
-    if (!tenant) {
-      console.error(`Unknown tenant "${o.tenant}". Known: ${Object.keys(TENANTS).join(', ')}`);
+    let tenant;
+    try {
+      tenant = requireInstitution(o.tenant);
+    } catch (e) {
+      console.error((e as Error).message);
       process.exit(2);
     }
-    const baseUrl = `${cfg.targetAppBase}/t/${tenant.slug}`;
+    const baseUrl = tenant.baseUrl;
     const entryUrl = `${baseUrl}${o.entry}`;
 
     banner('DISCOVERY', [
       ['goal', o.goal],
-      ['tenant', `${tenant.displayName} (${tenant.slug})`],
+      ['tenant', `${tenant.displayName} (${tenant.tenantId})`],
       ['entry', entryUrl],
       ['model', `${cfg.model} @ effort=${cfg.effort}`],
       ['evidence', evidence.dir],
@@ -95,16 +98,18 @@ program
       lease,
       headless: cfg.headless,
       defaultTimeoutMs: policy.limits.defaultActionTimeoutMs,
+      onObserve: observationRedactionHook(policy, redactor),
     });
 
     try {
-      const trace = await runDiscovery(o.goal, entryUrl, tenant.slug, {
+      const trace = await runDiscovery(o.goal, entryUrl, tenant.tenantId, {
         surface,
         policy,
         redactor,
         evidence,
         model: cfg.model,
         effort: cfg.effort,
+        ...(tenant.environmentNote ? { environmentNote: tenant.environmentNote } : {}),
       });
 
       evidence.saveJson('discovery-trace', trace);
@@ -127,11 +132,11 @@ program
 
       const cap = compile(trace, {
         policy,
-        tenantId: tenant.slug,
+        tenantId: tenant.tenantId,
         tenantDisplayName: tenant.displayName,
         baseUrl,
-        vendorProduct: tenant.vendorProduct,
-        vendorVersion: tenant.vendorVersion,
+        vendorProduct: tenant.product,
+        vendorVersion: tenant.productVersion,
         model: cfg.model,
         effort: cfg.effort,
         discoveryRunId: runId,
@@ -219,6 +224,7 @@ program
         lease,
         headless: cfg.headless,
         defaultTimeoutMs: policy.limits.defaultActionTimeoutMs,
+        onObserve: observationRedactionHook(policy, redactor),
       });
 
       let result: ReplayResult;
@@ -298,6 +304,7 @@ program
       lease,
       headless: cfg.headless,
       defaultTimeoutMs: policy.limits.defaultActionTimeoutMs,
+      onObserve: observationRedactionHook(policy, redactor),
     });
 
     let result: ReplayResult;
@@ -483,6 +490,7 @@ async function diagnose(
     lease,
     headless,
     defaultTimeoutMs: policy.limits.defaultActionTimeoutMs,
+    onObserve: observationRedactionHook(policy, redactor),
   });
 
   let result: ReplayResult;
@@ -598,9 +606,11 @@ program
     const store = new CapabilityStore(PATHS.artifacts);
     const cap = store.load(String(o['capability']));
     const tenantId = String(o['tenant']);
-    const tenant = TENANTS[tenantId];
-    if (!tenant) {
-      console.error(`Unknown tenant "${tenantId}".`);
+    let tenant;
+    try {
+      tenant = requireInstitution(tenantId);
+    } catch (e) {
+      console.error((e as Error).message);
       process.exit(2);
     }
 
@@ -652,8 +662,8 @@ program
     const binding = {
       tenantId,
       displayName: tenant.displayName,
-      baseUrl: `${runtimeConfig().targetAppBase}/t/${tenant.slug}`,
-      productVersion: tenant.vendorVersion,
+      baseUrl: tenant.baseUrl,
+      productVersion: tenant.productVersion,
       labelOverrides: overrides,
       additionalOutcomes,
       overrides: {},

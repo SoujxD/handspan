@@ -65,7 +65,20 @@ export function compile(trace: DiscoveryTrace, opts: CompileOptions): Capability
 
   const inputs = buildInputs(finish, trace);
   const paramByValue = buildParamValueIndex(trace, inputs);
-  const outputs = buildOutputs(finish);
+  /**
+   * Extraction sees a wider set of parameters than step values do.
+   *
+   * `paramByValue` is built from values the model TYPED, which is the right
+   * basis for a step. But an input can be load-bearing without ever being
+   * typed: `shareId` names which row of a grid to read, and is never entered
+   * into a box anywhere. Its declared example is the only place its value
+   * appears, so that is what an extraction rule has to be matched against.
+   */
+  const extractionParams = new Map(paramByValue);
+  for (const p of inputs) {
+    if (p.example && !extractionParams.has(p.example)) extractionParams.set(p.example, p.name);
+  }
+  const outputs = buildOutputs(finish, extractionParams);
 
   const steps = buildSteps(trace, opts, inputs, paramByValue);
   /**
@@ -208,7 +221,29 @@ function buildParamValueIndex(trace: DiscoveryTrace, inputs: InputParam[]): Map<
   return byValue;
 }
 
-function buildOutputs(finish: Record<string, unknown>): OutputField[] {
+/**
+ * Swap a literal that IS an input's value for a `{{param}}` reference.
+ *
+ * The compiler already does this for step values — typing "100234" into a box
+ * when `memberNumber` is "100234" compiles to a parameter reference, not the
+ * literal. Extraction rules were missed, and the consequence is worse than it
+ * looks: a grid read recorded as `rowMatch: "100234-S0001"` does not fail for
+ * the next caller, it silently returns the row belonging to the member it was
+ * recorded against. A wrong answer is more expensive than an error.
+ *
+ * Two successive discovery runs on the same goal produced `{{shareId}}` and
+ * then the bare literal, which is exactly why this cannot be left to the
+ * model's discretion. The compiler is the gatekeeper: the model proposes, this
+ * disposes.
+ */
+function parameterise(text: string, paramByValue: Map<string, string>): string {
+  if (!text) return text;
+  const exact = paramByValue.get(text);
+  if (exact) return `{{${exact}}}`;
+  return text;
+}
+
+function buildOutputs(finish: Record<string, unknown>, paramByValue: Map<string, string>): OutputField[] {
   const declared = Array.isArray(finish['outputs']) ? (finish['outputs'] as Record<string, unknown>[]) : [];
 
   return declared.map((d): OutputField => {
@@ -220,7 +255,7 @@ function buildOutputs(finish: Record<string, unknown>): OutputField[] {
       case 'fromLabelledCell':
         extraction = {
           via: 'fromLabelledCell',
-          label: String(d['label'] ?? name),
+          label: parameterise(String(d['label'] ?? name), paramByValue),
           labelMatch: 'normalized',
           framePath: [],
           direction: (asEnum(d['direction'], ['right', 'below']) ?? 'right') as 'right' | 'below',
@@ -229,8 +264,8 @@ function buildOutputs(finish: Record<string, unknown>): OutputField[] {
       case 'fromTableCell':
         extraction = {
           via: 'fromTableCell',
-          rowMatch: String(d['rowMatch'] ?? ''),
-          columnLabel: String(d['columnLabel'] ?? d['label'] ?? name),
+          rowMatch: parameterise(String(d['rowMatch'] ?? ''), paramByValue),
+          columnLabel: parameterise(String(d['columnLabel'] ?? d['label'] ?? name), paramByValue),
           matchMode: 'contains',
           framePath: [],
         };

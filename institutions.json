@@ -1,0 +1,45 @@
+{
+  "$comment": [
+    "The institution registry: every deployment this system is allowed to drive.",
+    "",
+    "This exists because the CLI used to import its institution list from",
+    "target-app/data.ts - the mock application's own module, whose TenantConfig",
+    "carries accent colours, DOM id prefixes and the label vocabulary used to",
+    "*render* the fixture. None of that means anything for a real target, and",
+    "an institution that is not the fixture could not be expressed at all.",
+    "",
+    "That was genuine coupling to the original target, and it is the one place",
+    "the adaptation found any. The fix is a registry the system owns: four",
+    "fields, no code, no rebuild. Onboarding institution number 2,001 is an",
+    "entry in this file plus an origin in policy.yaml.",
+    "",
+    "baseUrl: an absolute URL, or a path beginning with / which is resolved",
+    "against the local fixture app (TARGET_APP_PORT). product/productVersion",
+    "identify the VENDOR BUILD, not the institution - that is what makes one",
+    "recording reusable across every institution running the same software."
+  ],
+
+  "northstar": {
+    "displayName": "Northstar Community Credit Union",
+    "baseUrl": "/t/northstar",
+    "environmentNote": "A mock back-office servicing console that ships with this project and runs on localhost. Every record in it is synthetic and every sign-in credential is a fixture created for this exercise.",
+    "product": "meridian-core",
+    "productVersion": "8.4"
+  },
+
+  "lakeshore": {
+    "displayName": "Lakeshore Federal Credit Union",
+    "baseUrl": "/t/lakeshore",
+    "environmentNote": "A mock back-office servicing console that ships with this project and runs on localhost. Every record in it is synthetic and every sign-in credential is a fixture created for this exercise.",
+    "product": "meridian-core",
+    "productVersion": "8.6"
+  },
+
+  "meridian-demo": {
+    "displayName": "MERIDIAN CORE demo host (interface.ai)",
+    "baseUrl": "https://web-sample.interface-hiring.com",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "environmentNote": "A credit-union member-servicing console hosted by interface.ai at web-sample.interface-hiring.com as the sanctioned target for this exercise. Every member record in it is seeded demo data and the operator logins are published demo credentials that the brief invites candidates to use freely."
+  }
+}

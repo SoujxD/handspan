@@ -20,6 +20,29 @@ import { matchStrength, resolve, type ResolveOptions } from '../surface/web/reso
 export interface EvalContext {
   snapshot: SurfaceSnapshot;
   resolveOptions: ResolveOptions;
+  /**
+   * Typed inputs for this run, so an extraction can address a row the CALLER
+   * named rather than one fixed at record time.
+   *
+   * Reading "the Balance of share 100234-S0070" is the ordinary case for any
+   * data grid: which row you want is an argument, not a constant. Without
+   * this, `rowMatch` could only ever hold a literal, so a recording made
+   * against one row would silently look for that same row forever - and the
+   * discovery model, correctly, wrote `{{shareId}}` and had it not resolve.
+   *
+   * Same `{{name}}` syntax the artifact already uses for `{{baseUrl}}`.
+   */
+  params?: Record<string, string>;
+}
+
+/** Substitute `{{param}}` references. Unknown names are left alone so they
+ *  surface in the failure message rather than becoming an empty match that
+ *  silently returns the first row of the table. */
+function fill(text: string, params: Record<string, string> | undefined): string {
+  if (!params || !text.includes('{{')) return text;
+  return text.replace(/\{\{\s*([a-zA-Z][a-zA-Z0-9_]*)\s*\}\}/g, (whole, name: string) =>
+    params[name] !== undefined ? params[name] : whole,
+  );
 }
 
 export function evaluateCondition(cond: Condition, ctx: EvalContext): boolean {
@@ -141,8 +164,9 @@ function readRaw(ex: Extraction, ctx: EvalContext): string | undefined {
     case 'fromLabelledCell': {
       // The perception layer already derived each cell's label from its
       // structural neighbour, so this is a lookup rather than a DOM walk.
+      const wantLabel = fill(ex.label, ctx.params);
       const byLabel = snapshot.nodes.filter(
-        (n) => n.role === 'cell' && matchStrength(ex.label, n.label, ex.labelMatch) > 0,
+        (n) => n.role === 'cell' && matchStrength(wantLabel, n.label, ex.labelMatch) > 0,
       );
       const hit = byLabel.find((n) => (n.value ?? '').trim().length > 0);
       if (hit?.value) return hit.value;
@@ -177,14 +201,16 @@ function readRaw(ex: Extraction, ctx: EvalContext): string | undefined {
     case 'fromTableCell': {
       // Two-axis lookup. Both must agree, which is what stops "Current Balance"
       // from silently returning whichever row happens to come first.
+      const wantRow = fill(ex.rowMatch, ctx.params);
+      const wantColumn = fill(ex.columnLabel, ctx.params);
       const rows = groupByRow(snapshot.nodes);
       for (const cells of rows.values()) {
         const rowMatches = cells.some(
-          (c) => matchStrength(ex.rowMatch, c.value ?? '', ex.matchMode) > 0,
+          (c) => matchStrength(wantRow, c.value ?? '', ex.matchMode) > 0,
         );
         if (!rowMatches) continue;
         const cell = cells.find(
-          (c) => matchStrength(ex.columnLabel, c.columnHeader ?? c.label, 'normalized') > 0,
+          (c) => matchStrength(wantColumn, c.columnHeader ?? c.label, 'normalized') > 0,
         );
         if (cell?.value) return cell.value;
       }

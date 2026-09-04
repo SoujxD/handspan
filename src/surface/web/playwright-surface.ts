@@ -36,6 +36,18 @@ export interface PlaywrightSurfaceOptions {
   defaultTimeoutMs?: number;
   /** Called with each main-frame response so snapshots can carry HTTP status. */
   onNavigation?: (url: string, status: number) => void;
+
+  /**
+   * Called with every observation, before the caller can do anything with it.
+   *
+   * This is where regulated values get registered for scrubbing. It lives on
+   * the adapter rather than at the call sites because there are twelve of
+   * those across the replay engine and the discovery loop, and the one that
+   * matters most is the failure path - which is exactly the one a person
+   * adding a thirteenth would forget. A guarantee that depends on remembering
+   * is not a guarantee.
+   */
+  onObserve?: (snapshot: SurfaceSnapshot) => void;
 }
 
 export class PlaywrightSurface implements Surface {
@@ -198,7 +210,10 @@ export class PlaywrightSurface implements Surface {
     // Snapshots are read-only and intentionally NOT lease-gated: the harness
     // must keep observing while a human drives, so we can record what they did.
     await this.settle();
-    return snapshotPage(this.page, this.lastStatus);
+    const snap = await snapshotPage(this.page, this.lastStatus);
+    // Before the caller can log, dump or reason about this screen.
+    this.opts.onObserve?.(snap);
+    return snap;
   }
 
   async act(action: SurfaceAction): Promise<void> {

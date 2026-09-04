@@ -110,7 +110,24 @@ export interface DiscoveryDeps {
   effort: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
   /** Called when the model escalates, so the caller can raise an intervention. */
   onEscalate?: (reason: string, guidance: string) => Promise<void>;
+  /**
+   * What this deployment actually is, in one sentence, for the environment
+   * header. It has to be TRUE of the target being driven: the header exists
+   * because "sign in to a banking console and read a member's balance" is
+   * indistinguishable from something a classifier should stop until you say
+   * what the system is, and a description that has quietly stopped being
+   * accurate is worse than none. It was hardcoded to "a mock app on
+   * localhost", which stopped being true the moment the first hosted target
+   * arrived. Institutions declare it now.
+   */
+  environmentNote?: string;
 }
+
+const DEFAULT_ENVIRONMENT_NOTE =
+  'A mock back-office servicing console running locally as part of this project. ' +
+  'Every member record is a synthetic fixture and the sign-in credentials are test ' +
+  'values declared as parameters of the capability being recorded. No real institution, ' +
+  'customer, or credential is involved.';
 
 export async function runDiscovery(
   goal: string,
@@ -215,7 +232,7 @@ export async function runDiscovery(
             system: [
               {
                 type: 'text',
-                text: systemPrompt(),
+                text: systemPrompt(deps.environmentNote),
                 // Stable prefix; everything volatile lives after it in `messages`.
                 cache_control: { type: 'ephemeral' },
               },

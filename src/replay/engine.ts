@@ -606,7 +606,17 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
   // -------------------------------------------------------------------------
   snapshot = await surface.snapshot();
   // Reassigned as recoveries re-observe the final screen.
-  let ctx = { snapshot, resolveOptions };
+  //
+  // `params` carries the typed inputs so an extraction can address the row the
+  // CALLER named - "the Balance of share <shareId>" - rather than one frozen
+  // at record time. Secrets are excluded: an extraction rule has no business
+  // matching on a password, and a secret must not reach a failure message.
+  const extractionParams = Object.fromEntries(
+    Object.entries(inputs).filter(
+      ([name]) => cap.inputs.find((p) => p.name === name)?.sensitivity !== 'secret',
+    ),
+  );
+  let ctx = { snapshot, resolveOptions, params: extractionParams };
 
   /**
    * Terminal guards are evaluated BEFORE the success checkpoint.
@@ -675,7 +685,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
           recovery: { outcomeCode: guard.code, action: outcome.action, attempt: finalRecoveries },
         });
         snapshot = await surface.snapshot();
-        ctx = { snapshot, resolveOptions };
+        ctx = { snapshot, resolveOptions, params: extractionParams };
         continue;
       }
     }

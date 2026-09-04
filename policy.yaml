@@ -150,6 +150,26 @@ risk:
     - "\\b(card|pan|cvv|account\\s*number)\\b"
     - "\\b(dob|date\\s+of\\s+birth)\\b"
 
+    # Labels, not values.
+    #
+    # A member's name, street address, phone and balance have no dependable
+    # regex — "Lovelace, Ada" and "22 Harbor Lane" are indistinguishable from
+    # ordinary prose. But the cell that renders them is labelled, and the label
+    # is what declares the value regulated. Matching the label is the only
+    # mechanism that works for this class at all, which is why every screen
+    # this system observes has its labelled values registered for scrubbing
+    # before anything reaches disk.
+    #
+    # This was added after a failed replay wrote a debug dump containing a
+    # member's name. On the success path that name is scrubbed, because it is
+    # an extracted output classified `pii` and extraction registers it. The
+    # failure path dumps the screen without extracting anything — so a failure
+    # leaked precisely what a success protected, which is the wrong way round.
+    - "\\b(name|member\\s*name|first\\s*name|last\\s*name)\\b"
+    - "\\b(e-?mail|phone|mobile|telephone)\\b"
+    - "\\b(address|mailing\\s+address|street|city|postcode|zip)\\b"
+    - "\\b(balance|available|current\\s+balance)\\b"
+
 redaction:
   # Applied to every log record, every artifact write, and every extracted
   # output before it leaves the process. Order matters: structural rules run
