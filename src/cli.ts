@@ -796,6 +796,94 @@ program
     );
   });
 
+/**
+ * Strengthen a step's checkpoint before approval.
+ *
+ * The discovery model writes checkpoints that prove the flow MOVED - a URL
+ * changed, a heading appeared. What it consistently does not write is a
+ * checkpoint that proves the flow moved *with the caller's values*, because
+ * until conditions could reference parameters there was no way to say it.
+ *
+ * On a two-phase commit that distinction is the whole point. "Reached the
+ * review screen" and "the review screen restates the amount and the accounts
+ * this invocation was given" are different assertions, and only the second one
+ * makes review-then-post worth more than clicking two buttons.
+ *
+ * This is the same reviewer workflow `declare-outcome` provides: a human
+ * closing a gap the model left, recorded as such, resetting approval to draft
+ * so nothing is strengthened behind a reviewer's back.
+ */
+program
+  .command('assert-checkpoint')
+  .description("Add an assertion to a step's checkpoint. Use {{param}} to reference a typed input.")
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .requiredOption('-s, --step <id>', 'Step whose checkpoint to strengthen.')
+  .option('--text <text...>', 'Text that must be present. Repeatable. Supports {{param}}.', collect, [])
+  .requiredOption('--why <text>', 'Why a reviewer added this. Recorded in governance notes.')
+  .action((o: Record<string, unknown>) => {
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.load(String(o['capability']));
+    const stepId = String(o['step']);
+    const step = cap.steps.find((x) => x.id === stepId);
+    if (!step) {
+      console.error(`No step "${stepId}" in ${cap.id}. Steps: ${cap.steps.map((x) => x.id).join(', ')}`);
+      process.exit(2);
+      return;
+    }
+
+    const texts = (o['text'] as string[]) ?? [];
+    if (!texts.length) {
+      console.error('Nothing to assert. Pass at least one --text.');
+      process.exit(2);
+      return;
+    }
+
+    // Every {{param}} must name a declared input, or the assertion is dead on
+    // arrival: `fill` leaves an unknown reference alone, so the checkpoint
+    // would look for the literal text "{{amont}}" and fail every run.
+    const declared = new Set(cap.inputs.map((i) => i.name));
+    for (const t of texts) {
+      for (const m of t.matchAll(/\{\{\s*([a-zA-Z][a-zA-Z0-9_]*)\s*\}\}/g)) {
+        const name = m[1]!;
+        if (!declared.has(name)) {
+          console.error(
+            `"{{${name}}}" is not an input of ${cap.id}. Inputs: ${[...declared].join(', ')}`,
+          );
+          process.exit(2);
+          return;
+        }
+        if (cap.inputs.find((i) => i.name === name)?.sensitivity === 'secret') {
+          console.error(
+            `"{{${name}}}" is a secret input. A checkpoint prints what it expected when it fails, ` +
+              `so asserting on a secret would put it in a log. Refusing.`,
+          );
+          process.exit(2);
+          return;
+        }
+      }
+    }
+
+    const added = texts.map((t) => ({ kind: 'textPresent' as const, text: t, caseSensitive: false }));
+    const existing = step.checkpoint;
+    step.checkpoint = existing
+      ? { kind: 'all' as const, of: [existing, ...added] }
+      : added.length === 1
+        ? added[0]!
+        : { kind: 'all' as const, of: added };
+
+    const note = `[reviewer] checkpoint on ${stepId}: ${String(o['why'])}`;
+    cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}
+${note}` : note;
+    cap.version += 1;
+    cap.governance.approval = 'draft';
+    cap.provenance.contentHash = hashCapability(cap);
+    store.save(cap);
+
+    console.log(`  Strengthened ${stepId} on ${cap.id}: ${texts.length} assertion(s).`);
+    for (const t of texts) console.log(`    must show: ${t}`);
+    console.log(`  Now v${cap.version}, approval reset to draft.`);
+  });
+
 program
   .command('approve')
   .description('Mark a capability approved for unattended execution.')

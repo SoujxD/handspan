@@ -50,20 +50,24 @@ export function evaluateCondition(cond: Condition, ctx: EvalContext): boolean {
 
   switch (cond.kind) {
     case 'urlMatches':
-      return safeRegex(cond.pattern)?.test(snapshot.url) ?? false;
+      return safeRegex(fill(cond.pattern, ctx.params))?.test(snapshot.url) ?? false;
 
-    case 'textPresent':
+    case 'textPresent': {
+      const want = fill(cond.text, ctx.params);
       return cond.caseSensitive
-        ? snapshot.text.includes(cond.text)
-        : normalizeText(snapshot.text).includes(normalizeText(cond.text));
+        ? snapshot.text.includes(want)
+        : normalizeText(snapshot.text).includes(normalizeText(want));
+    }
 
-    case 'textAbsent':
+    case 'textAbsent': {
+      const want = fill(cond.text, ctx.params);
       return !(cond.caseSensitive
-        ? snapshot.text.includes(cond.text)
-        : normalizeText(snapshot.text).includes(normalizeText(cond.text)));
+        ? snapshot.text.includes(want)
+        : normalizeText(snapshot.text).includes(normalizeText(want)));
+    }
 
     case 'regexPresent':
-      return safeRegex(cond.pattern)?.test(snapshot.text) ?? false;
+      return safeRegex(fill(cond.pattern, ctx.params))?.test(snapshot.text) ?? false;
 
     case 'elementPresent':
       return resolve(cond.target, snapshot.nodes, ctx.resolveOptions).ok;

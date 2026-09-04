@@ -49,7 +49,7 @@ import type { PolicyEngine } from '../safety/policy.js';
 import type { Redactor } from '../safety/redaction.js';
 import type { EvidenceRecorder } from '../evidence/recorder.js';
 import { resolve, type ResolveOptions } from '../surface/web/resolver.js';
-import { describeCondition, evaluateCondition, explainFailure, extract } from './evaluate.js';
+import { describeCondition, evaluateCondition, explainFailure, extract, type EvalContext } from './evaluate.js';
 import { detemplatize } from '../agent/compiler.js';
 import { broker } from '../control/escalation.js';
 import type { SessionLease } from '../control/lease.js';
@@ -147,6 +147,23 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
     steps: cap.steps.length,
   });
 
+  /**
+   * Typed inputs, minus secrets, available to every condition and extraction.
+   *
+   * This is what lets a checkpoint assert that the review screen restates the
+   * amount THIS CALLER passed, rather than the one present when the flow was
+   * recorded - the difference between "clicked two buttons" and "verified the
+   * transaction it was about to commit matched its inputs".
+   *
+   * Secrets are excluded deliberately: no assertion has any business matching
+   * on a password, and a failed condition prints what it expected.
+   */
+  const extractionParams = Object.fromEntries(
+    Object.entries(inputs).filter(
+      ([name]) => cap.inputs.find((p) => p.name === name)?.sensitivity !== 'secret',
+    ),
+  );
+
   let snapshot: SurfaceSnapshot = await surface.snapshot();
 
   /**
@@ -190,7 +207,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
       snapshot = await surface.snapshot();
 
       // --- 2. guards ------------------------------------------------------
-      const hit = firstMatchingGuard(guards, step.id, { snapshot, resolveOptions });
+      const hit = firstMatchingGuard(guards, step.id, { snapshot, resolveOptions, params: extractionParams });
       if (hit) {
         const firings = (guardFirings.get(hit.code) ?? 0) + 1;
         guardFirings.set(hit.code, firings);
@@ -239,6 +256,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
           resolveOptions,
           recoveryAttempts,
           maxRecoveries,
+          params: extractionParams,
         });
 
         if (outcome.kind === 'recovered') {
@@ -277,7 +295,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
       // repeated actions.
       if (recoveryAttempts > 0 && step.checkpoint) {
         snapshot = await surface.snapshot();
-        if (evaluateCondition(step.checkpoint, { snapshot, resolveOptions })) {
+        if (evaluateCondition(step.checkpoint, { snapshot, resolveOptions, params: extractionParams })) {
           evidence.info('step_satisfied_by_recovery', { stepId: step.id, recoveries: recoveryAttempts });
           trace.push(entry(step, stepStarted, 'ok', undefined, 'checkpoint already satisfied after recovery'));
           stepDone = true;
@@ -324,7 +342,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
             evidence.info('resumed_after_operator', { stepId: step.id });
             // The operator may well have performed this step. Verify rather
             // than assume, and skip the action if the checkpoint already holds.
-            if (step.checkpoint && evaluateCondition(step.checkpoint, { snapshot, resolveOptions })) {
+            if (step.checkpoint && evaluateCondition(step.checkpoint, { snapshot, resolveOptions, params: extractionParams })) {
               trace.push(entry(step, stepStarted, 'ok', undefined, 'completed by operator'));
               stepDone = true;
               break;
@@ -361,6 +379,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
               surface,
               resolveOptions,
               timeoutMs,
+              extractionParams,
             );
             if (!ok) {
               lastFailure = fail(
@@ -522,7 +541,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
 
       // --- 6. checkpoint ---------------------------------------------------
       if (step.checkpoint) {
-        const ok = await waitForCondition(step.checkpoint, surface, resolveOptions, timeoutMs);
+        const ok = await waitForCondition(step.checkpoint, surface, resolveOptions, timeoutMs, extractionParams);
         snapshot = await surface.snapshot();
 
         if (!ok) {
@@ -531,7 +550,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
           // screen appeared. A "no such member" page failing the member-detail
           // checkpoint is a business outcome, not a broken capability. This
           // single re-check is what keeps the taxonomy from collapsing.
-          const guard = firstMatchingGuard(guards, step.id, { snapshot, resolveOptions });
+          const guard = firstMatchingGuard(guards, step.id, { snapshot, resolveOptions, params: extractionParams });
           if (guard) {
             const outcome = await handleGuard({
               rule: guard,
@@ -543,6 +562,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
               resolveOptions,
               recoveryAttempts,
               maxRecoveries,
+              params: extractionParams,
             });
             if (outcome.kind === 'recovered') {
               recoveryAttempts++;
@@ -576,7 +596,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
             `Step ${step.id} ran but did not reach the expected state.`,
             'The action may not have taken effect, or the application returned a state this capability does not know about. If it is a legitimate outcome, declare it in the artifact.',
             step,
-            explainFailure(step.checkpoint, { snapshot, resolveOptions }),
+            explainFailure(step.checkpoint, { snapshot, resolveOptions, params: extractionParams }),
             `url=${snapshot.url}; text starts "${snapshot.text.slice(0, 160).replace(/\s+/g, ' ')}"`,
           );
 
@@ -607,15 +627,6 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
   snapshot = await surface.snapshot();
   // Reassigned as recoveries re-observe the final screen.
   //
-  // `params` carries the typed inputs so an extraction can address the row the
-  // CALLER named - "the Balance of share <shareId>" - rather than one frozen
-  // at record time. Secrets are excluded: an extraction rule has no business
-  // matching on a password, and a secret must not reach a failure message.
-  const extractionParams = Object.fromEntries(
-    Object.entries(inputs).filter(
-      ([name]) => cap.inputs.find((p) => p.name === name)?.sensitivity !== 'secret',
-    ),
-  );
   let ctx = { snapshot, resolveOptions, params: extractionParams };
 
   /**
@@ -668,6 +679,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
         resolveOptions,
         recoveryAttempts: finalRecoveries,
         maxRecoveries: 4,
+        params: extractionParams,
       });
 
       if (outcome.kind === 'terminal') return outcome.result;
@@ -847,7 +859,7 @@ class StepRetryable extends Error {}
 function firstMatchingGuard(
   guards: OutcomeRule[],
   stepId: string | null,
-  ctx: { snapshot: SurfaceSnapshot; resolveOptions: ResolveOptions },
+  ctx: EvalContext,
 ): OutcomeRule | undefined {
   return guards.find((g) => {
     if (Array.isArray(g.scope)) {
@@ -872,10 +884,11 @@ async function handleGuard(args: {
   resolveOptions: ResolveOptions;
   recoveryAttempts: number;
   maxRecoveries: number;
+  params: Record<string, string>;
 }): Promise<GuardOutcome> {
   const { rule, step, snapshot, opts, trace, outputs, resolveOptions } = args;
   const { evidence, surface, capability: cap } = opts;
-  const ctx = { snapshot, resolveOptions };
+  const ctx = { snapshot, resolveOptions, params: args.params };
 
   evidence.info('guard_matched', {
     code: rule.code,
@@ -949,7 +962,7 @@ async function handleGuard(args: {
         const deadline = Date.now() + ms;
         for (;;) {
           const fresh = await surface.snapshot();
-          if (!evaluateCondition(rule.detect, { snapshot: fresh, resolveOptions })) return true;
+          if (!evaluateCondition(rule.detect, { snapshot: fresh, resolveOptions, params: args.params })) return true;
           if (fingerprint(fresh) !== before) return true; // a different occurrence
           if (Date.now() > deadline) return false;
           await sleep(250);
@@ -1296,13 +1309,14 @@ async function waitForCondition(
   surface: Surface,
   resolveOptions: ResolveOptions,
   timeoutMs: number,
+  params: Record<string, string>,
 ): Promise<boolean> {
   const deadline = Date.now() + timeoutMs;
   // Poll rather than sleep-then-check: a fixed wait is both slower on the happy
   // path and wrong on the slow path, which is the classic flaky-test failure.
   for (;;) {
     const snapshot = await surface.snapshot();
-    if (evaluateCondition(cond, { snapshot, resolveOptions })) return true;
+    if (evaluateCondition(cond, { snapshot, resolveOptions, params })) return true;
     if (Date.now() > deadline) return false;
     await sleep(250);
   }
