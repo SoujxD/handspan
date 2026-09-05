@@ -35,13 +35,27 @@ click — those were recorded once and reviewed."
 
 ## 2 · An answer, not a crash  *(Chat tab)*
 
-> **What is the balance for member 999999?**
+> **What is the balance of share 999999-S0001 for member 999999?**
 
-Comes back as a **business outcome**, HTTP **200**, exit code 0.
+Comes back as a **business outcome**, HTTP **200**, exit code 0:
+
+> *"No member matched the member number. That is an answer, not an error: the
+> application reported it and the run completed cleanly (member_not_found)."*
 
 *Say:* "'No such member' is an answer. A caller that retries on non-2xx must not
 retry it forever, and a dashboard must not count it as an error. That is why the
 result contract has four shapes rather than success-or-error."
+
+**Optional half-beat, and a good one.** Ask it without the share id —
+
+> **What is the balance for member 999999?**
+
+— and it does *not* run anything. It asks which share, because `shareId` is a
+required input and it is not allowed to invent one. Worth ten seconds: "the
+model binds arguments, it does not make them up."
+
+*(Equivalent if you prefer a name: **"look up the member with last name
+Nonexistent"** returns the `no_member_match` outcome the same way.)*
 
 ---
 
