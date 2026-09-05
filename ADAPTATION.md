@@ -1,10 +1,10 @@
 # Adaptation write-up — pointing Handspan at MERIDIAN CORE
 
 > Adapting to a legacy console this system had never seen took **405 lines of
-> configuration** and **503 lines of core change — all of it generic, none of it
+> configuration** and **589 lines of core change — all of it generic, none of it
 > specific to this target** — plus **$10.30** across 10 discovery runs and 7
 > capabilities. Replay costs zero tokens, by construction: **0 model calls
-> across 80 replays**.
+> across 124 replays**.
 
 Those numbers are computed, not asserted. `npx tsx scripts/adaptation-report.ts`
 regenerates them from the git diff since the `pre-meridian` tag, the token usage

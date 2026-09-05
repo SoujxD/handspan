@@ -211,10 +211,10 @@ npx tsx scripts/adaptation-report.ts
 ```
 
 It prints the current figures — do not read them off this page, they move every
-time you run anything. At the time of writing: **405 lines of configuration, 503
+time you run anything. At the time of writing: **405 lines of configuration, 589
 lines of core** (every line listed so you can check each is generic), **$10.30**
 across ten discovery runs for seven capabilities, and **zero model calls across
-80 replays**.
+124 replays**.
 
 *Say:* "The headline is deliberately not 'zero core changes'. A core that needed
 no changes is equally consistent with a core too thin to be stressed. The claim
@@ -224,7 +224,7 @@ never do. The one genuine coupling I found is in there too: the CLI used to
 import its institution list from the mock application's own module."
 
 **If someone notices the core number grew**, that is the right thing to notice
-and the answer is a good one. It went from 292 to 503, and all of
+and the answer is a good one. It went from 292 to 589, and all of
 it is in ADAPTATION.md §5: a card-number validator, a lock around a governance
 counter, a one-line timeout on a speculative `selectOption`, and recording the
 arguments a run was invoked with. None is about MERIDIAN CORE. Every one of them makes app number
