@@ -219,6 +219,15 @@ That check earned its place twice more here:
   `shareStatus` came back as `share[REDACTED]`. Column headers are page
   furniture and are now excluded.
 
+The audit's seeds are a **regression check, not a proof**. This host is shared
+and mutable — member 101555's e-mail and address changed underneath the project
+while it was running — so a hardcoded list rots. The actual guarantee is the
+structural one above: a value whose *label* says it is regulated is registered
+for scrubbing as the screen is observed, which works on a member record the
+audit has never seen. A live discovery run recorded during the final rehearsal
+extracted four brand-new PII fields; all four were classified and scrubbed
+without anything being added to the seed list.
+
 One seed was deliberately removed: MERIDIAN's demo password is literally the
 string `password`, and seeding it reported 41 "leaks", every one an English
 sentence. A substring audit can only check a secret distinguishable from prose,

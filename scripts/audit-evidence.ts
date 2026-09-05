@@ -35,6 +35,19 @@ const FORBIDDEN: Array<[string, string]> = [
   // Read from the live target, not remembered. Balances are deliberately NOT
   // seeded: they change between runs, so a hardcoded one rots into a check
   // that passes because it no longer matches anything.
+  //
+  // The same rot applies more slowly to everything else here. This host is
+  // shared and mutable - other people run Update Member Information against
+  // it, and member 101555's e-mail and address have already changed once
+  // during this project. So treat this list for what it is: a REGRESSION
+  // check against values known to have been rendered, not a proof that
+  // nothing leaked.
+  //
+  // The actual guarantee is structural and lives elsewhere: values whose LABEL
+  // says they are regulated are registered for scrubbing as each screen is
+  // observed, before anything is written. That works on a member record this
+  // file has never seen. A green audit here means "no known value escaped",
+  // which is worth having and is not the same claim.
   ['Lovelace, Ada', 'member name (100234)'],
   ['22 Harbor Lane, Arlington', 'member address (100234)'],
   ['Turing, Alan', 'member name (100987)'],
