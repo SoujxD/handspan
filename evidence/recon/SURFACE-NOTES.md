@@ -207,7 +207,7 @@ memory, so a global fault setting would break someone else's demo.
 | `validation` | 400 | `TRANSACTION REJECTED` | "The transaction could not be completed as entered. Please review the field values and resubmit." | Return to previous screen | business |
 | `notfound` | 404 | `RECORD NOT FOUND` | "The requested member record could not be located on this host." | Return to Member Inquiry | business |
 | `permission` | 403 | `SUPERVISOR OVERRIDE REQUIRED` | "Operator profile teller1 is not authorized to perform this function. A supervisor must sign on to complete this request." | Return to previous screen | **escalate** |
-| `timeout` | 440 | `YOUR SESSION HAS TIMED OUT` | "NOT SIGNED ON" | — | recoverable (re-auth) |
+| `timeout` | 440 | `YOUR SESSION HAS TIMED OUT` | "NOT SIGNED ON" | — | **escalate** (see note) |
 | `maintenance` | 503 | `SCHEDULED MAINTENANCE IN PROGRESS` | "The host is temporarily unavailable while nightly batch posting completes. This window normally clears within a few moments." | **`Continue` button** | recoverable (dismiss) |
 | `server` | 500 | `APPLICATION ERROR` | "An unexpected error occurred while processing your request. Reference: ERR-406751F1" | Return to previous screen | hard |
 
@@ -226,6 +226,14 @@ Three things this table settles:
 1. **`maintenance` has a `Continue` button**, so the recoverable path is a
    `click` recovery — which the engine already verifies made progress before
    letting the step retry.
+   *Note on `timeout`:* this table originally read `recoverable (re-auth)`,
+   which was the intent before the engine was examined. There is no recovery
+   kind that can re-run the sign-on steps — `restartFromStep` is deliberately
+   unimplemented because restarting mid-flow can re-submit an already committed
+   step — so it is classified `escalate` in every artifact. A recovery that
+   discarded a half-filled form would be worse than stopping. ADAPTATION.md §5
+   carries the design for the `runSteps` recovery that would close it.
+
 2. **`timeout` actually destroys the session server-side.** It is not merely a
    rendered page: every subsequent request 302s to `/signon`. So recovery
    genuinely requires re-authentication, and the engine has no recovery kind

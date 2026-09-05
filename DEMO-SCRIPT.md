@@ -139,8 +139,11 @@ MSYS_NO_PATHCONV=1 npx tsx src/cli.ts replay \
   automation *cannot* act: `PlaywrightSurface.act()` asserts it before touching
   the page. It is an enforcement point, not a convention.
 
-Operator console: `http://localhost:4400`. Open the intervention, **Take control**,
-sign on as `super1` in that same browser, apply the hold, then **Hand back**.
+**Open the console URL the command prints, not `:4400` from memory.** Each
+process serves its own interventions, so when the catalog already holds 4400
+this run binds a fresh port and prints it — e.g. `http://localhost:54473`. Open
+the intervention there, **Take control**, sign on as `super1` in that same
+browser, apply the hold, then **Hand back**.
 
 **Rehearse this one before you travel** — it is the beat with a live browser, a
 second identity and a lease transfer in it:

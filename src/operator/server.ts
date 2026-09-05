@@ -136,30 +136,54 @@ export async function startOperatorConsole(port = Number(process.env['OPERATOR_P
   // from a previous command, which is the normal case during a demo — becomes
   // an unhandled 'error' event that takes down the whole replay. A run must
   // not die because an auxiliary console was already up.
-  const started = await new Promise<boolean>((resolve) => {
-    const srv = app.listen(port, () => {
-      boundPort = port;
-      resolve(true);
+  /**
+   * If the port is taken, move to an ephemeral one rather than pointing at
+   * somebody else's console.
+   *
+   * The previous behaviour was to assume the occupant was a console and reuse
+   * its URL. That is wrong in the one situation that matters, and the demo is
+   * exactly that situation: the catalog server is already running and holding
+   * :4400, then an escalating capability is replayed from a second terminal.
+   *
+   * Interventions live in a per-process broker, so reusing the URL points the
+   * human at a console backed by a *different* broker — one that has never
+   * heard of the intervention just raised. The run parks correctly, the
+   * terminal prints a link, and the page it opens is empty. Nothing errors.
+   * A dress rehearsal with the catalog up is the only thing that finds it.
+   *
+   * Binding a fresh port keeps the invariant that the URL a process prints
+   * serves that process's own interventions.
+   */
+  const listenOn = (p: number): Promise<boolean> =>
+    new Promise((resolve) => {
+      const srv = app.listen(p, () => {
+        boundPort = (srv.address() as { port: number }).port;
+        server = srv;
+        resolve(true);
+      });
+      srv.once('error', () => resolve(false));
     });
-    srv.once('error', (err: NodeJS.ErrnoException) => {
-      if (err.code === 'EADDRINUSE') {
-        // Something is already serving this port; assume it is a console and
-        // reuse it rather than fighting over the socket.
-        boundPort = port;
-        resolve(false);
-        return;
-      }
-      // eslint-disable-next-line no-console
-      console.warn(`  [operator] console unavailable: ${err.message}`);
-      resolve(false);
-    });
-    server = srv;
-  });
 
-  if (!started) server = null;
+  let started = await listenOn(port);
+  let moved = false;
+
+  if (!started) {
+    started = await listenOn(0);
+    moved = started;
+  }
+
+  if (!started) {
+    server = null;
+    // eslint-disable-next-line no-console
+    console.warn('  [operator] console unavailable — escalations will have no page to open.');
+    return operatorBaseUrl();
+  }
 
   // eslint-disable-next-line no-console
-  console.log(`  [operator] console at ${operatorBaseUrl()}${started ? '' : ' (already running)'}`);
+  console.log(
+    `  [operator] console at ${operatorBaseUrl()}` +
+      (moved ? `  (port ${port} was busy; this console serves THIS process's interventions)` : ''),
+  );
   return operatorBaseUrl();
 }
 

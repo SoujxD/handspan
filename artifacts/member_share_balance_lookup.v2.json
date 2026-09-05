@@ -407,8 +407,8 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 11,
-      "successes": 10
+      "runs": 12,
+      "successes": 11
     },
     "reviewedBy": "soujanya",
     "notes": "Reviewed against MERIDIAN CORE: targets are semantic, outcome classifications normalised by hand, checkpoints assert the caller's own values where the flow commits state."
@@ -418,7 +418,7 @@
     "model": "claude-opus-5",
     "effort": "high",
     "discoveryRunId": "disc-20260904-161707-5c5064",
-    "contentHash": "cc19ae9132fdd8745e6bdd03f87a3773",
+    "contentHash": "4c3012b0021f23ac6389ba418b7226d6",
     "generator": "handspan"
   }
 }
