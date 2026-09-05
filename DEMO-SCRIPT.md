@@ -113,6 +113,19 @@ MSYS_NO_PATHCONV=1 npx tsx src/cli.ts replay \
   -i memberNumber=100234 -i shareId=100234-S0001
 ```
 
+All four classes the brief names are declared and exercised against this host —
+business, **recoverable**, hard, escalate. The recoverable one is the maintenance
+interstitial, and it is verified rather than asserted:
+
+```bash
+npx tsx scripts/verify-interstitial.ts
+```
+
+Five checks: it signs on for real, provokes the 503, and proves the detector
+fires on the page the host actually serves, that the `Continue` control resolves
+deterministically, and that clicking it clears the state — which is the progress
+property the engine requires before it will let a step retry.
+
 Then show the taxonomy is grounded rather than guessed:
 
 ```bash
@@ -225,7 +238,7 @@ Everything above already happened and is on disk:
 
 ```bash
 npx tsx scripts/audit-evidence.ts     # PII audit across all persisted evidence
-npx vitest run                        # 128 tests
+npx vitest run                        # 136 tests
 ls evidence/                          # every discovery and replay run
 ```
 

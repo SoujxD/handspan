@@ -196,7 +196,7 @@ cp .env.example .env        # then add your key (see below)
 Everything except `discover` runs with **no API key and no network**:
 
 ```bash
-npm test                              # 128 tests — resolver, policy, redaction,
+npm test                              # 136 tests — resolver, policy, redaction,
                                       # schema invariants, control-transfer FSM
 npx tsx tests/smoke-perception.ts     # see exactly what the model would see
 npm run replay -- ...                 # deterministic replay: zero model calls
@@ -471,6 +471,8 @@ must not retry it forever.
 | `npx tsx src/cli.ts codegen -c <id>` | Emit a human-readable review document |
 | `npx tsx src/cli.ts declare-outcome` | Add a reviewer-authored outcome rule (recorded with `origin: reviewer`) |
 | `npx tsx src/cli.ts revise-description` | Correct a capability's description — the text a routing model reads |
+| `npx tsx src/cli.ts generalise-targets -c <id>` | Strip the recording session's own data out of element descriptors |
+| `npx tsx scripts/verify-interstitial.ts` | Prove the recoverable class against the live host: detect, resolve, dismiss |
 | `npx tsx src/cli.ts revise-input` | Correct an input's description or example |
 | `npx tsx src/cli.ts assert-checkpoint` | Add or replace a step's checkpoint |
 | `npx tsx src/cli.ts reclassify-outcome` | Move an outcome between business / recoverable / hard / escalate |
@@ -480,7 +482,7 @@ must not retry it forever.
 | `npx tsx scripts/verify-artifact.ts <id>` | Audit an artifact: structural invariants, no baked-in credentials or PII, no id-based matching, approval traceable to a reviewer |
 | `npx tsx scripts/verify-outcomes.ts <id>` | Replay each declared outcome and report which detectors actually fire |
 | `npx tsx scripts/audit-evidence.ts` | Fail if any seeded PII or credential survived into `/evidence` |
-| `npm test` / `npm run typecheck` | 128 tests / strict TypeScript |
+| `npm test` / `npm run typecheck` | 136 tests / strict TypeScript |
 | `npm run test:replay` / `npm run test:escalation` | Integration: 8 replay scenarios (0 model calls) and the full control-transfer cycle |
 
 ---

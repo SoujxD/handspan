@@ -50,6 +50,43 @@ for (const [label, value] of [['SSN', '412-88-7301'], ['email', 'dana.whitfield@
   add(`no recorded ${label} baked in`, !raw.includes(value), raw.includes(value) ? `FOUND ${value}` : 'absent');
 }
 
+/**
+ * PII from the recording session, checked STRUCTURALLY.
+ *
+ * The three literals above are the fixture app's seed values. Against any other
+ * target that check is vacuous — it passed every MERIDIAN capability while three
+ * of them carried `Member 102777 - Johnson, Katherine` in a match signal and in
+ * the prose that reaches the logs. A detector written from one application's
+ * data is exactly the failure this project already had once.
+ *
+ * The general rule needs no list: a descriptor must not quote an input's
+ * example value. An example is instance data by definition, so a field
+ * containing one is describing a single member rather than a control — a
+ * privacy problem and a reuse bug at the same time, since that container can
+ * never match anyone else's screen.
+ */
+const instanceValues = cap.inputs
+  .filter((p) => p.sensitivity !== 'secret' && p.example && String(p.example).length > 3)
+  .map((p) => ({ name: p.name, value: String(p.example) }));
+
+const quotingInstanceData: string[] = [];
+for (const step of cap.steps) {
+  const target = (step.act as { target?: Record<string, unknown> }).target;
+  if (!target) continue;
+  for (const field of ['container', 'name', 'label'] as const) {
+    const v = target[field];
+    if (typeof v !== 'string') continue;
+    for (const iv of instanceValues) {
+      if (v.includes(iv.value)) quotingInstanceData.push(`${step.id}.${field} quotes {${iv.name}}`);
+    }
+  }
+}
+add(
+  'no descriptor quotes the recording session data',
+  quotingInstanceData.length === 0,
+  quotingInstanceData.length ? quotingInstanceData.join('; ') : `checked ${instanceValues.length} input example(s)`,
+);
+
 // --- element ids are hints only --------------------------------------------
 let idsInMatchPosition = 0;
 let idsAsHints = 0;

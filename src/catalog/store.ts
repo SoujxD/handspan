@@ -455,3 +455,29 @@ export function countsTowardStability(result: ReplayResult): boolean {
 function approvalRank(cap: Capability): number {
   return cap.governance.approval === 'approved' ? 1 : 0;
 }
+
+/**
+ * Begin a new, unproven version of a capability.
+ *
+ * Every reviewer edit forks a version, and each one used to bump the number and
+ * reset approval while leaving `governance.stability` untouched — so the new
+ * version silently inherited the clean-run credit the *previous* one earned.
+ * That is not a cosmetic inaccuracy. `minStableRunsBeforeApproval` is the gate
+ * between "a model wrote this" and "this runs unattended against member
+ * accounts", and a version could clear it on thirty runs of a flow that no
+ * longer existed: add a step, inherit the evidence.
+ *
+ * A version's stability is a claim about that version. Editing it invalidates
+ * the claim, so the counter starts again at zero and the edit has to earn its
+ * own approval.
+ */
+export function startNewVersion(cap: Capability, note?: string): void {
+  cap.version += 1;
+  cap.governance.approval = 'draft';
+  cap.governance.stability = { runs: 0, successes: 0 };
+  if (note) cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}
+${note}` : note;
+  // Re-hash: this is a *tracked* edit. The hash exists to reveal untracked
+  // ones, and the version bump plus the approval reset are the audit trail.
+  cap.provenance.contentHash = hashCapability(cap);
+}

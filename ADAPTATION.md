@@ -27,6 +27,89 @@ cheaper too, which is the only test of "generic" that means anything.
 
 ---
 
+## The two-page version
+
+The brief asks for one to two pages. That is this section; everything after it
+is supporting detail for a reader who wants the working, and can be skipped.
+
+**What adapting took.** Configuration, not a rewrite: an origin and an
+enumerated path list in `policy.yaml`, a risk vocabulary for this vendor's
+button text, and an entry in `institutions.json`. The core changes were real but
+generic — parameter references in conditions and extractions (`{{shareId}}` in a
+`rowMatch`, so a checkpoint can assert the row *this caller* asked for), a
+redaction hook on observation rather than at twelve call sites, a checksum gate
+on card-number detection, a lock around the counter that gates approval, a
+timeout on a speculative `selectOption`, and recording the arguments a run was
+invoked with. Not one of them mentions MERIDIAN CORE. That is the claim I will
+defend — *N generic core edits, zero target-specific ones* — because generic
+edits amortise across every app onboarded and target-specific ones never do.
+
+The one genuine coupling the adaptation exposed: the CLI imported its list of
+institutions from the **fixture application's own module**, so an institution
+that was not part of the mock could not be named at all. That is now a data
+file, which is what makes onboarding a deployment a configuration change.
+
+**The API contract.** A capability is a typed, versioned, reviewable artifact,
+so projecting it into a function-calling tool definition is mechanical:
+`GET /capabilities` returns tools an agent drops straight into its `tools`
+array, scoped to the product this catalog fronts. `POST /capabilities/:id/invoke`
+takes typed args and returns a four-shape discriminated union —
+`success | outcome | escalated | failure` — mapped to HTTP 200 / 200 / 202 /
+4xx-5xx. A business outcome returns **200 deliberately**: "no such member" is an
+answer, and a caller that retries on non-2xx must not retry it forever. Secrets
+and the operator identity are refused from the request body and supplied from
+the server's environment, so the chatbot cannot hold a credential or ask to be a
+supervisor.
+
+**Driving the UI, and its exceptional states.** The model never sees a DOM and
+the artifact never stores a selector. Elements are perceived as a screen reader
+sees them — role, visible label, container, frame path — and replay resolves a
+*description* with a deterministic scorer that refuses to guess when two
+candidates tie. Before any capability was recorded, a recon pass provoked every
+exceptional state and read its wording off the page; the first time this system
+checked its detectors against remembered phrasing, **8 of 8 were dead**. All
+four classes the brief names are now declared and exercised against the live
+host: business outcomes (`member_not_found`, `insufficient_available_balance`,
+`source_share_on_hold`), **recoverable** (the maintenance interstitial, detected
+and dismissed via its `Continue` button — verified by
+`scripts/verify-interstitial.ts`), hard failures (`system_error`), and
+escalation (`supervisor_override_denied`).
+
+**How the guarantees survive the new surface.** There is exactly one
+`invokeCapability` path, used by the HTTP route and the chatbot alike, so the
+wrapper cannot become a way around the guardrails — the brief's specific
+warning. Policy classifies `Apply Hold` as irreversible and blocks it in every
+mode, so discovery physically could not record that click; rather than weaken
+the rule, the capability stages the request to the `CONFIRM ACCOUNT HOLD` screen
+and stops, handing a supervisor a filled-in form. Authorisation is not
+expressible by the model: `confirm` is removed from the schema it is given, and
+the token is minted from a human's click. The lease moves
+`automation → paused → operator` and `PlaywrightSurface.act()` refuses to touch
+the page while a human holds it — an enforcement point, not a convention.
+Regulated values are registered structurally from their *labels*, so a member's
+name is scrubbed from persisted evidence even on a screen the system has never
+seen before, while the caller that asked for it still gets it.
+
+**What I left out.** A re-authentication recovery (`runSteps`) — designed and
+argued in §6, not built, so a mid-flow session timeout escalates rather than
+recovers. A per-step fault hook, which would close the four detectors that stay
+unverified because `?inject=` can only ride a navigation. A `drift --all` fleet
+sweep — the form the drift question actually takes at 300 institutions. And,
+from the chatbot: memory, planning, and any ability to compose capabilities.
+
+**What I would want a reviewer to press on.** The core figure grew late and on
+purpose. Six defects only surfaced once the system was *measured* rather than
+demonstrated — the audit trail was redacting its own run ids, twenty concurrent
+runs recorded as one, every dropdown cost twenty seconds, a version inherited
+clean-run credit it never earned, `approve` stamped the wrong version, and three
+artifacts had a member's name baked into an element descriptor. Each is written
+up below with the evidence. I would rather show a system that found those than
+one that had never looked.
+
+---
+
+## Detail
+
 ## 1. What adapting actually took, and what had to change
 
 ### Where the diff went
@@ -254,13 +337,14 @@ automation *cannot* act — `PlaywrightSurface.act()` asserts it.
 
 ---
 
-## 5. Three defects that only appear when you measure
+## 5. Six defects that only appear when you measure, or re-read the brief
 
 Everything above was verified before the system was measured. Adding two
 ordinary instruments — a percentile instead of a mean, and more than one caller
-at a time — found three defects that every existing check had passed over. None
-produced a wrong answer; all three were invisible by construction, which is the
-point worth making about them.
+at a time — and then re-reading both briefs against the code rather than against
+memory of it, found six defects that every existing check had passed over. Not
+one produced a wrong answer; all six were invisible by construction, which is
+the point worth making about them.
 
 ### The audit trail was redacting its own correlation key
 
@@ -370,6 +454,91 @@ until it refills, and the report says so rather than quietly printing a number
 the current code would not produce.
 
 ---
+
+### The recoverable class was analysed and never declared
+
+§2.2 names three classes a replay must tell apart and gives "dismiss a known
+interstitial" as the example of the middle one. The recon pass had already
+provoked it, transcribed it verbatim, and written the conclusion down:
+
+> **`maintenance` has a `Continue` button**, so the recoverable path is a
+> `click` recovery — which the engine already verifies made progress before
+> letting the step retry.
+
+And then nothing declared it. Across all seven capabilities the classification
+counts read `business 11, hard 7, escalate 7, recoverable 0` — the analysis
+existed, the detector did not. A maintenance interstitial mid-flow would have
+been a checkpoint failure rather than a dismissal and retry.
+
+It is now declared on all seven, and verified against the live host rather than
+asserted. `scripts/verify-outcomes.ts` could not do it: every other outcome here
+is provoked by an *input*, and this one rides a navigation to a route the flow
+reaches by clicking — the same limitation that leaves four detectors unverified.
+So `scripts/verify-interstitial.ts` signs on for real, navigates to
+`?inject=maintenance`, and checks the three things that could be wrong, through
+the production code paths: the detector's text matches what the host actually
+serves (503), the recovery control resolves through the real resolver (score 50,
+runner-up 20), and clicking it clears the state — the progress property the
+engine requires before allowing a retry.
+
+### A member's name was baked into three artifacts, and the auditor said fine
+
+`scripts/verify-artifact.ts` advertises "no PII value from the recording session
+is baked in". It was checking three string literals — an SSN, an email and a
+balance — belonging to the **fixture application**. Against MERIDIAN CORE that
+check is vacuous, and it passed happily while three capabilities carried
+
+```
+"container": "Member 102777 - Johnson, Katherine"
+```
+
+as an element match signal, and quoted it again in the human-readable
+description that reaches the logs. Which is how a member's name got into a
+committed file, and into `/evidence` — the one thing the redaction layer exists
+to prevent. It slipped through because the redactor scrubs values the run
+*observed*, and this value belongs to whoever the flow was recorded against, not
+to whoever it is being run for.
+
+It is a correctness bug wearing a privacy bug's clothes. A container quoting one
+member's number can never match another member's screen, so on every invocation
+but the recording it is dead weight: resolution silently degrades to a lower
+score instead of matching. That degradation is what surfaced it — the log line
+that reports a degraded resolution prints the recorded descriptor.
+
+Three fixes, because one would not have been enough:
+
+- `compile()` now strips descriptors that quote an input's example value, so a
+  future recording cannot bake it in. The model proposes; the compiler disposes.
+- `generalise-targets` is the reviewed path for the artifacts recorded before
+  that, and it went through the ordinary version-and-approval cycle.
+- The artifact audit checks it **structurally** — a descriptor must not quote an
+  input's example — rather than against a list of one application's data. The
+  general rule needs no list, which is precisely why the old one was worthless
+  on a target it had never seen.
+
+*Residue, stated plainly:* superseded artifact versions in git still carry the
+panel title. Those values are the demo host's fixture names, which the brief
+states carry no real PII, and versions are immutable by design — rewriting them
+would destroy the provenance chain that makes the review trail worth having. The
+current version of every capability is clean, and the audit now fails loudly if
+that ever stops being true.
+
+### A new version inherited clean runs it never earned
+
+Approval is gated on `minStableRunsBeforeApproval` clean runs. Every reviewer
+edit forks a version and resets approval to draft — and left
+`governance.stability` untouched, so the fork inherited the previous version's
+record. A reviewer could add a step and clear a three-run gate on thirty runs of
+a flow that no longer existed. A version's stability is a claim about *that*
+version; editing it invalidates the claim, so `startNewVersion` now resets the
+counter and the edit has to earn its own approval.
+
+Found alongside it: `approve` called `store.load`, which deliberately prefers the
+newest *approved* version — so approving stamped the version that was already
+approved and reported success while the draft under review stayed a draft. Six
+capabilities were "approved" that way before the output was read carefully.
+Exactly the shape of the bug `loadForEdit` already exists to fix: running wants
+the reviewed version, editing wants the latest, and approving is an edit.
 
 ### Four completeness gaps found by re-reading the brief against the build
 

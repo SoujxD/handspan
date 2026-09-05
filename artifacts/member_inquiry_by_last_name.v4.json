@@ -1,0 +1,417 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "member_inquiry_by_last_name",
+  "version": 4,
+  "name": "Member Inquiry by Last Name",
+  "description": "Signs on to the Meridian Core servicing console with the supplied operator credentials, opens Member Inquiry / Selection, searches by Last Name, and returns the matched member's member number and share count from the results table. If no member matches, reports a no_member_match business outcome.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "recordedOnTenant": "meridian-demo",
+    "entryUrl": "{{baseUrl}}/signon"
+  },
+  "inputs": [
+    {
+      "name": "operatorId",
+      "type": "string",
+      "description": "Operator ID used to sign on to the console.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller1"
+    },
+    {
+      "name": "operatorPassword",
+      "type": "string",
+      "description": "Password for the operator ID.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "lastName",
+      "type": "string",
+      "description": "Member last name to search for.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "Hopper"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "memberNumber",
+      "type": "string",
+      "description": "Member number of the first matched member in the results table.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "(\\d+)\\s+[^\\n]+,\\s*[^\\n]+?\\s+\\d+\\s*Select",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "shares",
+      "type": "number",
+      "description": "Number of shares shown for the matched member.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "\\d+\\s+[^\\n]+,\\s*[^\\n]+?\\s+(\\d+)\\s*Select",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "memberName",
+      "type": "string",
+      "description": "Displayed member name (Last, First) of the matched row.",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "\\d+\\s+([A-Za-z'\\-]+,\\s*[A-Za-z'\\- ]+?)\\s+\\d+\\s*Select",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the operator ID in the Operator ID box on the sign-on screen.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Operator ID:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Operator ID:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "operatorId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the operator password in the Password box on the sign-on screen.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "operatorPassword"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign on to the servicing console as the operator.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign On\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/menu(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Signed on as J.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open the Member Inquiry / Selection screen.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Inquiry / Selection\" in the \"Signed on as J. TELLER (TELLER)\" panel",
+          "role": "link",
+          "name": "Member Inquiry / Selection",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Last Name",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Set the Search by dropdown to Last Name.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Search by:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Search by:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "literal",
+          "value": "Last Name"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Enter the member's last name in the Value box.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Value:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Value:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "lastName"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s07",
+      "intent": "Run the member search by last name.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "regexPresent",
+    "pattern": "Member No\\.\\s*Name\\s*Shares"
+  },
+  "outcomes": [
+    {
+      "code": "no_member_match",
+      "title": "No member records matched the search",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "No member records matched your search.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "signon_failed",
+      "title": "Operator sign-on rejected",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "Invalid operator|sign[- ]on failed|Invalid password"
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "session_timeout",
+      "title": "Session expired and operator must sign on again",
+      "classification": "escalate",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "session (has )?(expired|timed out)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Re-run the capability; if it recurs, check operator credentials and console session limits.",
+      "origin": "discovered"
+    },
+    {
+      "code": "maintenance_interstitial",
+      "title": "Scheduled maintenance interstitial",
+      "classification": "recoverable",
+      "detect": {
+        "kind": "textPresent",
+        "text": "SCHEDULED MAINTENANCE IN PROGRESS",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "recovery": {
+        "do": "click",
+        "target": {
+          "description": "button \"Continue\" clearing this state",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {}
+        }
+      },
+      "extract": [],
+      "origin": "reviewer",
+      "addedBy": "s.chavan"
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "meridian-demo",
+      "displayName": "MERIDIAN CORE demo host (interface.ai)",
+      "baseUrl": "https://web-sample.interface-hiring.com",
+      "productVersion": "4.2.1",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "sensitive",
+    "requiresConfirmation": false,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300",
+      "https://web-sample.interface-hiring.com"
+    ]
+  },
+  "governance": {
+    "approval": "approved",
+    "stability": {
+      "runs": 3,
+      "successes": 3
+    },
+    "reviewedBy": "s.chavan",
+    "notes": "Adds the maintenance interstitial as a recoverable outcome. Detector, resolution and dismissal verified against the live host by scripts/verify-interstitial.ts; three clean runs on this version."
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-04T17:05:30.777Z",
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-170412-f4e4f9",
+    "contentHash": "9c89f5b0d1e80b1cf76f25fa275b1420",
+    "generator": "handspan"
+  }
+}

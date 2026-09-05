@@ -1,0 +1,648 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "place_account_hold_request",
+  "version": 9,
+  "name": "Place Account Hold Request (to confirmation screen)",
+  "description": "Signs on to the Meridian Core servicing console with the deployment's operator credentials, looks up a member by member number, opens the Place Account Hold action, fills in share, reason code and notes, and submits to reach the CONFIRM ACCOUNT HOLD review screen (banner: IRREVERSIBLE ACTION). It stops there without applying the hold, and returns the reviewed member, share, reason and notes for human approval. Applying the hold is supervisor-only and is refused by policy in every mode, so a teller deployment escalates to a person at that point. Returns a business outcome if no member matches the number supplied.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "recordedOnTenant": "meridian-demo",
+    "entryUrl": "{{baseUrl}}/signon"
+  },
+  "inputs": [
+    {
+      "name": "operatorId",
+      "type": "string",
+      "description": "Operator ID used to sign on (must have supervisor rights for the hold function).",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller1"
+    },
+    {
+      "name": "operatorPassword",
+      "type": "string",
+      "description": "Password for the operator ID.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "memberNumber",
+      "type": "string",
+      "description": "Member number to place the hold on.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "100987"
+    },
+    {
+      "name": "shareId",
+      "type": "string",
+      "description": "Share id to place the hold on, as shown in the Share ID column of the member's shares grid.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "100987-S0001"
+    },
+    {
+      "name": "reasonCode",
+      "type": "enum",
+      "description": "Hold reason code, as shown in the Reason Code dropdown.",
+      "required": true,
+      "sensitivity": "internal",
+      "enumValues": [
+        "FRAUD - Suspected fraud",
+        "LEGAL - Legal / levy",
+        "DECEASED - Member deceased"
+      ],
+      "example": "FRAUD - Suspected fraud"
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "description": "Free-text justification notes for the hold (optional; blank shows as '(none)').",
+      "required": false,
+      "sensitivity": "internal",
+      "example": "suspected fraud - pending review"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "member",
+      "type": "string",
+      "description": "Member number and name shown on the confirmation screen.",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Member:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "share",
+      "type": "string",
+      "description": "Share the hold would apply to.",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Share:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "description": "Reason code being applied.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Reason:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "description": "Notes recorded on the request.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Notes:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the supervisor operator ID in the Operator ID box on the sign-on screen.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Operator ID:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Operator ID:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "operatorId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the operator password in the Password box.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "operatorPassword"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign on to the servicing console as the supervisor operator.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign On\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "textPresent",
+            "text": "MAIN MENU",
+            "caseSensitive": false
+          },
+          {
+            "kind": "textPresent",
+            "text": "Signed on as",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open Member Inquiry / Selection to look up the member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Inquiry / Selection\" in the \"Signed on as S. VISOR (SUPERVISOR)\" panel",
+          "role": "link",
+          "name": "Member Inquiry / Selection",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Signed on as S. VISOR (SUPERVISOR)",
+          "framePath": [],
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Last Name",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Enter the target member number in the Value box of Member Inquiry.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Value:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Value:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "memberNumber"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Search for the member record by member number.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s07",
+      "intent": "Select the matched member to open their record.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Select\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "link",
+          "name": "Select",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "href": "/members/100987",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s08",
+      "intent": "Open the Place Account Hold action for this member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Place Account Hold\" in the \"Update Member Information\" panel",
+          "role": "link",
+          "name": "Place Account Hold",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Update Member Information",
+          "framePath": [],
+          "hints": {
+            "href": "/members/100987/hold",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members/[^/]+/hold(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s09",
+      "intent": "Select the share to be placed on hold.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Share:\" in the \"RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED\" panel",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Share:",
+          "labelMatch": "normalized",
+          "container": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "shareId"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s10",
+      "intent": "Select the hold reason code.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Reason Code:\" in the \"RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED\" panel",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Reason Code:",
+          "labelMatch": "normalized",
+          "container": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "reasonCode"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s11",
+      "intent": "Enter the justification notes for the hold request.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Notes:\" in the \"RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Notes:",
+          "labelMatch": "normalized",
+          "container": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "notes"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s12",
+      "intent": "Submit the hold request details to reach the Confirm Account Hold review screen.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Continue\" in the \"RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED\" panel",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members/[^/]+/hold/review(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "IRREVERSIBLE ACTION",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "textPresent",
+    "text": "IRREVERSIBLE ACTION",
+    "caseSensitive": false
+  },
+  "outcomes": [
+    {
+      "code": "hold_applied_unexpectedly",
+      "title": "Hold was committed instead of stopping at review",
+      "classification": "escalate",
+      "detect": {
+        "kind": "textPresent",
+        "text": "HOLD APPLIED",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "The capability must stop at the CONFIRM ACCOUNT HOLD screen; if a hold was actually applied, review the member's shares and the audit log immediately.",
+      "origin": "discovered"
+    },
+    {
+      "code": "supervisor_override_denied",
+      "title": "Operator lacks supervisor rights for the hold function",
+      "classification": "escalate",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(not authorized|Not authorised|insufficient (privileges|authority)|supervisor override (denied|required to continue))"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Open this intervention, take control of the live session, then sign on as a supervisor (super1) in that same browser and complete the hold using the details shown above. Hand control back when done. Do not re-run the capability with a different operator id: which operator this deployment acts as is bound to the deployment, not to the request.",
+      "origin": "discovered"
+    },
+    {
+      "code": "signon_failed",
+      "title": "Operator sign-on rejected",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(invalid operator|invalid password|sign[- ]on failed)"
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "maintenance_interstitial",
+      "title": "Scheduled maintenance interstitial",
+      "classification": "recoverable",
+      "detect": {
+        "kind": "textPresent",
+        "text": "SCHEDULED MAINTENANCE IN PROGRESS",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "recovery": {
+        "do": "click",
+        "target": {
+          "description": "button \"Continue\" clearing this state",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {}
+        }
+      },
+      "extract": [],
+      "origin": "reviewer",
+      "addedBy": "s.chavan"
+    },
+    {
+      "code": "member_not_found",
+      "title": "No member matched the member number",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "No member records matched your search.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "reviewer",
+      "addedBy": "s.chavan"
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "meridian-demo",
+      "displayName": "MERIDIAN CORE demo host (interface.ai)",
+      "baseUrl": "https://web-sample.interface-hiring.com",
+      "productVersion": "4.2.1",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "sensitive",
+    "requiresConfirmation": false,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300",
+      "https://web-sample.interface-hiring.com"
+    ]
+  },
+  "governance": {
+    "approval": "draft",
+    "stability": {
+      "runs": 1,
+      "successes": 1
+    },
+    "notes": "[reviewer] signon_failed: hard -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] input shareId: Recorded example carried the dropdown's descriptive suffix rather than the share id a caller has.\n[reviewer] checkpoint on s03: The recorded checkpoint asserted 'Signed on as S.' because this capability was discovered while signed on as a supervisor. That checks WHO signed on rather than THAT anyone did, and it made the artifact unusable by any other operator - which is the whole point of the escalation path, where a teller attempts the action and is refused. Replaced with an assertion of what the step actually guarantees.\n[reviewer] supervisor_override_denied: escalate -> escalate. The recorded guidance said to re-run with a supervisor operator id. That stopped being possible when operator identity became a deployment property rather than a request parameter - and it is the first thing an on-call human reads. Replaced with what someone can actually do: take the parked session and finish it by hand.\n[reviewer] description: Said 'as a supervisor operator', which is wrong and misleading in two ways: operatorId is bound to the deployment so the caller cannot choose an identity, and this deployment is a teller - which is exactly what makes the escalation structural rather than arranged. This is the tool description a routing model reads.\n[reviewer] input operatorId: Example said super1, implying the caller picks the identity. operatorId is bound to the deployment via HANDSPAN_BOUND_INPUTS and is stripped from the schema the chatbot sees, so the example must show what this deployment actually acts as."
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-04T17:03:50.415Z",
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-170119-511808",
+    "contentHash": "940e7cd829684949d9b5a185631297a1",
+    "generator": "handspan"
+  }
+}

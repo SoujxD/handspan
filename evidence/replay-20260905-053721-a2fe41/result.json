@@ -1,0 +1,457 @@
+{
+  "status": "success",
+  "meta": {
+    "runId": "replay-20260905-053721-a2fe41",
+    "capabilityId": "member_funds_transfer_between_shares",
+    "capabilityVersion": 6,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-05T05:37:22.379Z",
+    "finishedAt": "2026-09-05T05:37:33.402Z",
+    "durationMs": 11023,
+    "stepsAttempted": 14,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-20260905-053721-a2fe41",
+    "llmCalls": 0,
+    "inputs": {
+      "operatorId": {
+        "value": "teller1",
+        "sensitivity": "internal",
+        "redacted": false
+      },
+      "operatorPassword": {
+        "value": null,
+        "sensitivity": "secret",
+        "redacted": true
+      },
+      "memberNumber": {
+        "value": "[REDACTED:SECRET]",
+        "sensitivity": "pii",
+        "redacted": true
+      },
+      "fromShareOption": {
+        "value": "[REDACTED:SECRET]-S0001-14",
+        "sensitivity": "pii",
+        "redacted": true
+      },
+      "toShareOption": {
+        "value": "[REDACTED:SECRET]-S0001-19",
+        "sensitivity": "pii",
+        "redacted": true
+      },
+      "amount": {
+        "value": "1.00",
+        "sensitivity": "internal",
+        "redacted": false
+      },
+      "memo": {
+        "value": "generalised",
+        "sensitivity": "internal",
+        "redacted": false
+      }
+    }
+  },
+  "outputs": {
+    "confirmationNumber": {
+      "value": "CN480281",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "postedAt": {
+      "value": "09/05/2026 05:35:48",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "amountPosted": {
+      "value": 1,
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "sourceNewBalance": {
+      "value": 83,
+      "sensitivity": "pii",
+      "redacted": true
+    },
+    "destinationNewBalance": {
+      "value": 85,
+      "sensitivity": "pii",
+      "redacted": true
+    }
+  },
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator ID in the Operator Sign On panel.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:22.528Z",
+      "durationMs": 495,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Operator ID:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator [REDACTED:SECRET] in the Operator Sign On panel.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-05T05:37:23.024Z",
+      "durationMs": 458,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Password:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign on to the servicing console as the operator.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:23.486Z",
+      "durationMs": 1096,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "button",
+          "label": "Sign On",
+          "name": "Sign On",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Inquiry / Selection screen to look up the member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:24.583Z",
+      "durationMs": 1114,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 31,
+        "observed": {
+          "role": "link",
+          "label": "Member Inquiry / Selection",
+          "name": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)"
+        }
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the member number to service in the Member Inquiry search Value box.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:25.698Z",
+      "durationMs": 464,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "textbox",
+          "label": "Value:",
+          "name": "",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Search for the member record by member number.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:26.163Z",
+      "durationMs": 1113,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": 20,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "button",
+          "label": "Search",
+          "name": "Search",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Select the matched member record to open the member detail screen.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:27.277Z",
+      "durationMs": 1183,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 22,
+        "observed": {
+          "role": "link",
+          "label": "Select",
+          "name": "Select",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s08",
+      "intent": "Open the Funds Transfer screen for this member.",
+      "action": "click",
+      "risk": "confirmable",
+      "startedAt": "2026-09-05T05:37:28.460Z",
+      "durationMs": 1153,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 148,
+        "observed": {
+          "role": "link",
+          "label": "Funds Transfer",
+          "name": "Funds Transfer",
+          "container": "ACTIONS"
+        }
+      }
+    },
+    {
+      "stepId": "s09",
+      "intent": "Choose the source share to debit in the From Share dropdown.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:29.614Z",
+      "durationMs": 321,
+      "status": "ok",
+      "resolution": {
+        "score": 70,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "label"
+        ],
+        "missedSignals": [],
+        "candidateCount": 19,
+        "observed": {
+          "role": "combobox",
+          "label": "From Share:",
+          "name": "",
+          "container": "Member [REDACTED:SECRET] - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s10",
+      "intent": "Choose the destination share to credit in the To Share dropdown.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:29.936Z",
+      "durationMs": 288,
+      "status": "ok",
+      "resolution": {
+        "score": 70,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "label"
+        ],
+        "missedSignals": [],
+        "candidateCount": 19,
+        "observed": {
+          "role": "combobox",
+          "label": "To Share:",
+          "name": "",
+          "container": "Member [REDACTED:SECRET] - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s11",
+      "intent": "Enter the dollar amount to move between the member's shares.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:30.225Z",
+      "durationMs": 403,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 19,
+        "observed": {
+          "role": "textbox",
+          "label": "Amount:",
+          "name": "",
+          "container": "Member [REDACTED:SECRET] - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s12",
+      "intent": "Record the memo describing the reason for the transfer.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:30.628Z",
+      "durationMs": 479,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 19,
+        "observed": {
+          "role": "textbox",
+          "label": "Memo:",
+          "name": "",
+          "container": "Member [REDACTED:SECRET] - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s13",
+      "intent": "Submit the transfer details to reach the review/confirmation screen.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:37:31.108Z",
+      "durationMs": 1052,
+      "status": "ok",
+      "resolution": {
+        "score": 65,
+        "runnerUpScore": 20,
+        "matchedSignals": [
+          "role",
+          "name",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 19,
+        "observed": {
+          "role": "button",
+          "label": "Continue",
+          "name": "Continue",
+          "container": "Member [REDACTED:SECRET] - [REDACTED:SECRET]"
+        }
+      }
+    },
+    {
+      "stepId": "s14",
+      "intent": "Post the transfer between the member's own shares as authorised.",
+      "action": "click",
+      "risk": "confirmable",
+      "startedAt": "2026-09-05T05:37:32.161Z",
+      "durationMs": 1092,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 21,
+        "observed": {
+          "role": "button",
+          "label": "Post Transfer",
+          "name": "Post Transfer",
+          "container": "CONFIRM FUNDS TRANSFER"
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-20260905-053721-a2fe41/run.jsonl",
+      "capturedAt": "2026-09-05T05:37:21.199Z"
+    }
+  ]
+}

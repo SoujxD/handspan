@@ -1,0 +1,450 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "member_share_balance_lookup",
+  "version": 3,
+  "name": "Member Share Balance / Status Lookup",
+  "description": "Signs on to the Meridian Core servicing console with the supplied operator credentials, searches Member Inquiry by member number, opens the member record, and reads one named share's Balance, Status and Type from the SHARES / BALANCES grid. Read-only: performs no transfer, hold, share opening or member maintenance. Returns shareBalance (money), shareStatus (e.g. OPEN or \"HOLD [HOLD]\") and shareType (e.g. Regular Shares, Share Draft (Checking), Money Market, Certificate). If the member number does not exist the run reports the business outcome member_not_found instead of values.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "recordedOnTenant": "meridian-demo",
+    "entryUrl": "{{baseUrl}}/signon"
+  },
+  "inputs": [
+    {
+      "name": "operatorId",
+      "type": "string",
+      "description": "Operator sign-on id for the servicing console (e.g. a teller id).",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller1"
+    },
+    {
+      "name": "operatorPassword",
+      "type": "string",
+      "description": "Password for the operator id. Never logged or shown.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "memberNumber",
+      "type": "string",
+      "description": "Member number to look up in the Member Inquiry Value box, with Search by set to Member Number.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "100234"
+    },
+    {
+      "name": "shareId",
+      "type": "string",
+      "description": "Full share identifier exactly as it appears in the Share ID column of the SHARES / BALANCES grid. Must be the whole id — share ids share prefixes (100234-S0001 vs 100234-S0001-5).",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "100234-S0001"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "shareBalance",
+      "type": "money",
+      "description": "Current balance of the requested share, from the Balance column of its row in the SHARES / BALANCES grid.",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "fromTableCell",
+        "rowMatch": "{{shareId}}",
+        "columnLabel": "Balance",
+        "matchMode": "contains",
+        "framePath": []
+      },
+      "transform": "stripCurrency",
+      "required": true
+    },
+    {
+      "name": "shareStatus",
+      "type": "string",
+      "description": "Status of the requested share, from the Status column of its row. Observed values: \"OPEN\" and \"HOLD [HOLD]\".",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromTableCell",
+        "rowMatch": "{{shareId}}",
+        "columnLabel": "Status",
+        "matchMode": "contains",
+        "framePath": []
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "shareType",
+      "type": "string",
+      "description": "Share type of the requested share, from the Type column of its row (Regular Shares, Share Draft (Checking), Money Market, Certificate).",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromTableCell",
+        "rowMatch": "{{shareId}}",
+        "columnLabel": "Type",
+        "matchMode": "contains",
+        "framePath": []
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "memberName",
+      "type": "string",
+      "description": "Name shown on the MEMBER RECORD header, useful to confirm the right member was opened.",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Name:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the operator ID in the Operator ID box on the sign-on screen.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Operator ID:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Operator ID:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "operatorId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the operator password in the Password box on the sign-on screen.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "operatorPassword"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign on to the servicing console with the supplied operator credentials.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign On\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/menu(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Signed on as J.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open the Member Inquiry / Selection screen to look up the member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Inquiry / Selection\" in the \"Signed on as J. TELLER (TELLER)\" panel",
+          "role": "link",
+          "name": "Member Inquiry / Selection",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Last Name",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Enter the member number to look up in the Value box of the Member Inquiry panel.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Value:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Value:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "memberNumber"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Search for the member by member number.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s07",
+      "intent": "Open the matched member's record from the search results.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Select\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "link",
+          "name": "Select",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "href": "/members/100234",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "textPresent",
+    "text": "SHARES / BALANCES",
+    "caseSensitive": false
+  },
+  "outcomes": [
+    {
+      "code": "member_not_found",
+      "title": "No member matched the member number",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "No member records matched your search.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "invalid_operator_credentials",
+      "title": "Sign-on rejected",
+      "classification": "hard",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Invalid operator ID or password.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "settings_area_off_limits",
+      "title": "System Settings area refused to automation",
+      "classification": "escalate",
+      "detect": {
+        "kind": "textPresent",
+        "text": "This area is off-limits to automation",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Inferred/observed from the automation policy refusal on /settings (the System Settings error-injection page). The capability must never follow the System Settings link; if error injection is suspected, a human must inspect it.",
+      "origin": "discovered"
+    },
+    {
+      "code": "maintenance_interstitial",
+      "title": "Scheduled maintenance interstitial",
+      "classification": "recoverable",
+      "detect": {
+        "kind": "textPresent",
+        "text": "SCHEDULED MAINTENANCE IN PROGRESS",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "recovery": {
+        "do": "click",
+        "target": {
+          "description": "button \"Continue\" clearing this state",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {}
+        }
+      },
+      "extract": [],
+      "origin": "reviewer",
+      "addedBy": "s.chavan"
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "meridian-demo",
+      "displayName": "MERIDIAN CORE demo host (interface.ai)",
+      "baseUrl": "https://web-sample.interface-hiring.com",
+      "productVersion": "4.2.1",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "sensitive",
+    "requiresConfirmation": false,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300",
+      "https://web-sample.interface-hiring.com"
+    ]
+  },
+  "governance": {
+    "approval": "approved",
+    "stability": {
+      "runs": 7,
+      "successes": 7
+    },
+    "reviewedBy": "s.chavan",
+    "notes": "Adds the maintenance interstitial as a recoverable outcome. Detector, resolution and dismissal verified against the live host by scripts/verify-interstitial.ts; three clean runs on this version."
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-04T16:19:27.358Z",
+    "model": "claude-opus-5",
+    "effort": "high",
+    "discoveryRunId": "disc-20260904-161707-5c5064",
+    "contentHash": "bed6a74230c7d142f5a61817ec039897",
+    "generator": "handspan"
+  }
+}

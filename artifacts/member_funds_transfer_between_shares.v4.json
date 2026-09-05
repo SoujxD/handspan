@@ -700,18 +700,18 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 15,
-      "successes": 15
+      "runs": 18,
+      "successes": 18
     },
-    "reviewedBy": "soujanya",
-    "notes": "Both share inputs now documented as share ids, matching what a caller actually has."
+    "reviewedBy": "s.chavan",
+    "notes": ""
   },
   "provenance": {
     "discoveredAt": "2026-09-04T16:36:28.407Z",
     "model": "claude-opus-5",
     "effort": "high",
     "discoveryRunId": "disc-20260904-163212-68eb6c",
-    "contentHash": "1e5de7c6a795fdf283395b2c130c2201",
+    "contentHash": "4bf1a265c25752878c58af71b67d4efd",
     "generator": "handspan"
   }
 }

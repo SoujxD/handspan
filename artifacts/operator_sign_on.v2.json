@@ -312,18 +312,18 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 8,
-      "successes": 8
+      "runs": 11,
+      "successes": 11
     },
-    "reviewedBy": "soujanya",
-    "notes": "Reclassified session timeout to escalate; recovery dropped as it no longer applies."
+    "reviewedBy": "s.chavan",
+    "notes": ""
   },
   "provenance": {
     "discoveredAt": "2026-09-04T17:12:03.576Z",
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-171041-ef7a07",
-    "contentHash": "bd6a5ab6894686d58d934e3ab70de3b5",
+    "contentHash": "e4828abde6ebc9a593d5ab0b72f4cb3f",
     "generator": "handspan"
   }
 }

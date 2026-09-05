@@ -613,18 +613,18 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 8,
-      "successes": 8
+      "runs": 11,
+      "successes": 11
     },
-    "reviewedBy": "soujanya",
-    "notes": "request_not_validated reclassified to business after live verification showed it shadows invalid_initial_deposit."
+    "reviewedBy": "s.chavan",
+    "notes": ""
   },
   "provenance": {
     "discoveredAt": "2026-09-04T17:07:58.772Z",
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-170543-481467",
-    "contentHash": "fb3a54a52780dfd71b887b2e756573f6",
+    "contentHash": "e9f6e5f25e32db78732f7bf55b27ab11",
     "generator": "handspan"
   }
 }

@@ -1,0 +1,743 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "member_funds_transfer_between_shares",
+  "version": 5,
+  "name": "Member Funds Transfer Between Own Shares",
+  "description": "Signs on to the Meridian Core servicing console as an operator, looks up a member by member number, opens Funds Transfer for that member, and posts a transfer of a given amount from one of the member's shares to another of the member's own shares. Returns the confirmation number, posted timestamp, amount posted and the new balances of the source and destination shares. Reports legitimate non-posting outcomes such as member not found, source share on hold, insufficient balance, invalid amount, or same source and destination share.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "recordedOnTenant": "meridian-demo",
+    "entryUrl": "{{baseUrl}}/signon"
+  },
+  "inputs": [
+    {
+      "name": "operatorId",
+      "type": "string",
+      "description": "Operator ID used to sign on to the console.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller1"
+    },
+    {
+      "name": "operatorPassword",
+      "type": "string",
+      "description": "Password for the operator sign-on.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "memberNumber",
+      "type": "string",
+      "description": "Member number to search for in the Member Inquiry / Selection screen.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "100234"
+    },
+    {
+      "name": "fromShareOption",
+      "type": "string",
+      "description": "Share id to debit, exactly as it appears in the Share ID column of the member's SHARES / BALANCES grid (for example 100234-S0001-6). Not the dropdown text: the visible option label embeds a balance that changes between runs. Must be a share whose status is OPEN; a HOLD share cannot be debited.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "100234-S0001-6"
+    },
+    {
+      "name": "toShareOption",
+      "type": "string",
+      "description": "Share id to credit, exactly as it appears in the Share ID column of the member's SHARES / BALANCES grid (for example 100234-MMKT-11). Not the dropdown text: the visible option label embeds a balance that changes between runs.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "100234-MMKT-11"
+    },
+    {
+      "name": "amount",
+      "type": "money",
+      "description": "Dollar amount to transfer, as a plain figure such as 25.00 (no currency symbol).",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "25.00"
+    },
+    {
+      "name": "memo",
+      "type": "string",
+      "description": "Memo text recorded with the transfer.",
+      "required": false,
+      "sensitivity": "internal",
+      "example": "Member requested share to share transfer"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "confirmationNumber",
+      "type": "string",
+      "description": "Confirmation number issued for the posted transfer.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Confirmation:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "postedAt",
+      "type": "string",
+      "description": "Date and time the transfer posted.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Posted:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "amountPosted",
+      "type": "money",
+      "description": "Amount actually posted, as shown on the Transfer Posted screen.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Amount:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "stripCurrency",
+      "required": true
+    },
+    {
+      "name": "sourceNewBalance",
+      "type": "money",
+      "description": "New balance of the source share after posting (first '(new balance)' line).",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "\\$([0-9,]+\\.[0-9]{2}) \\(new balance\\)",
+        "group": 1
+      },
+      "transform": "stripCurrency",
+      "required": true
+    },
+    {
+      "name": "destinationNewBalance",
+      "type": "money",
+      "description": "New balance of the destination share after posting (second '(new balance)' line).",
+      "sensitivity": "pii",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "\\(new balance\\)[\\s\\S]*?\\$([0-9,]+\\.[0-9]{2}) \\(new balance\\)",
+        "group": 1
+      },
+      "transform": "stripCurrency",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the operator ID in the Operator Sign On panel.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Operator ID:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Operator ID:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "operatorId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the operator password in the Operator Sign On panel.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "operatorPassword"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign on to the servicing console as the operator.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign On\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/menu(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Signed on as J.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open the Member Inquiry / Selection screen to look up the member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Inquiry / Selection\" in the \"Signed on as J. TELLER (TELLER)\" panel",
+          "role": "link",
+          "name": "Member Inquiry / Selection",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Last Name",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Enter the member number to service in the Member Inquiry search Value box.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Value:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Value:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "memberNumber"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Search for the member record by member number.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s07",
+      "intent": "Select the matched member record to open the member detail screen.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Select\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "link",
+          "name": "Select",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "href": "/members/100234",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s08",
+      "intent": "Open the Funds Transfer screen for this member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Funds Transfer\" in the \"ACTIONS\" panel",
+          "role": "link",
+          "name": "Funds Transfer",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "ACTIONS",
+          "framePath": [],
+          "hints": {
+            "href": "/members/100234/transfer",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "confirmable",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+/transfer(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s09",
+      "intent": "Choose the source share to debit in the From Share dropdown.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"From Share:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "From Share:",
+          "labelMatch": "normalized",
+          "container": "Member 100234 - Lovelace, Ada",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "fromShareOption"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s10",
+      "intent": "Choose the destination share to credit in the To Share dropdown.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"To Share:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "To Share:",
+          "labelMatch": "normalized",
+          "container": "Member 100234 - Lovelace, Ada",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "toShareOption"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s11",
+      "intent": "Enter the dollar amount to move between the member's shares.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Amount:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Amount:",
+          "labelMatch": "normalized",
+          "container": "Member 100234 - Lovelace, Ada",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "amount"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s12",
+      "intent": "Record the memo describing the reason for the transfer.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Memo:\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Memo:",
+          "labelMatch": "normalized",
+          "container": "Member 100234 - Lovelace, Ada",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "memo"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s13",
+      "intent": "Submit the transfer details to reach the review/confirmation screen.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Continue\" in the \"Member 100234 - Lovelace, Ada\" panel",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Member 100234 - Lovelace, Ada",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members/[^/]+/transfer/review(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "{{fromShareOption}}",
+            "caseSensitive": false
+          },
+          {
+            "kind": "textPresent",
+            "text": "{{toShareOption}}",
+            "caseSensitive": false
+          },
+          {
+            "kind": "textPresent",
+            "text": "{{amount}}",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s14",
+      "intent": "Post the transfer between the member's own shares as authorised.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Post Transfer\" in the \"CONFIRM FUNDS TRANSFER\" panel",
+          "role": "button",
+          "name": "Post Transfer",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "CONFIRM FUNDS TRANSFER",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "confirmable",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members/[^/]+/transfer/post(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "TRANSACTION COMPLETE",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "textPresent",
+    "text": "TRANSACTION COMPLETE",
+    "caseSensitive": false
+  },
+  "outcomes": [
+    {
+      "code": "insufficient_available_balance",
+      "title": "Source share does not have enough available balance",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Insufficient available balance in the source share.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "source_share_on_hold",
+      "title": "Source share is on HOLD and cannot be debited",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Source share is HOLD and cannot be debited.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "invalid_amount",
+      "title": "Amount is missing or not a valid dollar figure",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Amount must be a valid dollar figure",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "same_source_and_destination",
+      "title": "Source and destination shares are the same",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Source and destination shares must differ.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "invalid_operator_credentials",
+      "title": "Operator sign-on rejected",
+      "classification": "hard",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Invalid operator ID or password.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "maintenance_interstitial",
+      "title": "Scheduled maintenance interstitial",
+      "classification": "recoverable",
+      "detect": {
+        "kind": "textPresent",
+        "text": "SCHEDULED MAINTENANCE IN PROGRESS",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "recovery": {
+        "do": "click",
+        "target": {
+          "description": "button \"Continue\" clearing this state",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {}
+        }
+      },
+      "extract": [],
+      "origin": "reviewer",
+      "addedBy": "s.chavan"
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "meridian-demo",
+      "displayName": "MERIDIAN CORE demo host (interface.ai)",
+      "baseUrl": "https://web-sample.interface-hiring.com",
+      "productVersion": "4.2.1",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "confirmable",
+    "requiresConfirmation": true,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300",
+      "https://web-sample.interface-hiring.com"
+    ]
+  },
+  "governance": {
+    "approval": "approved",
+    "stability": {
+      "runs": 3,
+      "successes": 3
+    },
+    "reviewedBy": "s.chavan",
+    "notes": "Adds the maintenance interstitial as a recoverable outcome. Detector, resolution and dismissal verified against the live host by scripts/verify-interstitial.ts; three clean runs on this version."
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-04T16:36:28.407Z",
+    "model": "claude-opus-5",
+    "effort": "high",
+    "discoveryRunId": "disc-20260904-163212-68eb6c",
+    "contentHash": "4e002fd9176646e6751ad45b6a866505",
+    "generator": "handspan"
+  }
+}

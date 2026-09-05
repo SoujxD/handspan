@@ -1,0 +1,246 @@
+{
+  "status": "success",
+  "meta": {
+    "runId": "replay-20260905-052443-d84565",
+    "capabilityId": "member_inquiry_by_last_name",
+    "capabilityVersion": 4,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-05T05:24:44.325Z",
+    "finishedAt": "2026-09-05T05:24:50.648Z",
+    "durationMs": 6323,
+    "stepsAttempted": 7,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-20260905-052443-d84565",
+    "llmCalls": 0,
+    "inputs": {
+      "operatorId": {
+        "value": "teller1",
+        "sensitivity": "internal",
+        "redacted": false
+      },
+      "operatorPassword": {
+        "value": null,
+        "sensitivity": "secret",
+        "redacted": true
+      },
+      "lastName": {
+        "value": "[REDACTED:SECRET]",
+        "sensitivity": "pii",
+        "redacted": true
+      }
+    }
+  },
+  "outputs": {
+    "memberNumber": {
+      "value": "101555",
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "shares": {
+      "value": 8,
+      "sensitivity": "internal",
+      "redacted": false
+    },
+    "memberName": {
+      "value": "[REDACTED:SECRET], Grace",
+      "sensitivity": "pii",
+      "redacted": true
+    }
+  },
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator ID in the Operator ID box on the sign-on screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:24:44.501Z",
+      "durationMs": 549,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Operator ID:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator [REDACTED:SECRET] in the Password box on the sign-on screen.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-05T05:24:45.051Z",
+      "durationMs": 464,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Password:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign on to the servicing console as the operator.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:24:45.521Z",
+      "durationMs": 1094,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "button",
+          "label": "Sign On",
+          "name": "Sign On",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open the Member Inquiry / Selection screen.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:24:46.616Z",
+      "durationMs": 1101,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 31,
+        "observed": {
+          "role": "link",
+          "label": "Member Inquiry / Selection",
+          "name": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)"
+        }
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Set the Search by dropdown to Last Name.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:24:47.718Z",
+      "durationMs": 1313,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "combobox",
+          "label": "Search by:",
+          "name": "",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Enter the member's last name in the Value box.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:24:49.032Z",
+      "durationMs": 423,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "textbox",
+          "label": "Value:",
+          "name": "",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Run the member search by last name.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-05T05:24:49.456Z",
+      "durationMs": 1050,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": 20,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "button",
+          "label": "Search",
+          "name": "Search",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-20260905-052443-d84565/run.jsonl",
+      "capturedAt": "2026-09-05T05:24:43.145Z"
+    }
+  ]
+}

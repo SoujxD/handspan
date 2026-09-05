@@ -30,8 +30,8 @@ import { EvidenceRecorder } from './evidence/recorder.js';
 import { SessionLease } from './control/lease.js';
 import { PlaywrightSurface } from './surface/web/playwright-surface.js';
 import { runDiscovery } from './agent/loop.js';
-import { compile, detemplatize, hashCapability } from './agent/compiler.js';
-import { CapabilityStore, toToolDefinition } from './catalog/store.js';
+import { compile, detemplatize, generaliseTargets, hashCapability } from './agent/compiler.js';
+import { CapabilityStore, startNewVersion, toToolDefinition } from './catalog/store.js';
 import type { Capability } from './types/artifact.js';
 import { replay } from './replay/engine.js';
 import { analyzeRun, renderReport, type DriftReport } from './replay/drift.js';
@@ -678,12 +678,7 @@ program
     if (existing >= 0) cap.tenants[existing] = { ...cap.tenants[existing]!, ...binding };
     else cap.tenants.push(binding);
 
-    cap.version += 1;
-    cap.governance.approval = 'draft'; // a new binding is a new thing to review
-    // Re-hash: this is a *tracked* edit. The hash exists to reveal untracked
-    // ones, and the version bump plus the approval reset are the audit trail.
-    // Leaving it stale would cry wolf on every subsequent load.
-    cap.provenance.contentHash = hashCapability(cap);
+    startNewVersion(cap);
     const path = store.save(cap);
     console.log(`  Bound ${cap.id} to ${tenantId} -> ${path} (now v${cap.version}, approval reset to draft)`);
     console.log(`  Label overrides: ${JSON.stringify(overrides)}`);
@@ -791,9 +786,7 @@ program
     }
 
     cap.outcomes.push(rule);
-    cap.version += 1;
-    cap.governance.approval = 'draft';
-    cap.provenance.contentHash = hashCapability(cap);
+    startNewVersion(cap);
     store.save(cap);
 
     console.log(
@@ -898,9 +891,7 @@ program
     const note = `[reviewer] checkpoint on ${stepId}: ${String(o['why'])}`;
     cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}
 ${note}` : note;
-    cap.version += 1;
-    cap.governance.approval = 'draft';
-    cap.provenance.contentHash = hashCapability(cap);
+    startNewVersion(cap);
     store.save(cap);
 
     console.log(
@@ -982,9 +973,7 @@ program
     const note = `[reviewer] ${code}: ${from} -> ${to}. ${String(o['why'])}`;
     cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}
 ${note}` : note;
-    cap.version += 1;
-    cap.governance.approval = 'draft';
-    cap.provenance.contentHash = hashCapability(cap);
+    startNewVersion(cap);
     store.save(cap);
 
     if (droppedRecovery) {
@@ -1044,9 +1033,7 @@ program
     const note = `[reviewer] input ${name}: ${String(o['why'])}`;
     cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}
 ${note}` : note;
-    cap.version += 1;
-    cap.governance.approval = 'draft';
-    cap.provenance.contentHash = hashCapability(cap);
+    startNewVersion(cap);
     store.save(cap);
 
     console.log(`  ${cap.id}: revised input "${name}".`);
@@ -1082,15 +1069,57 @@ program
     cap.description = next;
     const note = `[reviewer] description: ${String(o['why'])}`;
     cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}\n${note}` : note;
-    cap.version += 1;
-    cap.governance.approval = 'draft';
-    cap.provenance.contentHash = hashCapability(cap);
+    startNewVersion(cap);
     store.save(cap);
 
     console.log(`  ${cap.id}: description revised.`);
     console.log(`    was: ${before.slice(0, 100)}...`);
     console.log(`    now: ${next.slice(0, 100)}...`);
     console.log(`  Now v${cap.version}, approval reset to draft.`);
+  });
+
+program
+  .command('generalise-targets')
+  .description("Remove the recording session's own instance data from a capability's element descriptors.")
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .requiredOption('-r, --reviewer <name>', 'Who is making the change.')
+  .option('--dry-run', 'Report what would change and write nothing.', false)
+  .action((o: Record<string, unknown>) => {
+    /**
+     * A descriptor that quotes an input's example value describes one instance
+     * rather than a control. On this target that is the member panel title —
+     * `Member 102777 - Johnson, Katherine` — which lands in the artifact as a
+     * match signal and in the logs as prose, so a member's name comes to rest
+     * in a committed file. `compile` now strips it at record time; this is the
+     * reviewed path for the artifacts recorded before it did.
+     */
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.loadForEdit(String(o['capability']));
+    const changes = generaliseTargets(cap);
+
+    if (!changes.length) {
+      console.log(`  ${cap.id} v${cap.version}: no descriptor quotes the recording session's data.`);
+      return;
+    }
+
+    for (const c of changes) {
+      console.log(`  ${c.stepId} ${c.field}`);
+      console.log(`    was: ${c.before.slice(0, 90)}`);
+      console.log(`    now: ${c.after.slice(0, 90)}`);
+    }
+
+    if (o['dryRun']) {
+      console.log(`\n  Dry run: ${changes.length} field(s) would change. Nothing written.`);
+      return;
+    }
+
+    const containers = changes.filter((c) => c.field === 'container').length;
+    startNewVersion(
+      cap,
+      `[reviewer] generalised ${containers} target container(s) that quoted the recording member, by ${String(o['reviewer'])}`,
+    );
+    store.save(cap);
+    console.log(`\n  ${cap.id}: ${changes.length} field(s) generalised. Now v${cap.version}, approval reset to draft.`);
   });
 
 program
@@ -1107,7 +1136,19 @@ program
   )
   .action((o: Record<string, unknown>) => {
     const store = new CapabilityStore(PATHS.artifacts);
-    const cap = store.load(String(o['capability']), o['capabilityVersion'] as number | undefined);
+    /**
+     * Approving reviews the NEWEST version, not the one already approved.
+     *
+     * `store.load` deliberately prefers the newest *approved* version, because
+     * that is what should run — and applying that rule to an approval made the
+     * command a no-op that reported success. Six capabilities were "approved"
+     * here, each stamping a review note onto the previous version while the
+     * draft under review stayed draft. Same shape as the reviewer-edit bug
+     * `loadForEdit` exists to fix: running wants the reviewed version, editing
+     * wants the latest, and approving is an edit.
+     */
+    const pinned = o['capabilityVersion'] as number | undefined;
+    const cap = pinned ? store.load(String(o['capability']), pinned) : store.loadForEdit(String(o['capability']));
     const policy = loadPolicy();
 
     /**

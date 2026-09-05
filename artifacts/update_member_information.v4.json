@@ -1,0 +1,605 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "update_member_information",
+  "version": 4,
+  "name": "Update Member Contact Information",
+  "description": "Signs on to the Meridian Core servicing console as an operator, looks up a member by member number, opens the Update Member Information action, sets the e-mail, phone and mailing address, and saves. Returns the confirmation that the member's contact information was updated (with timestamp). Reports \"no member records matched\" and e-mail format validation as business outcomes.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "recordedOnTenant": "meridian-demo",
+    "entryUrl": "{{baseUrl}}/signon"
+  },
+  "inputs": [
+    {
+      "name": "operatorId",
+      "type": "string",
+      "description": "Operator ID used to sign on to the console.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller1"
+    },
+    {
+      "name": "operatorPassword",
+      "type": "string",
+      "description": "Password for the operator ID.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "memberNumber",
+      "type": "string",
+      "description": "Member number to service.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "102777"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "description": "New e-mail address for the member; must be a valid e-mail format.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "member102777@example.com"
+    },
+    {
+      "name": "phone",
+      "type": "string",
+      "description": "New phone number for the member.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "555-0102"
+    },
+    {
+      "name": "mailingAddress",
+      "type": "string",
+      "description": "New mailing address for the member.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "12 Example St, Springfield"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "confirmationMessage",
+      "type": "string",
+      "description": "The confirmation sentence including the effective date/time of the update.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "(Member\\s+\\d+\\s+contact information has been updated as of [^.]+)",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "string",
+      "description": "Date and time the update was recorded.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "regexOnPageText",
+        "pattern": "has been updated as of ([0-9/]+ [0-9:]+)",
+        "group": 1
+      },
+      "transform": "trim",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the operator ID in the sign-on panel.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Operator ID:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Operator ID:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "operatorId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the operator password.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "operatorPassword"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign on to the servicing console.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign On\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/menu(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Signed on as J.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open Member Inquiry / Selection to look up the member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Inquiry / Selection\" in the \"Signed on as J. TELLER (TELLER)\" panel",
+          "role": "link",
+          "name": "Member Inquiry / Selection",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Last Name",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Enter the member number to service.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Value:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Value:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "memberNumber"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Search for the member record.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s07",
+      "intent": "Select the member record to open the member detail screen.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Select\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "link",
+          "name": "Select",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "href": "/members/102777",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s08",
+      "intent": "Open the Update Member Information action for this member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Update Member Information\" in the \"Open New Share\" panel",
+          "role": "link",
+          "name": "Update Member Information",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Open New Share",
+          "framePath": [],
+          "hints": {
+            "href": "/members/102777/update",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+/update(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s09",
+      "intent": "Set the member's e-mail address.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"E-mail:\" in the \"Member 102777 - Johnson, Katherine\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "E-mail:",
+          "labelMatch": "normalized",
+          "container": "Member 102777 - Johnson, Katherine",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "email"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s10",
+      "intent": "Set the member's phone number.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Phone:\" in the \"Member 102777 - Johnson, Katherine\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Phone:",
+          "labelMatch": "normalized",
+          "container": "Member 102777 - Johnson, Katherine",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "phone"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s11",
+      "intent": "Set the member's mailing address.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Mailing Address:\" in the \"Member 102777 - Johnson, Katherine\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Mailing Address:",
+          "labelMatch": "normalized",
+          "container": "Member 102777 - Johnson, Katherine",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "mailingAddress"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s12",
+      "intent": "Save the updated member contact information.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Save Changes\" in the \"Member 102777 - Johnson, Katherine\" panel",
+          "role": "button",
+          "name": "Save Changes",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Member 102777 - Johnson, Katherine",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "confirmable",
+      "checkpoint": {
+        "kind": "textPresent",
+        "text": "CHANGES SAVED",
+        "caseSensitive": false
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "textPresent",
+    "text": "contact information has been updated as of",
+    "caseSensitive": false
+  },
+  "outcomes": [
+    {
+      "code": "invalid_email_format",
+      "title": "E-mail address rejected by validation",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "E-mail address is not in a valid format.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "validation_errors",
+      "title": "Form validation prevented the save",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Please correct the following:",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "signon_failed",
+      "title": "Operator sign-on rejected",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(invalid operator|sign[- ]?on failed|incorrect password)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Verify the operator ID/password and branch for this institution, then re-run.",
+      "origin": "discovered"
+    },
+    {
+      "code": "session_timed_out",
+      "title": "Operator session expired",
+      "classification": "escalate",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(session (has )?(expired|timed out)|please sign on again)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Sign on again in the parked session, reopen the member record, then hand control back.",
+      "origin": "discovered"
+    },
+    {
+      "code": "system_error",
+      "title": "Core system error while saving",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(system (error|unavailable)|core (is )?unavailable|unable to process your request)"
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "maintenance_interstitial",
+      "title": "Scheduled maintenance interstitial",
+      "classification": "recoverable",
+      "detect": {
+        "kind": "textPresent",
+        "text": "SCHEDULED MAINTENANCE IN PROGRESS",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "recovery": {
+        "do": "click",
+        "target": {
+          "description": "button \"Continue\" clearing this state",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {}
+        }
+      },
+      "extract": [],
+      "origin": "reviewer",
+      "addedBy": "s.chavan"
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "meridian-demo",
+      "displayName": "MERIDIAN CORE demo host (interface.ai)",
+      "baseUrl": "https://web-sample.interface-hiring.com",
+      "productVersion": "4.2.1",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "confirmable",
+    "requiresConfirmation": true,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300",
+      "https://web-sample.interface-hiring.com"
+    ]
+  },
+  "governance": {
+    "approval": "approved",
+    "stability": {
+      "runs": 3,
+      "successes": 3
+    },
+    "reviewedBy": "s.chavan",
+    "notes": "Adds the maintenance interstitial as a recoverable outcome. Detector, resolution and dismissal verified against the live host by scripts/verify-interstitial.ts; three clean runs on this version."
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-04T17:10:02.353Z",
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-170820-bbab38",
+    "contentHash": "a4373249b9f6f06b2a27ca14ab95050b",
+    "generator": "handspan"
+  }
+}

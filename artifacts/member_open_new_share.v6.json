@@ -1,0 +1,652 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "member_open_new_share",
+  "version": 6,
+  "name": "Open New Share for Member",
+  "description": "Signs on to the Meridian Core servicing console as an operator, looks up a member by member number, runs the Open New Share action for a chosen share type and initial deposit, confirms on the CONFIRM NEW SHARE review screen and commits. Returns the confirmation number, new share ID, share type description and opening balance. This writes data: it creates a real new share account on the member record.",
+  "surface": {
+    "kind": "legacy_web",
+    "product": "cornerstone-meridian-core",
+    "productVersion": "4.2.1",
+    "recordedOnTenant": "meridian-demo",
+    "entryUrl": "{{baseUrl}}/signon"
+  },
+  "inputs": [
+    {
+      "name": "operatorId",
+      "type": "string",
+      "description": "Operator ID used to sign on to the console.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "teller1"
+    },
+    {
+      "name": "operatorPassword",
+      "type": "string",
+      "description": "Password for the operator ID.",
+      "required": true,
+      "sensitivity": "secret"
+    },
+    {
+      "name": "memberNumber",
+      "type": "string",
+      "description": "Member number to service.",
+      "required": true,
+      "sensitivity": "pii",
+      "example": "102777"
+    },
+    {
+      "name": "shareType",
+      "type": "enum",
+      "description": "Visible option text of the share type to open in the Share Type dropdown.",
+      "required": true,
+      "sensitivity": "public",
+      "enumValues": [
+        "S0001 - Regular Shares",
+        "S0070 - Share Draft (Checking)",
+        "MMKT - Money Market",
+        "CERT - Certificate"
+      ],
+      "example": "MMKT - Money Market"
+    },
+    {
+      "name": "initialDeposit",
+      "type": "money",
+      "description": "Initial deposit amount in dollars, e.g. 5.00. Must be a valid dollar figure.",
+      "required": true,
+      "sensitivity": "internal",
+      "example": "5.00"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "confirmationNumber",
+      "type": "string",
+      "description": "Confirmation number for the share opening.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Confirmation:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "newShareId",
+      "type": "string",
+      "description": "Identifier of the newly created share.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "New Share ID:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "shareTypeDescription",
+      "type": "string",
+      "description": "Description of the opened share type.",
+      "sensitivity": "public",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Type:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "trim",
+      "required": true
+    },
+    {
+      "name": "openingBalance",
+      "type": "money",
+      "description": "Opening balance of the new share.",
+      "sensitivity": "internal",
+      "extraction": {
+        "via": "fromLabelledCell",
+        "label": "Opening Balance:",
+        "labelMatch": "normalized",
+        "framePath": [],
+        "direction": "right"
+      },
+      "transform": "stripCurrency",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "intent": "Enter the operator ID in the Operator ID box on the sign-on screen.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Operator ID:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Operator ID:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "operatorId"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s02",
+      "intent": "Enter the operator password in the Password box.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Password:\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Password:",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "password",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "operatorPassword"
+        },
+        "clearFirst": true
+      },
+      "risk": "sensitive",
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s03",
+      "intent": "Sign on to the servicing console.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Sign On\" in the \"OPERATOR SIGN ON\" panel",
+          "role": "button",
+          "name": "Sign On",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "OPERATOR SIGN ON",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/menu(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Signed on as J.",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s04",
+      "intent": "Open Member Inquiry / Selection to look up the member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Member Inquiry / Selection\" in the \"Signed on as J. TELLER (TELLER)\" panel",
+          "role": "link",
+          "name": "Member Inquiry / Selection",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Signed on as J. TELLER (TELLER)",
+          "framePath": [],
+          "hints": {
+            "href": "/members",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "Last Name",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s05",
+      "intent": "Enter the member number to service in the Value box of Member Inquiry.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Value:\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Value:",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "secret",
+          "ref": "memberNumber"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s06",
+      "intent": "Search for the member record.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Search\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "button",
+          "name": "Search",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s07",
+      "intent": "Select the matched member to open their record.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Select\" in the \"MEMBER INQUIRY / SELECTION\" panel",
+          "role": "link",
+          "name": "Select",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "MEMBER INQUIRY / SELECTION",
+          "framePath": [],
+          "hints": {
+            "href": "/members/102777",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s08",
+      "intent": "Start the Open New Share action for this member.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "link \"Open New Share\" in the \"Funds Transfer\" panel",
+          "role": "link",
+          "name": "Open New Share",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "Funds Transfer",
+          "framePath": [],
+          "hints": {
+            "href": "/members/102777/open-share",
+            "tag": "a"
+          }
+        }
+      },
+      "risk": "confirmable",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members/[^/]+/open-share(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "CERT - Certificate",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s09",
+      "intent": "Choose the share type to open in the Share Type dropdown.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Share Type:\"",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Share Type:",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "shareType"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s10",
+      "intent": "Choose the share type to open in the Share Type dropdown.",
+      "act": {
+        "action": "select",
+        "target": {
+          "description": "combobox labelled \"Share Type:\"",
+          "role": "combobox",
+          "nameMatch": "normalized",
+          "label": "Share Type:",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {
+            "tag": "select"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "shareType"
+        }
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s11",
+      "intent": "Enter the initial deposit amount for the new share.",
+      "act": {
+        "action": "type",
+        "target": {
+          "description": "textbox labelled \"Initial Deposit:\"",
+          "role": "textbox",
+          "nameMatch": "normalized",
+          "label": "Initial Deposit:",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {
+            "inputType": "text",
+            "tag": "input"
+          }
+        },
+        "value": {
+          "from": "param",
+          "name": "initialDeposit"
+        },
+        "clearFirst": true
+      },
+      "risk": "safe",
+      "retry": {
+        "attempts": 2,
+        "backoffMs": 500
+      }
+    },
+    {
+      "id": "s12",
+      "intent": "Continue to the confirmation review screen for the new share.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Continue\"",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "safe",
+      "checkpoint": {
+        "kind": "urlMatches",
+        "pattern": "/members/[^/]+/open-share/review(?:[?#].*)?$"
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    },
+    {
+      "id": "s13",
+      "intent": "Commit the new share by clicking Open Share.",
+      "act": {
+        "action": "click",
+        "target": {
+          "description": "button \"Open Share\" in the \"CONFIRM NEW SHARE\" panel",
+          "role": "button",
+          "name": "Open Share",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "container": "CONFIRM NEW SHARE",
+          "framePath": [],
+          "hints": {
+            "inputType": "submit",
+            "tag": "input"
+          }
+        }
+      },
+      "risk": "confirmable",
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "urlMatches",
+            "pattern": "/members/[^/]+/open-share/post(?:[?#].*)?$"
+          },
+          {
+            "kind": "textPresent",
+            "text": "NEW SHARE ESTABLISHED",
+            "caseSensitive": false
+          }
+        ]
+      },
+      "retry": {
+        "attempts": 1,
+        "backoffMs": 750
+      }
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "textPresent",
+    "text": "NEW SHARE ESTABLISHED",
+    "caseSensitive": false
+  },
+  "outcomes": [
+    {
+      "code": "invalid_initial_deposit",
+      "title": "Initial deposit rejected as not a valid dollar figure",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "Initial deposit must be a valid dollar figure.",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "request_not_validated",
+      "title": "Open New Share request failed validation",
+      "classification": "business",
+      "detect": {
+        "kind": "textPresent",
+        "text": "The request could not be validated",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "extract": [],
+      "origin": "discovered"
+    },
+    {
+      "code": "signon_failed",
+      "title": "Operator sign-on rejected",
+      "classification": "hard",
+      "detect": {
+        "kind": "regexPresent",
+        "pattern": "(Invalid operator|sign[- ]on failed|Invalid credentials)"
+      },
+      "scope": "global",
+      "extract": [],
+      "operatorGuidance": "Verify the operator ID/password and branch, then re-run.",
+      "origin": "discovered"
+    },
+    {
+      "code": "maintenance_interstitial",
+      "title": "Scheduled maintenance interstitial",
+      "classification": "recoverable",
+      "detect": {
+        "kind": "textPresent",
+        "text": "SCHEDULED MAINTENANCE IN PROGRESS",
+        "caseSensitive": false
+      },
+      "scope": "global",
+      "recovery": {
+        "do": "click",
+        "target": {
+          "description": "button \"Continue\" clearing this state",
+          "role": "button",
+          "name": "Continue",
+          "nameMatch": "normalized",
+          "labelMatch": "normalized",
+          "framePath": [],
+          "hints": {}
+        }
+      },
+      "extract": [],
+      "origin": "reviewer",
+      "addedBy": "s.chavan"
+    }
+  ],
+  "tenants": [
+    {
+      "tenantId": "meridian-demo",
+      "displayName": "MERIDIAN CORE demo host (interface.ai)",
+      "baseUrl": "https://web-sample.interface-hiring.com",
+      "productVersion": "4.2.1",
+      "labelOverrides": {},
+      "additionalOutcomes": [],
+      "overrides": {},
+      "verification": {
+        "lastResult": "unverified"
+      }
+    }
+  ],
+  "policy": {
+    "maxRisk": "confirmable",
+    "requiresConfirmation": true,
+    "allowedOrigins": [
+      "http://localhost:4300",
+      "http://127.0.0.1:4300",
+      "https://web-sample.interface-hiring.com"
+    ]
+  },
+  "governance": {
+    "approval": "approved",
+    "stability": {
+      "runs": 3,
+      "successes": 3
+    },
+    "reviewedBy": "s.chavan",
+    "notes": "Generalised element descriptors that quoted the recording member; the container was both PII in a committed file and a signal that could never match another member. Three clean runs on this version."
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-04T17:07:58.772Z",
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "discoveryRunId": "disc-20260904-170543-481467",
+    "contentHash": "02a7f770b423cbfe43eebca830acb8f1",
+    "generator": "handspan"
+  }
+}

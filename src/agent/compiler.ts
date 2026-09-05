@@ -168,6 +168,25 @@ export function compile(trace: DiscoveryTrace, opts: CompileOptions): Capability
     },
   };
 
+  /**
+   * Take the recording session's instance data back out of the descriptors
+   * before anything is hashed or written.
+   *
+   * The model faithfully records the panel it acted in, and on a servicing
+   * screen that panel is titled with the member being serviced. Left alone it
+   * becomes a match signal that only ever matches that one member, and a name
+   * in a committed file. Doing it here rather than asking the model not to is
+   * the same principle as the rest of the compiler: the model proposes and the
+   * compiler disposes.
+   */
+  const generalised = generaliseTargets(capability);
+  if (generalised.length) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `  Generalised ${generalised.length} descriptor field(s) that quoted the recording session's own data.`,
+    );
+  }
+
   capability.provenance.contentHash = hashCapability(capability);
   return parseCapability(capability);
 }
@@ -848,4 +867,71 @@ function escapeRe(s: string): string {
 function slugParam(s: string): string {
   const base = s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'value';
   return base.replace(/^(\d)/, 'p$1');
+}
+
+/**
+ * Strip instance data out of element descriptors.
+ *
+ * The model records what it saw, and on a member-servicing screen what it saw
+ * includes the panel title: `Member 102777 - Johnson, Katherine`. That string
+ * reached the artifact as a `container` match signal and, embedded in the
+ * human-readable `description`, reached the logs — so a member's name came to
+ * rest in a committed file and in `/evidence`, which is the one thing the
+ * redaction layer exists to prevent. It slipped through because the redactor
+ * scrubs values the run *observed*, and this value belongs to whoever the flow
+ * was recorded against, not to whoever it is being run for.
+ *
+ * It is also a correctness bug wearing a privacy bug's clothes. A container
+ * carrying one member's number can never match another member's screen, so the
+ * signal is dead weight for every invocation except the recording — resolution
+ * quietly degrades to a lower score instead of matching, on every run, forever.
+ *
+ * The test is deliberately mechanical: a descriptor field must not contain the
+ * example value of an input. An input's example is by definition instance data,
+ * so anything quoting it is describing one instance rather than the control.
+ * Secrets are skipped because they carry no example, and short values are
+ * skipped because a two-character example matches half the page.
+ */
+export function generaliseTargets(cap: Capability): Array<{
+  stepId: string;
+  field: string;
+  before: string;
+  after: string;
+}> {
+  const instanceValues = cap.inputs
+    .filter((p) => p.sensitivity !== 'secret' && p.example && String(p.example).length > 3)
+    .map((p) => ({ name: p.name, value: String(p.example) }));
+  if (!instanceValues.length) return [];
+
+  const changes: Array<{ stepId: string; field: string; before: string; after: string }> = [];
+
+  for (const step of cap.steps) {
+    const act = step.act as { target?: { container?: string; description?: string } };
+    const target = act.target;
+    if (!target) continue;
+
+    const container = target.container;
+    if (!container || !instanceValues.some((v) => container.includes(v.value))) continue;
+
+    // Drop the container outright rather than templating it. A template would
+    // need substitution at resolve time, and even then only the member number
+    // is knowable — the name beside it is not an input at all.
+    changes.push({ stepId: step.id, field: 'container', before: container, after: '(removed)' });
+    delete target.container;
+
+    if (target.description?.includes(container)) {
+      const before = target.description;
+      // The description is prose built around the container clause; take the
+      // clause out rather than rebuilding the sentence from scratch.
+      const quoted = container.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const after = before
+        .replace(new RegExp(`\\s*in the ["']?${quoted}["']?(\\s*panel)?`, 'i'), '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      target.description = after;
+      changes.push({ stepId: step.id, field: 'description', before, after });
+    }
+  }
+
+  return changes;
 }
