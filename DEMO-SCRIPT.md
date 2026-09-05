@@ -15,9 +15,12 @@ Open `http://localhost:4500`. Three tabs: **Catalog**, **Runs**, **Chat**, plus
 the **Adaptation ledger**. Leave Runs open on a second screen if you have one —
 every beat below appears there as it happens.
 
-> Windows note: run these from Git Bash with `MSYS_NO_PATHCONV=1` set, or it
-> rewrites `/signon` into a Windows path. The allowlist catches it, which is
-> reassuring but not what you want live.
+> Windows note: none of the commands below pass a leading-slash argument, so
+> Git Bash has nothing to rewrite. Each institution declares its own entry path
+> in `institutions.json`. If you do hand-type one (`--entry /signon`), prefix
+> the command with `MSYS_NO_PATHCONV=1` or Git Bash turns it into a filesystem
+> path — the allowlist catches that, which is reassuring in a test and a stumble
+> on stage.
 
 ---
 

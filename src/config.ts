@@ -107,6 +107,16 @@ export interface Institution {
   displayName: string;
   /** Absolute URL, or a path resolved against the local fixture app. */
   baseUrl: string;
+  /**
+   * Where a recording starts on this deployment.
+   *
+   * Declared rather than typed on the command line. It is a property of the
+   * target — MERIDIAN CORE signs on at /signon, the fixture at /login — and
+   * passing it by hand is a live-demo hazard on Windows, where Git Bash
+   * rewrites a leading-slash argument into a filesystem path. The allowlist
+   * catches that, which is reassuring in a test and a stumble on stage.
+   */
+  entryPath?: string;
   product: string;
   productVersion: string;
   /** One true sentence about what this deployment is, for the model's
@@ -146,6 +156,7 @@ export function loadInstitutions(): Record<string, Institution> {
       product: v.product,
       productVersion: v.productVersion,
       ...(v.environmentNote ? { environmentNote: v.environmentNote } : {}),
+      ...(v.entryPath ? { entryPath: v.entryPath } : {}),
       ...(v.probes ? { probes: v.probes } : {}),
     };
   }

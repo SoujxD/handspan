@@ -22,6 +22,7 @@
   "northstar": {
     "displayName": "Northstar Community Credit Union",
     "baseUrl": "/t/northstar",
+    "entryPath": "/login",
     "environmentNote": "A mock back-office servicing console that ships with this project and runs on localhost. Every record in it is synthetic and every sign-in credential is a fixture created for this exercise.",
     "product": "meridian-core",
     "productVersion": "8.4"
@@ -30,6 +31,7 @@
   "lakeshore": {
     "displayName": "Lakeshore Federal Credit Union",
     "baseUrl": "/t/lakeshore",
+    "entryPath": "/login",
     "environmentNote": "A mock back-office servicing console that ships with this project and runs on localhost. Every record in it is synthetic and every sign-in credential is a fixture created for this exercise.",
     "product": "meridian-core",
     "productVersion": "8.6"
@@ -38,6 +40,7 @@
   "meridian-demo": {
     "displayName": "MERIDIAN CORE demo host (interface.ai)",
     "baseUrl": "https://web-sample.interface-hiring.com",
+    "entryPath": "/signon",
     "product": "cornerstone-meridian-core",
     "productVersion": "4.2.1",
     "environmentNote": "A credit-union member-servicing console hosted by interface.ai at web-sample.interface-hiring.com as the sanctioned target for this exercise. Every member record in it is seeded demo data and the operator logins are published demo credentials that the brief invites candidates to use freely.",

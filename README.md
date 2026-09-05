@@ -81,8 +81,8 @@ path real rather than arranged.
 ### Recording and replaying against the live target
 
 ```bash
-# Record (needs a model). Windows: prefix with MSYS_NO_PATHCONV=1
-npx tsx src/cli.ts discover --tenant meridian-demo --entry "/signon" --headless   --goal "Sign on as operator teller1 ..."
+# Record (needs a model). The entry path comes from institutions.json.
+npx tsx src/cli.ts discover --tenant meridian-demo --headless   --goal "Sign on as the operator, open member 100234 and ..."
 
 # Replay (never touches a model)
 npx tsx src/cli.ts replay -c member_share_balance_lookup -t meridian-demo --headless   -i memberNumber=100234 -i shareId=100234-S0001

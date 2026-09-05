@@ -1,0 +1,18 @@
+{
+  "goal": "probe",
+  "entryUrl": "https://web-sample.interface-hiring.com/signon",
+  "tenantId": "meridian-demo",
+  "actions": [],
+  "notes": [],
+  "entryState": {
+    "url": "https://web-sample.interface-hiring.com/signon",
+    "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nOPERATOR SIGN ON\nOperator ID:\nPassword:\n[REDACTED:SECRET]\nMAIN-001 - Main Office\nWEST-014 - Westside\nEAST-022 - Eastgate\nDemo operators: teller1 / password · super1 / password (supervisor)\nNOT SIGNED ON | 09/05/2026 01:53:45\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel"
+  },
+  "stoppedBecause": "model_refusal",
+  "llmCalls": 1,
+  "usage": {
+    "inputTokens": 1022,
+    "outputTokens": 0,
+    "cacheReadTokens": 0
+  }
+}

@@ -63,7 +63,11 @@ program
   .description('Run an LLM-driven discovery session and compile the result into a capability artifact.')
   .requiredOption('-g, --goal <text>', 'Natural-language goal.')
   .option('-t, --tenant <id>', 'Institution to record against.', 'northstar')
-  .option('-e, --entry <path>', 'Entry path relative to the tenant base URL.', '/login')
+  .option(
+    '-e, --entry <path>',
+    "Entry path relative to the institution's base URL. Defaults to the entryPath " +
+      'declared in institutions.json.',
+  )
   .option('--headless', 'Run without a visible browser window.', false)
   .action(async (o: { goal: string; tenant: string; entry: string; headless: boolean }) => {
     requireAnthropicKey();
@@ -83,7 +87,7 @@ program
       process.exit(2);
     }
     const baseUrl = tenant.baseUrl;
-    const entryUrl = `${baseUrl}${o.entry}`;
+    const entryUrl = `${baseUrl}${o.entry ?? tenant.entryPath ?? '/login'}`;
 
     banner('DISCOVERY', [
       ['goal', o.goal],
