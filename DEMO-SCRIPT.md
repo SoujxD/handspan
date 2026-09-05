@@ -139,7 +139,19 @@ MSYS_NO_PATHCONV=1 npx tsx src/cli.ts replay \
   automation *cannot* act: `PlaywrightSurface.act()` asserts it before touching
   the page. It is an enforcement point, not a convention.
 
-Operator console: `http://localhost:4400`.
+Operator console: `http://localhost:4400`. Open the intervention, **Take control**,
+sign on as `super1` in that same browser, apply the hold, then **Hand back**.
+
+**Rehearse this one before you travel** — it is the beat with a live browser, a
+second identity and a lease transfer in it:
+
+```bash
+npx tsx scripts/rehearse-escalation.ts
+```
+
+It drives the whole cycle through the console's own HTTP endpoints and asserts
+the load-bearing part: that while a human holds the session, the automation
+*cannot* act. Nine checks, all against the live target.
 
 Ask it through the **chatbot** too — it is refused before anything starts,
 because an unattended invocation of a `draft` capability is not permitted. Two

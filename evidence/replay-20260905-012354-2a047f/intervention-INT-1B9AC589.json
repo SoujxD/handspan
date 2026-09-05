@@ -1,0 +1,22 @@
+{
+  "runId": "replay-[REDACTED:PAN]-2a047f",
+  "capabilityId": "place_account_hold_request",
+  "capabilityName": "Place Account Hold Request (to confirmation screen)",
+  "tenantId": "meridian-demo",
+  "goal": "Signs on to Meridian Core as a supervisor operator, looks up a member by member number, opens the Place Account Hold action, fills in share, reason code and notes, and submits to reach the CONFIRM ACCOUNT HOLD review screen (banner: IRREVERSIBLE ACTION). It stops there without applying the hold, and returns the reviewed member, share, reason and notes for human approval. Returns a business outcome if no member matches the number supplied.",
+  "trigger": "declared_outcome",
+  "reason": "Operator lacks supervisor rights for the hold function — supervisor_override_denied",
+  "guidance": "Wording inferred, not observed. Re-run with a supervisor operator ID such as super1.",
+  "atStepId": "s12",
+  "stepIntent": "Submit the hold request details to reach the Confirm Account Hold review screen.",
+  "currentUrl": "https://web-sample.interface-hiring.com/members/[REDACTED:SECRET]/hold/review",
+  "screenshotPath": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-2a047f/001-escalation-s12.png",
+  "snapshotPath": "D:/project/interface-assessment/evidence/replay-[REDACTED:PAN]-2a047f/002-escalation-s12.a11y.json",
+  "id": "INT-1B9AC589",
+  "createdAt": "2026-09-05T01:24:46.456Z",
+  "status": "resolved",
+  "humanActions": [],
+  "operatorId": "supervisor@rehearsal",
+  "resolutionNote": "rehearsal: supervisor reviewed, hold not applied",
+  "closedAt": "2026-09-05T01:24:46.977Z"
+}

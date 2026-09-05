@@ -95,6 +95,9 @@ npx tsx src/cli.ts replay -c place_account_hold_request -t meridian-demo   -i me
 # Which of a member's shares can actually be debited right now
 npx tsx scripts/open-shares.ts 100234
 
+# Rehearse the escalation: park, hand a human the live session, hand back
+npx tsx scripts/rehearse-escalation.ts
+
 # What the target renders, what the detectors do, and what the adaptation cost
 npx tsx scripts/recon-meridian.ts
 npx tsx scripts/verify-outcomes.ts member_funds_transfer_between_shares

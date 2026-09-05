@@ -1,0 +1,278 @@
+{
+  "result": {
+    "status": "success",
+    "meta": {
+      "runId": "verify-[REDACTED:PAN]-54524b",
+      "capabilityId": "ref_member_savings_balance",
+      "capabilityVersion": 1,
+      "tenantId": "northstar",
+      "mode": "replay",
+      "startedAt": "2026-09-05T01:21:47.136Z",
+      "finishedAt": "2026-09-05T01:21:52.760Z",
+      "durationMs": 5624,
+      "stepsAttempted": 7,
+      "evidenceDir": "D:\\project\\interface-assessment\\evidence\\verify-[REDACTED:PAN]-54524b",
+      "llmCalls": 0
+    },
+    "outputs": {
+      "savingsBalance": {
+        "value": 18432.07,
+        "sensitivity": "internal",
+        "redacted": false
+      },
+      "memberName": {
+        "value": "[REDACTED:SECRET]",
+        "sensitivity": "pii",
+        "redacted": true
+      }
+    },
+    "trace": [
+      {
+        "stepId": "s01",
+        "intent": "Enter the servicing console user id.",
+        "action": "type",
+        "risk": "safe",
+        "startedAt": "2026-09-05T01:21:47.304Z",
+        "durationMs": 523,
+        "status": "ok",
+        "resolution": {
+          "score": 75,
+          "runnerUpScore": 30,
+          "matchedSignals": [
+            "role",
+            "label",
+            "inputType"
+          ],
+          "missedSignals": [],
+          "candidateCount": 5,
+          "observed": {
+            "role": "textbox",
+            "label": "User ID",
+            "name": "",
+            "container": "Northstar Community Credit Union — Core Servicing Sign In"
+          }
+        }
+      },
+      {
+        "stepId": "s02",
+        "intent": "Enter the servicing console password.",
+        "action": "type",
+        "risk": "sensitive",
+        "startedAt": "2026-09-05T01:21:47.828Z",
+        "durationMs": 545,
+        "status": "ok",
+        "resolution": {
+          "score": 75,
+          "runnerUpScore": 30,
+          "matchedSignals": [
+            "role",
+            "label",
+            "inputType"
+          ],
+          "missedSignals": [],
+          "candidateCount": 5,
+          "observed": {
+            "role": "textbox",
+            "label": "Password",
+            "name": "",
+            "container": "Northstar Community Credit Union — Core Servicing Sign In"
+          }
+        }
+      },
+      {
+        "stepId": "s03",
+        "intent": "Sign in to the servicing console.",
+        "action": "click",
+        "risk": "safe",
+        "startedAt": "2026-09-05T01:21:48.374Z",
+        "durationMs": 1136,
+        "status": "ok",
+        "resolution": {
+          "score": 60,
+          "runnerUpScore": -25,
+          "matchedSignals": [
+            "role",
+            "name"
+          ],
+          "missedSignals": [],
+          "candidateCount": 5,
+          "observed": {
+            "role": "button",
+            "label": "Sign In",
+            "name": "Sign In",
+            "container": "Northstar Community Credit Union — Core Servicing Sign In"
+          }
+        }
+      },
+      {
+        "stepId": "s04",
+        "intent": "Open the member search screen.",
+        "action": "navigate",
+        "risk": "safe",
+        "startedAt": "2026-09-05T01:21:49.515Z",
+        "durationMs": 745,
+        "status": "recovered",
+        "recovery": {
+          "outcomeCode": "session_expired",
+          "action": "operator intervention",
+          "attempt": 1
+        }
+      },
+      {
+        "stepId": "s04",
+        "intent": "Open the member search screen.",
+        "action": "navigate",
+        "risk": "safe",
+        "startedAt": "2026-09-05T01:21:49.515Z",
+        "durationMs": 1448,
+        "status": "ok",
+        "note": "checkpoint already satisfied after recovery"
+      },
+      {
+        "stepId": "s05",
+        "intent": "Enter the member number to look up.",
+        "action": "type",
+        "risk": "safe",
+        "startedAt": "2026-09-05T01:21:50.963Z",
+        "durationMs": 496,
+        "status": "ok",
+        "resolution": {
+          "score": 100,
+          "runnerUpScore": 60,
+          "matchedSignals": [
+            "role",
+            "label",
+            "container",
+            "framePath",
+            "inputType"
+          ],
+          "missedSignals": [],
+          "candidateCount": 12,
+          "observed": {
+            "role": "textbox",
+            "label": "Member ID",
+            "name": "",
+            "container": "Member Search"
+          }
+        }
+      },
+      {
+        "stepId": "s06",
+        "intent": "Run the member search.",
+        "action": "click",
+        "risk": "safe",
+        "startedAt": "2026-09-05T01:21:51.460Z",
+        "durationMs": 1142,
+        "status": "ok",
+        "resolution": {
+          "score": 85,
+          "runnerUpScore": 0,
+          "matchedSignals": [
+            "role",
+            "name",
+            "container",
+            "framePath"
+          ],
+          "missedSignals": [],
+          "candidateCount": 12,
+          "observed": {
+            "role": "button",
+            "label": "Search",
+            "name": "Search",
+            "container": "Member Search"
+          }
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "kind": "log",
+        "path": "D:/project/interface-assessment/evidence/verify-[REDACTED:PAN]-54524b/run.jsonl",
+        "capturedAt": "2026-09-05T01:21:45.849Z"
+      },
+      {
+        "kind": "screenshot",
+        "path": "D:/project/interface-assessment/evidence/verify-[REDACTED:PAN]-54524b/001-escalation-s04.png",
+        "capturedAt": "2026-09-05T01:21:49.744Z"
+      },
+      {
+        "kind": "a11y_snapshot",
+        "path": "D:/project/interface-assessment/evidence/verify-[REDACTED:PAN]-54524b/002-escalation-s04.a11y.json",
+        "capturedAt": "2026-09-05T01:21:49.745Z"
+      }
+    ]
+  },
+  "intervention": {
+    "runId": "verify-[REDACTED:PAN]-54524b",
+    "capabilityId": "ref_member_savings_balance",
+    "capabilityName": "Read member savings balance (test fixture)",
+    "tenantId": "northstar",
+    "goal": "Signs in to the servicing console, looks up a member by id, and returns the current balance of their SAVINGS account. Returns a business outcome if the member does not exist or the record is access-restricted.",
+    "trigger": "declared_outcome",
+    "reason": "The servicing session timed out — session_expired",
+    "guidance": "Sign back in to the servicing console in the live session, return to the member search screen, then hand control back.",
+    "atStepId": "s04",
+    "stepIntent": "Open the member search screen.",
+    "currentUrl": "http://localhost:4300/t/northstar/shell?to=%2Ft%2Fnorthstar%2Fhome",
+    "screenshotPath": "D:/project/interface-assessment/evidence/verify-[REDACTED:PAN]-54524b/001-escalation-s04.png",
+    "snapshotPath": "D:/project/interface-assessment/evidence/verify-[REDACTED:PAN]-54524b/002-escalation-s04.a11y.json",
+    "id": "INT-03080707",
+    "createdAt": "2026-09-05T01:21:49.746Z",
+    "status": "resolved",
+    "humanActions": [
+      {
+        "at": "2026-09-05T01:21:50.223Z",
+        "type": "note",
+        "target": "session re-authenticated by operator"
+      },
+      {
+        "at": "2026-09-05T01:21:50.252Z",
+        "type": "click",
+        "role": "link",
+        "label": "Member Servicing",
+        "target": "link \"Member Servicing\"",
+        "url": "http://localhost:4300/t/northstar/member/search"
+      }
+    ],
+    "operatorId": "[REDACTED:EMAIL]",
+    "resolutionNote": "re-authenticated the servicing session",
+    "closedAt": "2026-09-05T01:21:50.258Z"
+  },
+  "lease": [
+    {
+      "at": "2026-09-05T01:21:45.849Z",
+      "from": "nobody",
+      "to": "automation",
+      "reason": "session started"
+    },
+    {
+      "at": "2026-09-05T01:21:49.746Z",
+      "from": "automation",
+      "to": "nobody",
+      "reason": "The servicing session timed out — session_expired",
+      "interventionId": "INT-03080707"
+    },
+    {
+      "at": "2026-09-05T01:21:50.211Z",
+      "from": "nobody",
+      "to": "operator",
+      "reason": "operator took control",
+      "interventionId": "INT-03080707",
+      "operatorId": "[REDACTED:EMAIL]"
+    },
+    {
+      "at": "2026-09-05T01:21:50.257Z",
+      "from": "operator",
+      "to": "nobody",
+      "reason": "operator handed back: re-authenticated the servicing session",
+      "interventionId": "INT-03080707",
+      "operatorId": "[REDACTED:EMAIL]"
+    },
+    {
+      "at": "2026-09-05T01:21:50.258Z",
+      "from": "nobody",
+      "to": "automation",
+      "reason": "operator completed: re-authenticated the servicing session"
+    }
+  ]
+}

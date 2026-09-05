@@ -956,6 +956,12 @@ program
     const from = rule.classification;
     rule.classification = to as typeof rule.classification;
 
+    // An explicit --guidance always wins. This is the text an on-call human
+    // reads first, and it is the most likely thing to go stale: the model
+    // writes it from what it inferred during discovery, and a later decision
+    // can quietly invalidate the advice without touching the classification.
+    if (typeof o['guidance'] === 'string') rule.operatorGuidance = o['guidance'];
+
     // Only a `recoverable` outcome ever applies a recovery. Leaving one
     // attached to any other classification is dead weight, and the validator
     // rejects it outright - so the artifact would be written and then silently
