@@ -1,0 +1,26 @@
+
+  Outcome verification — place_account_hold_request v9
+  ────────────────────────────────────────────────────────────────────────────────────────
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  member does not exist      outcome=member_not_found  [fired: member_not_found]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  teller attempts a supervisor-only action failure=recovery_exhausted  [fired: supervisor_override_denied]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operator credentials rejected failure=surface_error  [fired: signon_failed]
+  ────────────────────────────────────────────────────────────────────────────────────────
+
+  Declared outcome detectors:
+
+  UNVERIFIED  hold_applied_unexpectedly  escalate     never fired in any probe
+  VERIFIED    supervisor_override_denied escalate     fired on: teller attempts a supervisor-only action
+  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
+  UNVERIFIED  maintenance_interstitial   recoverable  never fired in any probe
+  VERIFIED    member_not_found           business     fired on: member does not exist
+
+  3/5 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+  not evidence of anything either. A detector written from remembered phrasing rather than observed
+  text is the most common way a capability ships looking correct and behaving otherwise.
+

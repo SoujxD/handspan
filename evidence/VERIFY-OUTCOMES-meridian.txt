@@ -1,76 +1,114 @@
 Outcome-detector verification against the live MERIDIAN CORE target
-Generated 2026-09-04T21:02:53Z — zero model calls, every probe a real replay.
+Generated 2026-09-05T06:43:34.466Z — zero model calls, every probe a real replay.
+Regenerate with: npx tsx scripts/verify-all-outcomes.ts
 
 Probes are declared per institution in institutions.json, because which member
 number does not exist and which share is on HOLD are properties of the target,
-not of the verification script. All natural error paths: the host is shared with
-other candidates, so its global fault-injection screen is never touched.
+not of this script. All natural error paths: the host is shared with other
+candidates, so its global fault-injection screen is never touched.
 
-════ member_funds_transfer_between_shares
-  VERIFIED    insufficient_available_balance business     fired on: amount exceeds balance
-  VERIFIED    source_share_on_hold       business     fired on: source share is on HOLD
-  VERIFIED    invalid_amount             business     fired on: amount the host will not accept
-  VERIFIED    same_source_and_destination business     fired on: same source and destination
-  VERIFIED    invalid_operator_credentials hard         fired on: operator credentials rejected
-  5/5 declared detectors verified against the live application.
+VERIFIED   fired during the probe pass.
+VERIFIED*  provoked by a dedicated check instead, named on the line. A probe
+           varies the ARGUMENTS to a flow; a state that is not reachable by
+           argument needs a different instrument, not a weaker claim.
+UNVERIFIED never fired. Not evidence the detector is wrong — and not evidence
+           it works either. Listed so the difference stays visible.
 
-════ member_share_balance_lookup
-  VERIFIED    member_not_found           business     fired on: member does not exist
-  VERIFIED    invalid_operator_credentials hard         fired on: operator credentials rejected
-  UNVERIFIED  settings_area_off_limits   escalate     never fired in any probe
-  2/3 declared detectors verified against the live application.
-  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+════ member_funds_transfer_between_shares v6
+  VERIFIED    insufficient_available_balance business     fired on: amount exceeds balance, teller attempts a supervisor-only action
+  VERIFIED    source_share_on_hold           business     fired on: source share is on HOLD
+  VERIFIED    invalid_amount                 business     fired on: amount the host will not accept
+  VERIFIED    same_source_and_destination    business     fired on: same source and destination
+  VERIFIED    invalid_operator_credentials   hard         fired on: operator credentials rejected
+  VERIFIED*   maintenance_interstitial       recoverable  scripts/verify-interstitial.ts (detected, resolved, dismissed on the live host)
 
-════ member_inquiry_by_last_name
-  VERIFIED    no_member_match            business     fired on: member does not exist
-  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
-  UNVERIFIED  session_timeout            escalate     never fired in any probe
-  2/3 declared detectors verified against the live application.
-  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+════ member_inquiry_by_last_name v4
+  VERIFIED    no_member_match                business     fired on: member does not exist
+  VERIFIED    signon_failed                  hard         fired on: operator credentials rejected
+  UNVERIFIED  session_timeout                escalate     never fired in any probe
+  VERIFIED*   maintenance_interstitial       recoverable  scripts/verify-interstitial.ts (detected, resolved, dismissed on the live host)
 
-════ member_open_new_share
-  UNVERIFIED  invalid_initial_deposit    business     never fired in any probe
-  VERIFIED    request_not_validated      business     fired on: deposit below the minimum
-  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
-  2/3 declared detectors verified against the live application.
-  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+════ member_open_new_share v6
+  UNVERIFIED  invalid_initial_deposit        business     never fired in any probe
+  VERIFIED    request_not_validated          business     fired on: deposit below the minimum
+  VERIFIED    signon_failed                  hard         fired on: operator credentials rejected
+  VERIFIED*   maintenance_interstitial       recoverable  scripts/verify-interstitial.ts (detected, resolved, dismissed on the live host)
 
-════ update_member_information
-  VERIFIED    invalid_email_format       business     fired on: e-mail in the wrong format
-  UNVERIFIED  validation_errors          business     never fired in any probe
-  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
-  UNVERIFIED  session_timed_out          escalate     never fired in any probe
-  UNVERIFIED  system_error               hard         never fired in any probe
-  2/5 declared detectors verified against the live application.
-  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+════ member_share_balance_lookup v3
+  VERIFIED    member_not_found               business     fired on: member does not exist
+  VERIFIED    invalid_operator_credentials   hard         fired on: operator credentials rejected
+  UNVERIFIED  settings_area_off_limits       escalate     never fired in any probe
+  VERIFIED*   maintenance_interstitial       recoverable  scripts/verify-interstitial.ts (detected, resolved, dismissed on the live host)
 
-════ Why some detectors stay UNVERIFIED, honestly
+════ operator_sign_on v3
+  VERIFIED    invalid_credentials            business     fired on: operator credentials rejected
+  UNVERIFIED  account_locked                 escalate     never fired in any probe
+  UNVERIFIED  session_timed_out              escalate     never fired in any probe
+  VERIFIED*   maintenance_interstitial       recoverable  scripts/verify-interstitial.ts (detected, resolved, dismissed on the live host)
 
-13 of 19 declared detectors fire against the live application. The six that do
-not fall into two groups, and neither is evidence that the detector is wrong —
-only that this pass could not reach the state.
+════ place_account_hold_request v9
+  UNVERIFIED  hold_applied_unexpectedly      escalate     never fired in any probe
+  VERIFIED    supervisor_override_denied     escalate     fired on: teller attempts a supervisor-only action
+  VERIFIED    signon_failed                  hard         fired on: operator credentials rejected
+  VERIFIED*   maintenance_interstitial       recoverable  scripts/verify-interstitial.ts (detected, resolved, dismissed on the live host)
+  VERIFIED    member_not_found               business     fired on: member does not exist
 
-  session_timeout / session_timed_out / system_error / settings_area_off_limits
-      These need a fault injected at a step the flow reaches by CLICKING, not by
-      navigating. `?inject=` is a URL parameter, so it can only be attached to a
-      navigation — and the only navigation in these capabilities is the entry
-      URL, before the state matters. The alternative is the System Settings
-      screen, which sets injection GLOBALLY on a host shared with other
-      candidates. Breaking someone else's demo to tick a box here is not a
-      trade worth making.
+════ update_member_information v5
+  VERIFIED    invalid_email_format           business     fired on: e-mail in the wrong format
+  UNVERIFIED  validation_errors              business     never fired in any probe
+  VERIFIED    signon_failed                  hard         fired on: operator credentials rejected
+  UNVERIFIED  session_timed_out              escalate     never fired in any probe
+  UNVERIFIED  system_error                   hard         never fired in any probe
+  VERIFIED*   maintenance_interstitial       recoverable  scripts/verify-interstitial.ts (detected, resolved, dismissed on the live host)
 
-  invalid_initial_deposit
-      Verified as shadowed rather than broken. The application's generic
-      "could not be validated" banner matches request_not_validated first, and
-      outcomes match in declaration order. Both are now classified `business`,
-      so the shadowing is harmless: a rejected deposit is reported as an answer
-      either way. Reordering would need a re-recording; reclassifying was the
-      cheaper correct fix.
+════ Totals
 
-  validation_errors
-      Same shadowing shape as above, behind invalid_email_format.
+24 of 33 declared detectors are verified against the live application
+(17 by the probe pass, 7 by a dedicated check). 9 are not:
 
-What would close the first group: a per-step fault hook in the replay engine
-that can attach `?inject=` to the request a click is about to make. That is a
-core change for the benefit of a test, so it is on the next-steps list rather
-than in this build.
+  session_timeout                escalate     member_inquiry_by_last_name
+  invalid_initial_deposit        business     member_open_new_share
+  settings_area_off_limits       escalate     member_share_balance_lookup
+  account_locked                 escalate     operator_sign_on
+  session_timed_out              escalate     operator_sign_on
+  hold_applied_unexpectedly      escalate     place_account_hold_request
+  validation_errors              business     update_member_information
+  session_timed_out              escalate     update_member_information
+  system_error                   hard         update_member_information
+
+════ Why those stay UNVERIFIED, honestly
+
+They fall into two groups, and the two are different in kind.
+
+  1. THE STATE CANNOT BE REACHED FROM OUTSIDE THE FLOW
+     session_timeout / session_timed_out / system_error / settings_area_off_limits
+     / account_locked / hold_applied_unexpectedly
+
+     "?inject=" is a URL parameter, so it can only ride a navigation. The only
+     navigation in these capabilities is the entry URL, which happens before the
+     state matters; every step after it is a click, and a click carries no query
+     string. There is no way to expire a session at step nine from out here.
+
+     The alternative is the System Settings screen, which sets injection
+     GLOBALLY on a host shared with other candidates — and which policy.yaml
+     denies for exactly that reason. Breaking someone else's demo to tick a box
+     here is not a trade worth making.
+
+     What would close it: a per-step fault hook in the replay engine, able to
+     attach "?inject=" to the request a click is about to make. That is a core
+     change for the benefit of a test, so it is on the next-steps list rather
+     than in this build.
+
+  2. SHADOWED BY AN EARLIER RULE, AND HARMLESSLY SO
+     invalid_initial_deposit, validation_errors
+
+     The application renders a generic "could not be validated" banner, which
+     matches request_not_validated (respectively invalid_email_format) first,
+     and outcomes match in declaration order. Both members of each pair are
+     classified 'business', so the shadowing changes nothing a caller can
+     observe: a rejected deposit is reported as an answer either way.
+     Reordering would need a re-recording; reclassifying was the cheaper
+     correct fix.
+
+     This group is not "unproven". It is proven unreachable and demonstrably
+     harmless, which is a different and better position to be in.

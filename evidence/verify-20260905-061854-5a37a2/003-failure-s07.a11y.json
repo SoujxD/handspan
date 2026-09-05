@@ -1,0 +1,325 @@
+{
+  "capturedAt": "2026-09-05T06:19:01.096Z",
+  "url": "https://web-sample.interface-hiring.com/members?by=number&q=[REDACTED:SECRET]",
+  "frameUrls": [
+    "https://web-sample.interface-hiring.com/members?by=number&q=[REDACTED:SECRET]"
+  ],
+  "title": "Member Inquiry - Meridian Core",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "link",
+      "name": "Main Menu",
+      "label": "Main Menu",
+      "labelSource": "accessible-name",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 307,
+        "y": 42,
+        "width": 66.546875,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "link",
+      "name": "Member Inquiry",
+      "label": "Member Inquiry",
+      "labelSource": "accessible-name",
+      "container": "Main Menu",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 393.03125,
+        "y": 42,
+        "width": 88.125,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "link",
+      "name": "System Settings",
+      "label": "System Settings",
+      "labelSource": "accessible-name",
+      "container": "Member Inquiry",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/settings",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 500.640625,
+        "y": 42,
+        "width": 90.359375,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "link",
+      "name": "Sign Off",
+      "label": "Sign Off",
+      "labelSource": "accessible-name",
+      "container": "System Settings",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/signoff",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 610.484375,
+        "y": 42,
+        "width": 44.625,
+        "height": 13
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "combobox",
+      "name": "",
+      "label": "Search by:",
+      "labelSource": "table-cell",
+      "value": "Member Number",
+      "container": "MEMBER INQUIRY / SELECTION",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "select"
+      },
+      "bounds": {
+        "x": 401.28125,
+        "y": 113,
+        "width": 119,
+        "height": 19
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "textbox",
+      "name": "",
+      "label": "Value:",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]",
+      "container": "MEMBER INQUIRY / SELECTION",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "inputType": "text",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 401.28125,
+        "y": 139,
+        "width": 218,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "button",
+      "name": "Search",
+      "label": "Search",
+      "labelSource": "accessible-name",
+      "container": "MEMBER INQUIRY / SELECTION",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "inputType": "submit",
+        "tag": "input"
+      },
+      "bounds": {
+        "x": 630.890625,
+        "y": 138,
+        "width": 58.078125,
+        "height": 19
+      }
+    },
+    {
+      "handle": "e8",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 15,
+        "width": 758,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e9",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "table-cell",
+      "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 40,
+        "width": 758,
+        "height": 17
+      }
+    },
+    {
+      "handle": "e10",
+      "role": "heading",
+      "name": "",
+      "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "labelSource": "table-cell",
+      "value": "MEMBER INQUIRY / SELECTION",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "h1"
+      },
+      "bounds": {
+        "x": 315,
+        "y": 69,
+        "width": 730,
+        "height": 16
+      }
+    },
+    {
+      "handle": "e11",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "Search by:",
+      "rowKey": "Search by:",
+      "container": "MEMBER INQUIRY / SELECTION",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 110,
+        "width": 71.28125,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e12",
+      "role": "cell",
+      "name": "",
+      "label": "Search by:",
+      "labelSource": "table-cell",
+      "value": "Value:",
+      "rowKey": "Value:",
+      "columnHeader": "Search by:",
+      "container": "MEMBER INQUIRY / SELECTION",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 327,
+        "y": 135,
+        "width": 71.28125,
+        "height": 25
+      }
+    },
+    {
+      "handle": "e13",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "column-header",
+      "value": "OPR TELLER1 | BR MAIN-001 | 09/05/2026 06:17:16 | SID EC8480F9",
+      "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/05/2026 06:17:16 | SID EC8480F9",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 223,
+        "width": 758,
+        "height": 20
+      }
+    },
+    {
+      "handle": "e14",
+      "role": "cell",
+      "name": "",
+      "label": "OPR TELLER1 | BR MAIN-001 | 09/05/2026 06:17:16 | SID EC8480F9",
+      "labelSource": "table-cell",
+      "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 301,
+        "y": 243,
+        "width": 758,
+        "height": 19
+      }
+    }
+  ],
+  "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nMEMBER INQUIRY / SELECTION\nSearch by:\nMember Number\nLast Name\nValue:\nNo member records matched your search.\nTry member numbers 100234, 100987, 101555, 102777, 103001.\nOPR TELLER1 | BR MAIN-001 | 09/05/2026 06:17:16 | SID EC8480F9\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+  "lastStatus": 200
+}

@@ -144,7 +144,7 @@ npx tsx scripts/verify-concurrency.ts
 
 # What the target renders, what the detectors do, and what the adaptation cost
 npx tsx scripts/recon-meridian.ts
-npx tsx scripts/verify-outcomes.ts member_funds_transfer_between_shares
+npx tsx scripts/verify-all-outcomes.ts        # regenerates the committed verification report
 npx tsx scripts/adaptation-report.ts
 npx tsx scripts/audit-evidence.ts
 ```
@@ -481,6 +481,7 @@ must not retry it forever.
 | `npx tsx src/cli.ts repair -c <id> [--assist]` | Propose a reviewed patch for vocabulary drift; writes a draft, never applies it |
 | `npx tsx scripts/verify-artifact.ts <id>` | Audit an artifact: structural invariants, no baked-in credentials or PII, no id-based matching, approval traceable to a reviewer |
 | `npx tsx scripts/verify-outcomes.ts <id>` | Replay each declared outcome and report which detectors actually fire |
+| `npx tsx scripts/verify-all-outcomes.ts` | The same across every capability, regenerating the committed report |
 | `npx tsx scripts/audit-evidence.ts` | Fail if any seeded PII or credential survived into `/evidence` |
 | `npm test` / `npm run typecheck` | 136 tests / strict TypeScript |
 | `npm run test:replay` / `npm run test:escalation` | Integration: 8 replay scenarios (0 model calls) and the full control-transfer cycle |

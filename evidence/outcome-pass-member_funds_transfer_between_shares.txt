@@ -1,0 +1,39 @@
+
+  Outcome verification — member_funds_transfer_between_shares v6
+  ────────────────────────────────────────────────────────────────────────────────────────
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  member does not exist      failure=target_not_found
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  amount exceeds balance     outcome=insufficient_available_balance  [fired: insufficient_available_balance]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  same source and destination outcome=same_source_and_destination  [fired: same_source_and_destination]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  amount the host will not accept outcome=invalid_amount  [fired: invalid_amount]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  source share is on HOLD    outcome=source_share_on_hold  [fired: source_share_on_hold]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  teller attempts a supervisor-only action outcome=insufficient_available_balance  [fired: insufficient_available_balance]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operator credentials rejected failure=surface_error  [fired: invalid_operator_credentials]
+  ────────────────────────────────────────────────────────────────────────────────────────
+
+  Declared outcome detectors:
+
+  VERIFIED    insufficient_available_balance business     fired on: amount exceeds balance, teller attempts a supervisor-only action
+  VERIFIED    source_share_on_hold       business     fired on: source share is on HOLD
+  VERIFIED    invalid_amount             business     fired on: amount the host will not accept
+  VERIFIED    same_source_and_destination business     fired on: same source and destination
+  VERIFIED    invalid_operator_credentials hard         fired on: operator credentials rejected
+  UNVERIFIED  maintenance_interstitial   recoverable  never fired in any probe
+
+  5/6 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+  not evidence of anything either. A detector written from remembered phrasing rather than observed
+  text is the most common way a capability ships looking correct and behaving otherwise.
+

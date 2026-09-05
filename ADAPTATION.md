@@ -229,11 +229,17 @@ declared detectors were dead because they were written from remembered phrasing.
 | application error | 500 | **hard** | The target is broken, not the automation. Its own reference code is captured |
 
 **These detectors are verified firing, not merely declared.**
-`npx tsx scripts/verify-outcomes.ts <capability>` replays each capability
-against inputs chosen to provoke each declared outcome and reports which ones
-actually matched. **13 of 19 fire against the live application, including 5/5 on
-funds transfer** — see `evidence/VERIFY-OUTCOMES-meridian.txt`, which also
-explains, per detector, why the other six could not be reached.
+`npx tsx scripts/verify-all-outcomes.ts` replays every capability against
+inputs chosen to provoke each declared outcome and reports which ones actually
+matched. **24 of 33 fire against the live application, including 5/5 on funds
+transfer** — see `evidence/VERIFY-OUTCOMES-meridian.txt`, which names the nine
+that do not and why, per detector.
+
+The report is *generated*, not maintained. The previous one was assembled from
+several single-capability runs by hand, and went stale the moment new detectors
+were declared: it described 19 detectors across 5 capabilities while the
+artifacts had grown to 33 across 7. A report that disagrees with the thing it
+reports on is worse than no report, because it gets read as evidence.
 
 Probes live in `institutions.json`, not in the script: which member number does
 not exist and which share is on HOLD are properties of the deployment. Hardcoding

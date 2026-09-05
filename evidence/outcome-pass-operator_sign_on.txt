@@ -1,0 +1,22 @@
+
+  Outcome verification — operator_sign_on v3
+  ────────────────────────────────────────────────────────────────────────────────────────
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  teller attempts a supervisor-only action success
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operator credentials rejected outcome=invalid_credentials  [fired: invalid_credentials]
+  ────────────────────────────────────────────────────────────────────────────────────────
+
+  Declared outcome detectors:
+
+  VERIFIED    invalid_credentials        business     fired on: operator credentials rejected
+  UNVERIFIED  account_locked             escalate     never fired in any probe
+  UNVERIFIED  session_timed_out          escalate     never fired in any probe
+  UNVERIFIED  maintenance_interstitial   recoverable  never fired in any probe
+
+  1/4 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+  not evidence of anything either. A detector written from remembered phrasing rather than observed
+  text is the most common way a capability ships looking correct and behaving otherwise.
+

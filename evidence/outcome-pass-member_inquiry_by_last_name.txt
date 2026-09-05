@@ -1,0 +1,25 @@
+
+  Outcome verification — member_inquiry_by_last_name v4
+  ────────────────────────────────────────────────────────────────────────────────────────
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  member does not exist      outcome=no_member_match  [fired: no_member_match]
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operatorPassword supplied from HANDSPAN_INPUT_OPERATOR_PASSWORD
+  teller attempts a supervisor-only action success
+  operatorId supplied from HANDSPAN_INPUT_OPERATOR_ID
+  operator credentials rejected failure=surface_error  [fired: signon_failed]
+  ────────────────────────────────────────────────────────────────────────────────────────
+
+  Declared outcome detectors:
+
+  VERIFIED    no_member_match            business     fired on: member does not exist
+  VERIFIED    signon_failed              hard         fired on: operator credentials rejected
+  UNVERIFIED  session_timeout            escalate     never fired in any probe
+  UNVERIFIED  maintenance_interstitial   recoverable  never fired in any probe
+
+  2/4 declared detectors verified against the live application.
+  UNVERIFIED detectors are not necessarily wrong — some states are hard to provoke — but they are
+  not evidence of anything either. A detector written from remembered phrasing rather than observed
+  text is the most common way a capability ships looking correct and behaving otherwise.
+
