@@ -92,8 +92,12 @@ npx tsx src/cli.ts replay -c member_funds_transfer_between_shares -t meridian-de
 # The staging capability that escalates: this deployment is a teller
 npx tsx src/cli.ts replay -c place_account_hold_request -t meridian-demo   -i memberNumber=100987 -i shareId=100987-S0001   -i "reasonCode=FRAUD - Suspected fraud" -i notes="pending review"
 
-# What the target renders, and what the adaptation cost
+# Which of a member's shares can actually be debited right now
+npx tsx scripts/open-shares.ts 100234
+
+# What the target renders, what the detectors do, and what the adaptation cost
 npx tsx scripts/recon-meridian.ts
+npx tsx scripts/verify-outcomes.ts member_funds_transfer_between_shares
 npx tsx scripts/adaptation-report.ts
 npx tsx scripts/audit-evidence.ts
 ```

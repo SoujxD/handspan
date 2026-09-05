@@ -47,6 +47,22 @@ result contract has four shapes rather than success-or-error."
 
 ## 3 · Moving money, and who is allowed to authorise it  *(Chat tab)*
 
+**Before this beat, check which shares are actually spendable.** The host is
+shared and its state moves under you:
+
+```bash
+npx tsx scripts/open-shares.ts 100234
+```
+
+It prints the member's OPEN shares, most funded first, and a ready-to-paste
+`-i fromShareOption=… -i toShareOption=…` pair. Run it once just before you
+start and use whatever it gives you.
+
+**If a share does get held mid-demo anyway**, you get the `source_share_on_hold`
+business outcome instead of a confirmation number — which is a *better* beat, so
+take it: "the application changed underneath us between one run and the next,
+and the capability reported it as an answer rather than falling over."
+
 > **Transfer 1 dollar from share 100234-S0001-6 to share 100234-MMKT-11 for member 100234, memo demo**
 
 The bot **stops** and restates the transaction. Nothing has happened yet. Click
@@ -63,17 +79,6 @@ The bot **stops** and restates the transaction. Nothing has happened yet. Click
   the server supplies them from its own environment.
 
 Returns a real confirmation number, e.g. `CN480223`.
-
-**If a share has been put on HOLD by another candidate**, you get the
-`source_share_on_hold` business outcome instead — which is a *better* beat. Take
-it: "the app changed underneath us and the capability reported it as an answer."
-Fresh open shares:
-
-```bash
-curl -s -c /tmp/j -b /tmp/j -o /dev/null https://web-sample.interface-hiring.com/signon
-curl -s -c /tmp/j -b /tmp/j -o /dev/null -X POST https://web-sample.interface-hiring.com/signon --data "operator=teller1&password=password"
-curl -s -b /tmp/j https://web-sample.interface-hiring.com/members/100234 | grep -o '100234-[A-Za-z0-9-]*' | head
-```
 
 ---
 
@@ -134,9 +139,11 @@ independent gates, one demo.
 npx tsx scripts/adaptation-report.ts
 ```
 
-> 330 lines of configuration. 292 lines of core, every line listed so you can
-> check that each is generic. $10.30 and nine discovery runs for seven
-> capabilities. **Zero model calls across 53 replays.**
+It prints the current figures — do not read them off this page, they move every
+time you run anything. At the time of writing: **374 lines of configuration, 292
+lines of core** (every line listed so you can check each is generic), **$10.30**
+across nine discovery runs for seven capabilities, and **zero model calls across
+58 replays**.
 
 *Say:* "The headline is deliberately not 'zero core changes'. A core that needed
 no changes is equally consistent with a core too thin to be stressed. The claim
