@@ -1055,6 +1055,45 @@ ${note}` : note;
   });
 
 program
+  .command('revise-description')
+  .description("Correct a capability's description. Records reviewer provenance.")
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .requiredOption('--description <text>', 'Replacement description.')
+  .requiredOption('--why <text>', 'Why. Recorded in governance notes.')
+  .action((o: Record<string, unknown>) => {
+    /**
+     * The description is not documentation — it is the tool description a
+     * routing model reads, and the first thing a human reviewer reads. There
+     * was a reviewed path to correct an input's wording and none to correct
+     * the capability's own, so the only way to fix a description that had gone
+     * stale was to hand-edit a file the store exists to protect.
+     */
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.loadForEdit(String(o['capability']));
+    const before = cap.description;
+    const next = String(o['description']);
+
+    if (next === before) {
+      console.error('That is the description it already has. Nothing to do.');
+      process.exit(2);
+      return;
+    }
+
+    cap.description = next;
+    const note = `[reviewer] description: ${String(o['why'])}`;
+    cap.governance.notes = cap.governance.notes ? `${cap.governance.notes}\n${note}` : note;
+    cap.version += 1;
+    cap.governance.approval = 'draft';
+    cap.provenance.contentHash = hashCapability(cap);
+    store.save(cap);
+
+    console.log(`  ${cap.id}: description revised.`);
+    console.log(`    was: ${before.slice(0, 100)}...`);
+    console.log(`    now: ${next.slice(0, 100)}...`);
+    console.log(`  Now v${cap.version}, approval reset to draft.`);
+  });
+
+program
   .command('approve')
   .description('Mark a capability approved for unattended execution.')
   .requiredOption('-c, --capability <id>', 'Capability id.')

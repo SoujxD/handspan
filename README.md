@@ -78,6 +78,47 @@ server's environment, and `operatorId` is bound to the deployment — so the
 chatbot cannot ask to run as a supervisor, which is what makes the escalation
 path real rather than arranged.
 
+#### Invoking a capability against the live target
+
+Everything below runs against `web-sample.interface-hiring.com`. Open
+`http://localhost:4500` and use the **Chat** tab, or drive the same path over
+HTTP:
+
+```bash
+# What an agent would discover: typed tool definitions, no UI knowledge needed
+curl -s localhost:4500/capabilities
+
+# Invoke one. Secrets and operatorId are refused from the body on purpose;
+# the server supplies them from its own environment.
+curl -s -X POST localhost:4500/capabilities/member_share_balance_lookup/invoke \
+  -H 'content-type: application/json' \
+  -d '{"memberNumber":"100234","shareId":"100234-S0001"}'
+
+# The same thing through the chatbot, which picks the capability itself
+curl -s -X POST localhost:4500/chat \
+  -H 'content-type: application/json' \
+  -d '{"message":"What is the balance of share 100234-S0001 for member 100234?"}'
+
+# A business outcome, NOT an error: HTTP 200, exit code 0
+curl -s -o /dev/null -w '%{http_code}\n' \
+  -X POST localhost:4500/capabilities/member_share_balance_lookup/invoke \
+  -H 'content-type: application/json' \
+  -d '{"memberNumber":"999999","shareId":"999999-S0001"}'
+```
+
+These print raw JSON. Pipe any of them through `jq` if you have it — it is not
+installed by default on Windows, so nothing here depends on it.
+
+Each response carries an `x-handspan-run-id` header. Open that run on the
+**Runs** tab to see its steps, timings, the arguments it was invoked with, and
+every evidence file it produced — screenshots and DOM snapshots included,
+viewable in place.
+
+A capability that commits state (a transfer, an update) will refuse an
+unattended call without a confirmation token naming it. That is deliberate, and
+the chatbot cannot mint one: `confirm` is not in the schema the model is given,
+so the token comes from a human's click.
+
 ### Recording and replaying against the live target
 
 ```bash
@@ -395,10 +436,10 @@ unverified is called out as unverified rather than quietly counted.
 ```bash
 npm run catalog         # http://localhost:4500
 
-curl -s localhost:4500/capabilities | jq '.tools[0]'
+curl -s "localhost:4500/capabilities?product=all"
 curl -s -X POST localhost:4500/capabilities/member_savings_balance/invoke \
   -H 'content-type: application/json' \
-  -d '{"tenantId":"northstar","memberId":"12345"}' | jq
+  -d '{"tenantId":"northstar","memberId":"12345"}'
 ```
 
 Or watch a caller do the whole thing — discover the catalog, build a valid call
@@ -429,6 +470,11 @@ must not retry it forever.
 | `npx tsx src/cli.ts approve` | Mark a capability approved for unattended runs |
 | `npx tsx src/cli.ts codegen -c <id>` | Emit a human-readable review document |
 | `npx tsx src/cli.ts declare-outcome` | Add a reviewer-authored outcome rule (recorded with `origin: reviewer`) |
+| `npx tsx src/cli.ts revise-description` | Correct a capability's description — the text a routing model reads |
+| `npx tsx src/cli.ts revise-input` | Correct an input's description or example |
+| `npx tsx src/cli.ts assert-checkpoint` | Add or replace a step's checkpoint |
+| `npx tsx src/cli.ts reclassify-outcome` | Move an outcome between business / recoverable / hard / escalate |
+| `npx tsx scripts/verify-concurrency.ts` | Serve three members at once through the API and check nothing is lost |
 | `npx tsx src/cli.ts drift -c <id> [-t <tenant>]` | Replay and report how far the surface has moved from what was recorded |
 | `npx tsx src/cli.ts repair -c <id> [--assist]` | Propose a reviewed patch for vocabulary drift; writes a draft, never applies it |
 | `npx tsx scripts/verify-artifact.ts <id>` | Audit an artifact: structural invariants, no baked-in credentials or PII, no id-based matching, approval traceable to a reviewer |

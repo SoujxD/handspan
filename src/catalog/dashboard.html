@@ -30,6 +30,14 @@
   nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
   main { padding: 20px 24px 60px; max-width: 1180px; }
   section[hidden] { display: none; }
+  .ev-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ev { display: flex; gap: 10px; align-items: baseline; cursor: pointer;
+        background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+        padding: 5px 9px; font: inherit; color: inherit; }
+  .ev:hover { border-color: var(--accent); }
+  .ev-body { max-height: 460px; overflow: auto; background: var(--bg);
+             border: 1px solid var(--line); border-radius: 6px; padding: 10px;
+             font-size: 11px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
           padding: 14px 16px; margin-bottom: 14px; }
   .lede { font-size: 15px; line-height: 1.6; margin: 0; }
@@ -192,6 +200,16 @@ async function renderRun(id) {
         ${r ? `· <b>${r.meta.llmCalls}</b> model calls` : ''}</div>
     </div>
 
+    ${r && r.meta.inputs && Object.keys(r.meta.inputs).length ? `<div class="card">
+      <h3 style="margin:0 0 8px;font-size:13px">Invoked with</h3>
+      <table><tbody>${Object.entries(r.meta.inputs).map(([k, v]) => `
+        <tr><td class="mono">${esc(k)}</td>
+            <td class="mono">${v.sensitivity === 'secret'
+                ? '<span class="muted">supplied by the server, never recorded</span>'
+                : esc(v.value)}</td>
+            <td class="muted">${esc(v.sensitivity)}${v.redacted && v.sensitivity !== 'secret' ? ' · scrubbed from evidence' : ''}</td></tr>`).join('')}
+      </tbody></table></div>` : ''}
+
     ${outputs ? `<div class="card"><h3 style="margin:0 0 8px;font-size:13px">Typed outputs</h3>
       <table><tbody>${Object.entries(outputs).map(([k, v]) => `
         <tr><td class="mono">${esc(k)}</td>
@@ -229,12 +247,58 @@ async function renderRun(id) {
                   : t.checkpointPassed ? '<span class="s-success">passed</span>' : '<span class="muted">—</span>'}</td>
         </tr>`).join('')}</tbody></table></div>` : ''}
 
-    <div class="card scroll">
+    <div class="card">
       <h3 style="margin:0 0 8px;font-size:13px">Evidence on disk (${run.evidence.length} files)</h3>
-      <div class="mono muted">${run.evidence.map((f) => esc(f.name) + '  ' + f.bytes + 'B').join('<br>')}</div>
+      <p class="muted" style="margin:0 0 10px">Screenshots are masked in the browser before the pixels are captured;
+        every snapshot and log went through the redactor on its way to disk. What you open here is what was persisted.</p>
+      <div class="ev-list">${run.evidence.map((f) => `
+        <button class="ev" data-run="${esc(run.runId)}" data-file="${esc(f.name)}">
+          <span class="mono">${esc(f.name)}</span><span class="muted mono">${f.bytes}B</span>
+        </button>`).join('')}</div>
+      <div id="ev-view"></div>
     </div>`;
 
+  for (const b of document.querySelectorAll('#runs .ev')) {
+    b.onclick = () => showEvidence(b.dataset.run, b.dataset.file);
+  }
   $('#runs .back').onclick = () => { renderRuns(); startPolling(); };
+}
+
+/**
+ * Open one evidence file inline.
+ *
+ * A screenshot renders; anything textual is shown as text, never as markup —
+ * a DOM snapshot is evidence to read, not a document to run inside the
+ * dashboard's own origin.
+ */
+async function showEvidence(runId, file) {
+  const view = $('#ev-view');
+  const url = `/runs/${encodeURIComponent(runId)}/evidence/${encodeURIComponent(file)}`;
+  view.innerHTML = `<p class="muted">Loading ${esc(file)}...</p>`;
+
+  if (file.endsWith('.png')) {
+    view.innerHTML = `<h4 class="mono" style="margin:14px 0 6px">${esc(file)}</h4>
+      <img src="${url}" alt="Evidence screenshot from ${esc(runId)}"
+           style="max-width:100%;border:1px solid var(--line);border-radius:6px">`;
+    return;
+  }
+
+  const res = await fetch(url);
+  const text = await res.text();
+  let body = text;
+  if (file.endsWith('.jsonl')) {
+    // One JSON object per line; pretty-print each so a step is readable.
+    body = text.split('
+').filter(Boolean).map((l) => {
+      try { return JSON.stringify(JSON.parse(l), null, 2); } catch { return l; }
+    }).join('
+
+');
+  } else if (file.endsWith('.json')) {
+    try { body = JSON.stringify(JSON.parse(text), null, 2); } catch { /* show it raw */ }
+  }
+  view.innerHTML = `<h4 class="mono" style="margin:14px 0 6px">${esc(file)}</h4>
+    <pre class="ev-body">${esc(body)}</pre>`;
 }
 
 // ---- adaptation ------------------------------------------------------------

@@ -60,9 +60,28 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
   app.use(express.json());
   app.disable('x-powered-by');
 
-  app.get('/capabilities', (_req, res) => {
-    const caps = store.listLatest();
+  /**
+   * The catalog an agent discovers, scoped to the product this catalog fronts.
+   *
+   * It used to return everything on disk, which mixed MERIDIAN CORE's
+   * capabilities with the take-home fixture's — two different applications that
+   * happen to share a repo. An agent reading the list could pick a tool whose
+   * tenant this deployment has never heard of and get an error it could not
+   * have predicted from the catalog it was given. The chatbot already filtered
+   * by product; the endpoint underneath it did not, so the two disagreed about
+   * what existed.
+   *
+   * `?product=all` returns everything, which is what the take-home's own demo
+   * path needs, and `?product=<id>` selects another. Invoking by id is
+   * deliberately NOT filtered: the listing decides what an agent should
+   * discover, not what the operator of this process is allowed to run.
+   */
+  app.get('/capabilities', (req, res) => {
+    const want = String(req.query['product'] ?? PRODUCT);
+    const all = store.listLatest();
+    const caps = want === 'all' ? all : all.filter((c) => c.surface.product === want);
     res.json({
+      product: want,
       count: caps.length,
       tools: caps.map(toToolDefinition),
     });
@@ -212,6 +231,53 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
     res.json(run);
   });
 
+  /**
+   * One evidence file from one run.
+   *
+   * The run detail listed the files a run produced and their sizes, which tells
+   * a reviewer that a screenshot exists without letting them look at it. The
+   * brief asks for the evidence to be *visible* — steps, screenshots, DOM
+   * snapshots, timings, logs — because that is how someone debugs a run they
+   * did not watch happen.
+   *
+   * Serving these is safe by construction rather than by intention: screenshots
+   * are masked in the browser before the pixels are ever captured, and every
+   * JSON or log file went through the redactor on its way to disk. There is no
+   * unredacted copy on disk to leak.
+   *
+   * Both path segments are validated. `readRun` already refuses a run id that
+   * is not exactly a run id; the filename is checked here against the run's own
+   * directory listing rather than by pattern, so what is served is necessarily
+   * a file that run produced, and `..` has nothing to traverse to.
+   */
+  app.get('/runs/:id/evidence/:file', (req, res) => {
+    const runId = String(req.params['id']);
+    const run = readRun(PATHS.evidence, runId);
+    if (!run) {
+      res.status(404).json({ error: `No run "${runId}".` });
+      return;
+    }
+    const name = String(req.params['file']);
+    if (!run.evidence.some((f) => f.name === name)) {
+      res.status(404).json({ error: `Run "${runId}" produced no file "${name}".` });
+      return;
+    }
+
+    const types: Record<string, string> = {
+      '.png': 'image/png',
+      '.json': 'application/json',
+      '.jsonl': 'application/x-ndjson',
+      '.txt': 'text/plain; charset=utf-8',
+      '.html': 'text/plain; charset=utf-8',
+    };
+    const ext = name.slice(name.lastIndexOf('.'));
+    // A DOM snapshot is served as text, never as html: it is evidence to read,
+    // not a document to execute in the dashboard's origin.
+    res.type(types[ext] ?? 'application/octet-stream');
+    res.setHeader('content-security-policy', "default-src 'none'; sandbox");
+    res.send(readFileSync(join(PATHS.evidence, runId, name)));
+  });
+
   app.get('/adaptation', (_req, res) => {
     res.json(
       computeAdaptation({
@@ -296,7 +362,7 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
     }
   });
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const server = app.listen(port, () => {
       // eslint-disable-next-line no-console
       console.log(`[catalog] agent-facing capability API on http://localhost:${port}`);
@@ -305,6 +371,35 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
       // eslint-disable-next-line no-console
       console.log(`[catalog]   POST /capabilities/:id/invoke`);
       resolve(server);
+    });
+
+    /**
+     * Say what is wrong, rather than throwing a listen stack trace.
+     *
+     * Unlike the operator console, this deliberately does NOT move to another
+     * port. The console's URL is printed for a human to click, so any port will
+     * do; this one is an address a caller has configured, and quietly serving
+     * it from somewhere else would mean the dashboard and the chatbot talk to
+     * a catalog nobody knows about.
+     *
+     * It matters because the stale process keeps answering. A second catalog
+     * started after a code change died on this error, the old one carried on
+     * serving 4500, and the request came back looking like the change had not
+     * worked.
+     */
+    server.on('error', (e: NodeJS.ErrnoException) => {
+      if (e.code === 'EADDRINUSE') {
+        reject(
+          new Error(
+            `Port ${port} is already in use, so the catalog did not start — ` +
+              `and whatever is already on ${port} will keep answering.
+` +
+              `  Stop it first, or run with CATALOG_PORT=<other port>.`,
+          ),
+        );
+        return;
+      }
+      reject(e);
     });
   });
 }

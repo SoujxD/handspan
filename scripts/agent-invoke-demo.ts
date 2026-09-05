@@ -28,7 +28,10 @@ const hr = () => console.log(`  ${'─'.repeat(88)}`);
 console.log('\n  1. Agent discovers available capabilities\n');
 hr();
 
-const catalog = (await fetch(`${CATALOG}/capabilities`).then((r) => r.json())) as {
+// `product=all`: this demo drives the take-home fixture, and the catalog now
+// scopes its listing to the product it fronts (MERIDIAN CORE) so an agent is
+// not offered a tool from a different application.
+const catalog = (await fetch(`${CATALOG}/capabilities?product=all`).then((r) => r.json())) as {
   count: number;
   tools: Array<Record<string, any>>;
 };

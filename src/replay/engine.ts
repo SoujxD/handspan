@@ -792,6 +792,7 @@ export async function replay(opts: ReplayOptions): Promise<ReplayResult> {
       stepsAttempted: steps,
       evidenceDir: evidence.dir,
       llmCalls: 0,
+      inputs: recordedInputs(cap, o.inputs),
     };
   }
 
@@ -1445,6 +1446,38 @@ function entry(
   };
 }
 
+/**
+ * The arguments a run was invoked with, typed by the artifact's own declaration.
+ *
+ * Reads sensitivity from `capability.inputs` rather than guessing from the
+ * value, so a member number is `pii` because the artifact says so and not
+ * because it happened to look like one.
+ *
+ * A `secret` never carries a value. Every other class does, and is scrubbed on
+ * persistence by the same redactor that handles outputs — which is the point:
+ * an argument and an extracted value are the same kind of regulated data, and
+ * giving them two different rules is how one of them eventually leaks.
+ */
+export function recordedInputs(
+  capability: ReplayOptions['capability'],
+  supplied: Record<string, string>,
+): Record<string, TypedValue> {
+  const out: Record<string, TypedValue> = {};
+  for (const declared of capability.inputs) {
+    const value = supplied[declared.name];
+    if (value === undefined) continue;
+    out[declared.name] =
+      declared.sensitivity === 'secret'
+        ? { value: null, sensitivity: 'secret', redacted: true }
+        : // Same rule the outputs use, so an argument and an extracted value
+          // report their handling identically. The flag says "scrubbed from
+          // what this run persisted", not "withheld from you" — the caller is
+          // handed the arguments it supplied.
+          { value, sensitivity: declared.sensitivity, redacted: declared.sensitivity === 'pii' };
+  }
+  return out;
+}
+
 function metaFor(opts: ReplayOptions, steps: number): RunMeta {
   const now = new Date();
   return {
@@ -1459,6 +1492,7 @@ function metaFor(opts: ReplayOptions, steps: number): RunMeta {
     stepsAttempted: steps,
     evidenceDir: opts.evidence.dir,
     llmCalls: 0,
+    inputs: recordedInputs(opts.capability, opts.inputs),
   };
 }
 

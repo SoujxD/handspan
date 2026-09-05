@@ -107,6 +107,23 @@ export interface RunMeta {
   evidenceDir: string;
   /** Zero on the replay path, always. Proves the LLM was not in the loop. */
   llmCalls: number;
+
+  /**
+   * The arguments this run was actually invoked with.
+   *
+   * A result recorded which capability ran and what came back, but not what it
+   * was asked to do — so the evidence trail could not answer "which member did
+   * this act on", which is the first question an auditor asks about a run that
+   * moved money.
+   *
+   * Carried as `TypedValue` so each argument travels with the sensitivity the
+   * artifact declared for it, and is therefore scrubbed from persisted evidence
+   * by exactly the same rule as an extracted output. `secret` inputs never
+   * carry a value at all — not a redacted one, not a masked one. The name is
+   * recorded so a reader can see a credential was supplied; the value never
+   * enters the document in the first place.
+   */
+  inputs: Record<string, TypedValue>;
 }
 
 export interface TypedValue {

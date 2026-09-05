@@ -364,6 +364,70 @@ the current code would not produce.
 
 ---
 
+### Four completeness gaps found by re-reading the brief against the build
+
+Re-auditing §3.2 and §3.4 line by line, rather than from memory of what I had
+built, turned up four things that were specified and not done.
+
+**The dashboard could not open the evidence it listed.** §3.4 asks for the
+evidence to be visible — steps, screenshots, DOM snapshots, timings, logs — and
+the run detail showed filenames and byte counts. A reviewer could see that
+`001-escalation-s12.png` existed and had no way to look at it, which is the
+whole point of the tab. There is now `GET /runs/:id/evidence/:file` and an
+inline viewer: screenshots render, snapshots and logs open as text.
+
+Serving them is safe by construction rather than by intention. Screenshots are
+masked in the browser before the pixels are captured and every JSON or log file
+passed through the redactor on its way to disk, so there is no unredacted copy
+to expose. The filename is validated against the run's own directory listing
+rather than by pattern, so `..` has nothing to traverse to, and a DOM snapshot
+is served as `text/plain` under a `sandbox` CSP — it is evidence to read, not a
+document to execute in the dashboard's origin.
+
+**A run did not record what it was asked to do.** §3.4 asks for each run's
+inputs and outputs; the result contract carried outputs only. The evidence trail
+could not answer "which member did this act on", which is the first question
+anyone asks about a run that moved money. `meta.inputs` now carries the
+arguments, typed by the artifact's own declaration so a member number is `pii`
+because the artifact says so rather than because it looked like one — which
+means an argument is scrubbed on persistence by the identical rule as an
+extracted output. A `secret` never carries a value at all, not even a redacted
+one: the name is recorded so a reader can see a credential was supplied, and the
+value never enters the document.
+
+The split is visible in one run: the caller gets `memberNumber: "100234"`,
+because the caller supplied it; the file on disk reads `[REDACTED:SECRET]`.
+
+**The catalog offered tools an agent could not invoke.** `GET /capabilities`
+returned every artifact on disk, mixing MERIDIAN CORE's seven with the two from
+the take-home fixture — a different application that happens to share the repo.
+An agent reading that list could pick a tool whose tenant this deployment has
+never heard of, and get an error it could not have predicted from the catalog it
+was handed. The chatbot already filtered by product; the endpoint underneath it
+did not, so the two disagreed about what existed. The listing is now scoped to
+the product the catalog fronts, with `?product=all` for the take-home's own demo
+path. Invoking by id is deliberately not filtered: the listing decides what an
+agent should *discover*, not what the operator of the process may run.
+
+**A tool description that described a different deployment.**
+`place_account_hold_request` began "Signs on to Meridian Core as a supervisor
+operator", with `operatorId` exampled as `super1`. Both are wrong, and wrong in
+the direction that matters: `operatorId` is bound to the deployment, so a caller
+cannot choose an identity, and this deployment is a teller — which is precisely
+what makes the escalation structural rather than arranged. It is also the text a
+routing model reads. There was a reviewed path to correct an input's wording and
+none to correct the capability's own, so `revise-description` now exists and the
+fix went through it: v7, provenance recorded, approval reset to draft.
+
+Two smaller things fell out of the same pass. The catalog died on a raw
+`EADDRINUSE` stack trace while the stale process kept answering — so a restart
+after a code change looked like the change had not worked; it now says what is
+wrong and refuses to move ports, because unlike the operator console its address
+is one a caller has configured. And the README's own commands piped through
+`jq`, which is not installed on the machine this will be demonstrated from.
+
+---
+
 ## 6. What I deliberately left out, and would build next
 
 **A re-authentication recovery kind.** The honest gap. `RecoveryAction` has no

@@ -36,6 +36,7 @@ function meta() {
     stepsAttempted: 1,
     evidenceDir: '/tmp',
     llmCalls: 0,
+    inputs: {},
   };
 }
 

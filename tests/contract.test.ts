@@ -8,6 +8,8 @@
  * plausible-looking artifact quietly becomes dangerous in production.
  */
 
+import { referenceCapability } from './fixtures/reference-capability.js';
+import { recordedInputs } from '../src/replay/engine.js';
 import { describe, expect, it } from 'vitest';
 import { SCHEMA_VERSION, highestRisk, parseCapability, validateCapability, type Capability } from '../src/types/artifact.js';
 import { evaluateCondition, extract } from '../src/replay/evaluate.js';
@@ -353,7 +355,7 @@ describe('result contract', () => {
   const meta = {
     runId: 'r', capabilityId: 'c', capabilityVersion: 1, tenantId: 't',
     mode: 'replay' as const, startedAt: '', finishedAt: '', durationMs: 0,
-    stepsAttempted: 1, evidenceDir: '', llmCalls: 0,
+    stepsAttempted: 1, evidenceDir: '', llmCalls: 0, inputs: {},
   };
 
   it('exits 0 for a business outcome — it is an answer, not a failure', () => {
@@ -437,5 +439,47 @@ describe('session lease (control transfer)', () => {
       'operator->nobody',
       'nobody->automation',
     ]);
+  });
+});
+
+/**
+ * A result recorded what came back but never what it was asked to do, so the
+ * evidence trail could not answer "which member did this run act on" — the
+ * first question an auditor asks about a run that moved money.
+ */
+describe('recorded run inputs', () => {
+  const cap = referenceCapability('http://localhost:4300');
+
+  it('records the arguments a run was invoked with', () => {
+    const rec = recordedInputs(cap, { memberId: '12345' });
+    expect(rec['memberId']?.value).toBe('12345');
+  });
+
+  it('never carries a secret value — not even a redacted one', () => {
+    const withSecret = {
+      ...cap,
+      inputs: [
+        ...cap.inputs,
+        { name: 'password', description: 'operator password', type: 'string' as const, required: true, sensitivity: 'secret' as const },
+      ],
+    };
+    const rec = recordedInputs(withSecret, { memberId: '12345', password: 'hunter2' });
+
+    expect(JSON.stringify(rec)).not.toContain('hunter2');
+    // The NAME is kept, so a reader can see a credential was supplied.
+    expect(rec['password']).toBeDefined();
+    expect(rec['password']?.value).toBeNull();
+    expect(rec['password']?.redacted).toBe(true);
+  });
+
+  it('carries the sensitivity the ARTIFACT declared, not one guessed from the value', () => {
+    // This is what makes an argument scrub under the same rule as an output.
+    const rec = recordedInputs(cap, { memberId: '12345' });
+    const declared = cap.inputs.find((i) => i.name === 'memberId')?.sensitivity;
+    expect(rec['memberId']?.sensitivity).toBe(declared);
+  });
+
+  it('omits arguments that were not supplied rather than inventing empties', () => {
+    expect(recordedInputs(cap, {})).toEqual({});
   });
 });

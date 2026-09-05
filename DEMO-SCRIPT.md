@@ -31,6 +31,12 @@ every beat below appears there as it happens.
 One model call picks a capability and binds arguments. The run itself makes
 **zero**. Switch to Runs and it is there: 7 steps, ~6s, `llmCalls 0`.
 
+Open the run. It shows the arguments it was invoked with — and the password
+recorded as *supplied by the server, never recorded* — its per-step timings,
+and every evidence file, openable in place. Click a `.png` and you are looking
+at the masked screenshot; click the `.a11y.json` and you are looking at exactly
+what the resolver saw.
+
 *Say:* "The model chose which capability to call. It did not decide a single
 click — those were recorded once and reviewed."
 
