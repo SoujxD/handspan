@@ -49,6 +49,59 @@ export interface CoreEdit {
   lines: number;
 }
 
+/**
+ * How long an invocation takes, at the tail as well as in the middle.
+ *
+ * The mean was the only figure here, and for anything that sits behind a live
+ * member conversation it is the wrong one: a caller waits for their own request,
+ * not for the average of everybody's. p95 is what decides whether this can be
+ * called synchronously during a conversation or has to be handed off and
+ * reported back, and that is an architectural question, not a tuning one.
+ *
+ * Wall clock, including browser launch and sign-on — the honest number a caller
+ * would actually experience, not the sum of the parts anyone would like to
+ * exclude.
+ */
+export interface ReplayLatency {
+  samples: number;
+  meanMs: number;
+  p50Ms: number;
+  p95Ms: number;
+  maxMs: number;
+}
+
+/**
+ * The most recent runs of one capability, newest last.
+ *
+ * Run ids are `<kind>-<UTC stamp>-<suffix>`, so lexical order is chronological.
+ * The window is small on purpose: it is meant to describe the code as it stands
+ * now, and these flows change more often than they are run.
+ */
+const LATENCY_WINDOW = 10;
+
+function recentRuns(samples: Array<{ runId: string; ms: number }>): number[] {
+  return [...samples]
+    .sort((a, b) => a.runId.localeCompare(b.runId))
+    .slice(-LATENCY_WINDOW)
+    .map((s) => s.ms);
+}
+
+/** Nearest-rank percentile. No interpolation: with tens of samples rather than
+ *  thousands, every reported value is one that genuinely happened. */
+function latencyOf(samples: number[]): ReplayLatency {
+  if (!samples.length) return { samples: 0, meanMs: 0, p50Ms: 0, p95Ms: 0, maxMs: 0 };
+  const sorted = [...samples].sort((a, b) => a - b);
+  const at = (q: number): number =>
+    sorted[Math.min(sorted.length - 1, Math.ceil(q * sorted.length) - 1)] ?? 0;
+  return {
+    samples: sorted.length,
+    meanMs: Math.round(sorted.reduce((s, n) => s + n, 0) / sorted.length),
+    p50Ms: at(0.5),
+    p95Ms: at(0.95),
+    maxMs: sorted[sorted.length - 1] ?? 0,
+  };
+}
+
 export interface AdaptationReport {
   generatedAt: string;
   baseline: string;
@@ -63,6 +116,7 @@ export interface AdaptationReport {
     runs: number;
     byStatus: Record<string, number>;
     meanDurationMs: number;
+    latency: ReplayLatency;
     totalLlmCalls: number;
     usdPerThousandInvocations: number;
   };
@@ -76,6 +130,7 @@ export interface AdaptationReport {
     outcomes: number;
     byClass: Record<string, number>;
     maxRisk: string;
+    latency: ReplayLatency;
   }>;
   headline: string;
 }
@@ -221,8 +276,9 @@ export function computeAdaptation(opts: {
 
   // ---- replay ------------------------------------------------------------
   const byStatus: Record<string, number> = {};
-  let durations = 0;
-  let durationCount = 0;
+  /** Every run's wall-clock duration, kept so the tail can be reported. */
+  const durationSamples: number[] = [];
+  const durationsByCapability = new Map<string, Array<{ runId: string; ms: number }>>();
   let totalLlmCalls = 0;
   let replayRuns = 0;
   if (existsSync(opts.evidenceDir)) {
@@ -234,8 +290,22 @@ export function computeAdaptation(opts: {
       byStatus[r.status] = (byStatus[r.status] ?? 0) + 1;
       totalLlmCalls += r.meta.llmCalls;
       if (r.meta.durationMs) {
-        durations += r.meta.durationMs;
-        durationCount++;
+        durationSamples.push(r.meta.durationMs);
+        const id = r.meta.capabilityId;
+        // Per capability as well as overall. A single fleet-wide percentile
+        // answers the wrong question: these flows are 5 to 14 steps long, so
+        // the spread is mostly "which capability", not "how variable". Which
+        // ones can be called synchronously during a conversation is decided
+        // one capability at a time.
+        //
+        // The run id is kept so this can be a ROLLING window. Evidence is
+        // cumulative and immutable, and a lifetime percentile answers "what did
+        // this ever cost" when the operational question is "what does it cost
+        // now". A since-fixed stall would sit in the lifetime figure forever.
+        durationsByCapability.set(id, [
+          ...(durationsByCapability.get(id) ?? []),
+          { runId: entry, ms: r.meta.durationMs },
+        ]);
       }
     }
   }
@@ -267,6 +337,7 @@ export function computeAdaptation(opts: {
         outcomes: c.outcomes.length,
         byClass,
         maxRisk: c.policy.maxRisk,
+        latency: latencyOf(recentRuns(durationsByCapability.get(c.id) ?? [])),
       };
     });
 
@@ -280,7 +351,7 @@ export function computeAdaptation(opts: {
   const coreLines = buckets.find((b) => b.bucket === 'core')?.lines ?? 0;
   const configLines = buckets.find((b) => b.bucket === 'config')?.lines ?? 0;
   const totalUsd = discovery.reduce((s, d) => s + d.estimatedUsd, 0);
-  const meanDurationMs = durationCount ? Math.round(durations / durationCount) : 0;
+  const latency = latencyOf(durationSamples);
 
   const headline =
     `Adapting to a legacy console this system had never seen took ${configLines} lines of ` +
@@ -305,7 +376,8 @@ export function computeAdaptation(opts: {
     replay: {
       runs: replayRuns,
       byStatus,
-      meanDurationMs,
+      meanDurationMs: latency.meanMs,
+      latency,
       totalLlmCalls,
       usdPerThousandInvocations: 0,
     },

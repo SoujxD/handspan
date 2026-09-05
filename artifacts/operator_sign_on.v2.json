@@ -312,8 +312,8 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 7,
-      "successes": 7
+      "runs": 8,
+      "successes": 8
     },
     "reviewedBy": "soujanya",
     "notes": "Reclassified session timeout to escalate; recovery dropped as it no longer applies."
@@ -323,7 +323,7 @@
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-171041-ef7a07",
-    "contentHash": "5375b666773060d12f05bb9953eb2c92",
+    "contentHash": "bd6a5ab6894686d58d934e3ab70de3b5",
     "generator": "handspan"
   }
 }

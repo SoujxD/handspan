@@ -65,22 +65,40 @@ console.log(
     .map(([k, v]) => `${k}=${v}`)
     .join('  ')}`,
 );
-console.log(`  mean duration        ${report.replay.meanDurationMs} ms`);
+const lat = report.replay.latency;
+console.log(
+  `  latency (n=${lat.samples})${' '.repeat(Math.max(1, 10 - String(lat.samples).length))}` +
+    `p50 ${lat.p50Ms} ms   p95 ${lat.p95Ms} ms   max ${lat.maxMs} ms   mean ${lat.meanMs} ms`,
+);
+console.log(`                       wall clock, browser launch and sign-on included`);
 console.log(`  model calls          ${report.replay.totalLlmCalls}   <- asserted in code, not reported`);
 console.log(`  cost per 1,000       $0.00 in tokens. Replay is a browser, not a model.`);
 
 console.log(`\n  COVERAGE — MERIDIAN CORE's function surface`);
 console.log(`  ${line()}`);
 console.log(
-  `  ${'capability'.padEnd(38)} ${'v'.padStart(2)} ${'steps'.padStart(5)} ${'out'.padStart(4)} ${'risk'.padEnd(12)} outcomes`,
+  `  ${'capability'.padEnd(38)} ${'v'.padStart(2)} ${'steps'.padStart(5)} ${'out'.padStart(4)} ` +
+    `${'p50'.padStart(7)} ${'p95'.padStart(7)} ${'risk'.padEnd(12)} outcomes`,
 );
+const secs = (ms: number): string => (ms ? `${(ms / 1000).toFixed(1)}s` : '-');
 for (const c of report.coverage) {
   const classes = Object.entries(c.byClass)
     .map(([k, v]) => `${v} ${k}`)
     .join(', ');
   console.log(
     `  ${c.capabilityId.slice(0, 38).padEnd(38)} ${String(c.version).padStart(2)} ${String(c.steps).padStart(5)} ` +
-      `${String(c.outputs).padStart(4)} ${c.maxRisk.padEnd(12)} ${classes}`,
+      `${String(c.outputs).padStart(4)} ${secs(c.latency.p50Ms).padStart(7)} ${secs(c.latency.p95Ms).padStart(7)} ` +
+      `${c.maxRisk.padEnd(12)} ${classes}`,
   );
 }
-console.log('');
+console.log(
+  '\n  Latency is per capability, because the spread here is mostly step count rather' +
+    '\n  than variance, and over a rolling window of recent runs rather than all of them:' +
+    '\n  the operational question is what a call costs now, not what it ever cost.' +
+    '\n' +
+    '\n  The window lags a change until it refills. The 20s-per-dropdown stall fixed in' +
+    '\n  playwright-surface.ts took member_open_new_share from 50.5s to 13.1s measured,' +
+    '\n  operator_sign_on from 23.6s to 4.8s and member_inquiry_by_last_name from 25.3s' +
+    '\n  to 6.4s — none of which shows here yet, because most of each window is still' +
+    '\n  runs recorded before it. Evidence is immutable; the numbers catch up as it runs.',
+);

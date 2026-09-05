@@ -165,6 +165,26 @@ independent gates, one demo.
 
 ---
 
+## 5½ · Three members at once  *(terminal — 30 seconds, and worth it)*
+
+Leave the catalog running and, in a second terminal:
+
+```bash
+npx tsx scripts/verify-concurrency.ts
+```
+
+Three members served simultaneously through the HTTP API. Five assertions: own
+run id and evidence directory each, no crossed sessions, zero model calls, and
+the stability counter advancing by exactly three.
+
+*Say:* "This is the first thing a platform team asks and the last thing a demo
+usually shows. It was also broken — `recordRun` did a read-modify-write on the
+counter that gates approval, so twenty simultaneous runs recorded as one. It
+survived because nothing had ever run two at once. The unit test fires twenty
+and the counter now reads twenty."
+
+---
+
 ## 6 · The closing argument  *(Adaptation ledger tab)*
 
 ```bash
@@ -192,7 +212,7 @@ Everything above already happened and is on disk:
 
 ```bash
 npx tsx scripts/audit-evidence.ts     # PII audit across all persisted evidence
-npx vitest run                        # 105 tests
+npx vitest run                        # 128 tests
 ls evidence/                          # every discovery and replay run
 ```
 
@@ -217,6 +237,21 @@ step worked. The fleet sweep — which of 300 institutions break — is on the
 next-steps list, honestly.
 
 **"How long would a second app take?"**
-The ledger is the answer, with the rework left in: three of those nine runs
+The ledger is the answer, with the rework left in: several of those runs
 re-recorded one capability while I was fixing compiler and redaction bugs, and
 one escalated without producing an artifact. That is what it actually cost.
+
+**"Can this sit inside a live member conversation?"**
+Per capability, and the ledger says which. Balance lookup runs in about 6s and
+belongs in a conversation. A transfer is 16.6s at p95 and probably wants a "let
+me do that and come back to you". That distinction only became visible when the
+ledger started reporting a percentile instead of a mean — the mean said 18s and
+the p95 said 50.8s, and the gap turned out to be a 20-second stall on every
+dropdown in the system. See ADAPTATION.md §5; the fix took the open-share flow
+from 50.5s to 13.1s and sign-on from 23.6s to 4.8s.
+
+**"How many of these can run at once?"**
+Beat 5½ shows three. It is worth being asked, because it was broken until it was
+measured: the counter that gates a capability's approval was incremented
+in-memory, so twenty concurrent runs recorded as one. Sessions were always
+isolated — that part was sound — but the governance record was not.

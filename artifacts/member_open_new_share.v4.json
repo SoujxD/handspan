@@ -613,8 +613,8 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 7,
-      "successes": 7
+      "runs": 8,
+      "successes": 8
     },
     "reviewedBy": "soujanya",
     "notes": "request_not_validated reclassified to business after live verification showed it shadows invalid_initial_deposit."
@@ -624,7 +624,7 @@
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-170543-481467",
-    "contentHash": "08509f0b3c2d4f2e278bf09ee09a0ee5",
+    "contentHash": "fb3a54a52780dfd71b887b2e756573f6",
     "generator": "handspan"
   }
 }

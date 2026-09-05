@@ -17,6 +17,16 @@ import type { ScreenshotOptions, Surface, SurfaceAction, SurfaceSnapshot } from 
 import { snapshotPage } from './perception.js';
 import type { SessionLease } from '../../control/lease.js';
 
+/**
+ * Budget for an attempt whose failure is an expected, ordinary branch.
+ *
+ * Playwright's auto-waiting is the right default for an action that must
+ * eventually succeed, and exactly wrong for one used to ask a question. Any
+ * "try this, otherwise that" against the DOM has to bound the speculative half
+ * itself, or the cheap path silently costs a full action timeout.
+ */
+const SPECULATIVE_MATCH_TIMEOUT_MS = 1000;
+
 /** Shape emitted by the in-page operator-action listener. */
 export interface RawHumanAction {
   at: string;
@@ -254,10 +264,25 @@ export class PlaywrightSurface implements Surface {
       }
       case 'select': {
         const el = await this.locate(action.handle);
-        // Try by value, then by visible label — tenants differ on which is
-        // stable, and the artifact records the human-visible one.
+        /**
+         * Try by value, then by visible label — tenants differ on which is
+         * stable, and the artifact records the human-visible one.
+         *
+         * The speculative attempt gets a SHORT timeout of its own. Playwright
+         * auto-waits on `selectOption`, so a value that does not match is not
+         * a fast failure: it retries for the full action timeout before
+         * throwing. With the default 20s that cost 20 seconds per dropdown on
+         * the overwhelmingly common path where the artifact holds a label —
+         * 41 of the 50 seconds in `member_open_new_share`, which is most of
+         * why the p95 was five times the median.
+         *
+         * A matching option is present the moment the element is, so a second
+         * is generous. The fallback keeps the full budget, which is what
+         * actually needs it: if the page is genuinely still settling, this
+         * attempt fails fast and the labelled one waits properly.
+         */
         try {
-          await el.selectOption({ value: action.value });
+          await el.selectOption({ value: action.value }, { timeout: SPECULATIVE_MATCH_TIMEOUT_MS });
         } catch {
           await el.selectOption({ label: action.value });
         }

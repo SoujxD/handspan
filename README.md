@@ -98,6 +98,9 @@ npx tsx scripts/open-shares.ts 100234
 # Rehearse the escalation: park, hand a human the live session, hand back
 npx tsx scripts/rehearse-escalation.ts
 
+# Three members served at once, through the API (needs the catalog running)
+npx tsx scripts/verify-concurrency.ts
+
 # What the target renders, what the detectors do, and what the adaptation cost
 npx tsx scripts/recon-meridian.ts
 npx tsx scripts/verify-outcomes.ts member_funds_transfer_between_shares

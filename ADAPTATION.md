@@ -162,7 +162,7 @@ engine has no recovery kind that can re-run steps — `restartFromStep` is
 deliberately unimplemented because restarting mid-flow can re-submit an already
 committed step. A recovery that discards a half-filled form is not a recovery;
 the engine already escalates on `recovery_lost_progress` for exactly that reason.
-See §5.
+See §6.
 
 **Review → post is a checkpoint, not two clicks.** Before the committing step
 runs, the transfer asserts that the review screen restates the from-share,
@@ -247,7 +247,124 @@ automation *cannot* act — `PlaywrightSurface.act()` asserts it.
 
 ---
 
-## 5. What I deliberately left out, and would build next
+## 5. Three defects that only appear when you measure
+
+Everything above was verified before the system was measured. Adding two
+ordinary instruments — a percentile instead of a mean, and more than one caller
+at a time — found three defects that every existing check had passed over. None
+produced a wrong answer; all three were invisible by construction, which is the
+point worth making about them.
+
+### The audit trail was redacting its own correlation key
+
+`result.json` in every run on disk reads:
+
+```json
+"runId": "replay-[REDACTED:PAN]-8e3d7a"
+```
+
+The card-number rule matches 13–19 digits. A run id carries a fourteen-digit
+timestamp, so every persisted result, and nine lines of every `run.jsonl`,
+scrubbed the one field that ties a result back to the run that produced it. For
+a system whose central claim is auditability that is not cosmetic: the evidence
+could not be correlated from its own contents.
+
+The rule now validates what it matched, the way production DLP does — an
+assigned issuer range **and** the ISO/IEC 7812 check digit. Both are needed. The
+check digit alone clears nine arbitrary numbers in ten, which sounds decisive
+until the tenth is a timestamp: `20260905015133`, taken from this project's own
+evidence, passes Luhn cleanly. It is rejected because no card is issued in the
+`2026` range.
+
+This does not soften the file's stated "fail toward over-matching" doctrine.
+Both tests are properties of the thing being detected rather than confidence
+thresholds, so no real PAN stops being caught — `tests/safety.test.ts` pins ten
+brands, spaced and hyphenated, before it pins a single false positive. Evidence
+already on disk keeps the old redaction, correctly: evidence is immutable.
+
+### Twenty concurrent runs recorded as one
+
+`recordRun` increments `governance.stability.runs` — the counter that gates
+approval — and it did so on the caller's own in-memory copy. Two invocations of
+the same capability at once both read `runs: 12` and both wrote `13`.
+
+Nothing had ever run two at once, which is why it survived. Nothing about the
+deployment runs one at a time: the API serves concurrent requests, and the demo
+script itself drives a CLI replay beside a running catalog. A unit test
+(`tests/store-concurrency.test.ts`) fires twenty simultaneous records; before
+the fix it counted **one**.
+
+The counter is now re-read from disk inside a lock and incremented there, so the
+file is the only source of truth for it. The lock is a lock *file* rather than
+an in-process mutex, because the contending processes are genuinely separate —
+`npx tsx src/cli.ts replay` and the catalog server write the same artifacts. It
+is awaited rather than spun on: a synchronous spin would block the event loop,
+and two runs inside one process would then deadlock, the holder never reaching
+its own release.
+
+`scripts/verify-concurrency.ts` asserts the whole path over real HTTP against
+the live target — three members served simultaneously, each with its own run id
+and evidence directory, each returning its own member's record, zero model
+calls, and the counter advancing by exactly three.
+
+### Every dropdown cost twenty seconds
+
+The mean replay duration was 18s, which looked unremarkable. The p95 was 50.8s.
+
+The tail was not variance, and not the failure runs — it was one capability,
+`member_open_new_share`, at 50.5s on every successful run with under 400ms of
+spread between them. A number that stable is a timeout, not work. Its step log
+shows eleven steps at about a second each and two `select` steps at 20.3s.
+
+The cause is a reasonable-looking idiom:
+
+```ts
+try {
+  await el.selectOption({ value: action.value });
+} catch {
+  await el.selectOption({ label: action.value });
+}
+```
+
+Try the value, fall back to the visible label. But Playwright auto-waits, so the
+failing branch is not a fast failure — it retries for the full 20s action
+timeout before throwing. The artifact records the human-visible label, so the
+speculative branch failed *every time*, and every dropdown in the system paid
+twenty seconds for a guess.
+
+The fix bounds the speculative attempt at one second; the fallback keeps the
+full budget, which is the branch that actually needs it. Measured against the
+live target:
+
+| capability | before | after |
+|---|---|---|
+| `member_open_new_share` | 50.5s | **13.1s** |
+| `operator_sign_on` | 23.6s | **4.8s** |
+| `member_inquiry_by_last_name` | 25.3s | **6.4s** |
+
+The general lesson is in the constant's name. Playwright's auto-waiting is
+correct for an action that must eventually succeed and exactly wrong for one
+used to ask a question, so any "try this, otherwise that" against a live DOM has
+to bound the speculative half itself.
+
+### Why the ledger now reports latency per capability
+
+A single fleet-wide percentile answers the wrong question. These flows are 5 to
+14 steps long, so the spread is mostly *which capability*, not how variable any
+one of them is — and whether something can be called synchronously inside a live
+member conversation is decided one capability at a time.
+`member_share_balance_lookup` at 6.6s belongs in a conversation;
+`member_funds_transfer_between_shares` at 16.6s p95 probably wants a "let me do
+that and come back to you".
+
+It is a rolling window over recent runs rather than a lifetime figure, because
+the operational question is what a call costs now. The window lags a change
+until it refills, and the report says so rather than quietly printing a number
+the current code would not produce.
+
+---
+
+## 6. What I deliberately left out, and would build next
 
 **A re-authentication recovery kind.** The honest gap. `RecoveryAction` has no
 variant that can re-run a declared prefix of a flow, so a mid-flow session
