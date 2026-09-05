@@ -192,10 +192,10 @@ npx tsx scripts/adaptation-report.ts
 ```
 
 It prints the current figures — do not read them off this page, they move every
-time you run anything. At the time of writing: **374 lines of configuration, 292
+time you run anything. At the time of writing: **405 lines of configuration, 452
 lines of core** (every line listed so you can check each is generic), **$10.30**
-across nine discovery runs for seven capabilities, and **zero model calls across
-58 replays**.
+across ten discovery runs for seven capabilities, and **zero model calls across
+68 replays**.
 
 *Say:* "The headline is deliberately not 'zero core changes'. A core that needed
 no changes is equally consistent with a core too thin to be stressed. The claim
@@ -203,6 +203,13 @@ I will defend is *N generic core edits, zero target-specific ones* — because
 generic edits amortise across every app you onboard, and target-specific ones
 never do. The one genuine coupling I found is in there too: the CLI used to
 import its institution list from the mock application's own module."
+
+**If someone notices the core number grew**, that is the right thing to notice
+and the answer is a good one. It went from 292 to 452 in the last three commits,
+and all of it is the three defects in ADAPTATION.md §5: a card-number validator,
+a lock around a governance counter, and a one-line timeout on a speculative
+`selectOption`. None is about MERIDIAN CORE. Every one of them makes app number
+2,001 cheaper too, which is the whole test of whether a core edit was generic.
 
 ---
 
