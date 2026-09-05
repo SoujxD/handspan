@@ -155,7 +155,7 @@ cp .env.example .env        # then add your key (see below)
 Everything except `discover` runs with **no API key and no network**:
 
 ```bash
-npm test                              # 98 tests — resolver, policy, redaction,
+npm test                              # 128 tests — resolver, policy, redaction,
                                       # schema invariants, control-transfer FSM
 npx tsx tests/smoke-perception.ts     # see exactly what the model would see
 npm run replay -- ...                 # deterministic replay: zero model calls
@@ -434,7 +434,7 @@ must not retry it forever.
 | `npx tsx scripts/verify-artifact.ts <id>` | Audit an artifact: structural invariants, no baked-in credentials or PII, no id-based matching, approval traceable to a reviewer |
 | `npx tsx scripts/verify-outcomes.ts <id>` | Replay each declared outcome and report which detectors actually fire |
 | `npx tsx scripts/audit-evidence.ts` | Fail if any seeded PII or credential survived into `/evidence` |
-| `npm test` / `npm run typecheck` | 98 tests / strict TypeScript |
+| `npm test` / `npm run typecheck` | 128 tests / strict TypeScript |
 | `npm run test:replay` / `npm run test:escalation` | Integration: 8 replay scenarios (0 model calls) and the full control-transfer cycle |
 
 ---
