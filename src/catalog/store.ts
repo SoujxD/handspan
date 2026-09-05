@@ -13,7 +13,16 @@
  * without knowing anything about browsers.
  */
 
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import {
+  closeSync,
+  existsSync,
+  openSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { type Capability, parseCapability, validateCapability } from '../types/artifact.js';
 import type { ReplayResult } from '../types/result.js';
@@ -217,19 +226,97 @@ export class CapabilityStore {
    * capability to 1/2.
    *
    * Returns whether the run was counted, so callers can say so.
+   *
+   * CONCURRENCY. This is a read-modify-write on a counter that gates approval,
+   * and it used to increment the caller's own in-memory copy. Two invocations
+   * of the same capability at once — the HTTP API serving two requests, or a
+   * CLI replay running beside the catalog, which is exactly how the demo is
+   * driven — both read `runs: 12` and both wrote `13`. Last write wins and a
+   * run silently vanishes from the governance record.
+   *
+   * So the counter is re-read from disk inside a lock and incremented there.
+   * The caller's object is not the source of truth for it; only the file is.
    */
-  recordRun(cap: Capability, result: ReplayResult): boolean {
+  async recordRun(cap: Capability, result: ReplayResult): Promise<boolean> {
     if (!countsTowardStability(result)) return false;
+    const counted = result.status === 'success' || result.status === 'outcome';
 
-    cap.governance.stability.runs += 1;
-    if (result.status === 'success' || result.status === 'outcome') {
-      cap.governance.stability.successes += 1;
-    }
-    cap.provenance.contentHash = hashCapability(cap);
-    this.save(cap);
+    await this.withLock(cap.id, () => {
+      // Re-read rather than trusting `cap`: another process may have recorded
+      // a run against this exact version since it was loaded.
+      const fresh = this.load(cap.id, cap.version);
+      fresh.governance.stability.runs += 1;
+      if (counted) fresh.governance.stability.successes += 1;
+      fresh.provenance.contentHash = hashCapability(fresh);
+      this.save(fresh);
+      // Keep the caller's view consistent with what was actually persisted,
+      // so anything that reports the score after this call reports the truth.
+      cap.governance.stability = fresh.governance.stability;
+      cap.provenance.contentHash = fresh.provenance.contentHash;
+    });
     return true;
   }
+
+  /**
+   * Hold an exclusive lock on one capability id while `fn` runs.
+   *
+   * A lock file rather than an in-process mutex, because the processes that
+   * contend here are genuinely separate: `npx tsx src/cli.ts replay` and the
+   * catalog server write the same artifacts, and the demo runs both at once.
+   * `wx` fails if the file exists, which is the atomic test-and-set this needs.
+   *
+   * The wait is `await`ed, never spun. A synchronous spin would block the event
+   * loop, and two runs inside one process would then deadlock: the holder could
+   * never reach the code that releases the lock.
+   *
+   * A lock older than the timeout is broken rather than obeyed. A process
+   * killed mid-write — Ctrl-C during a demo — must not leave a capability
+   * permanently unrecordable, and the write it was performing is a single
+   * `writeFileSync` of a validated document.
+   */
+  private async withLock<T>(id: string, fn: () => T): Promise<T> {
+    const lock = join(this.dir, `.${id}.lock`);
+    const deadline = Date.now() + LOCK_TIMEOUT_MS;
+
+    for (;;) {
+      try {
+        closeSync(openSync(lock, 'wx'));
+        break;
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== 'EEXIST') throw e;
+        const heldSince = existsSync(lock) ? statSync(lock).mtimeMs : 0;
+        if (Date.now() - heldSince > LOCK_TIMEOUT_MS) {
+          // Stale. Break it and retry; the next `wx` decides the winner.
+          try {
+            unlinkSync(lock);
+          } catch {
+            /* another waiter broke it first, which is the same outcome */
+          }
+        }
+        if (Date.now() > deadline) {
+          throw new Error(
+            `Timed out after ${LOCK_TIMEOUT_MS}ms waiting to record a run against "${id}". ` +
+              `Another process is holding ${lock}; remove it if nothing is running.`,
+          );
+        }
+        await new Promise((r) => setTimeout(r, 15));
+      }
+    }
+
+    try {
+      return fn();
+    } finally {
+      try {
+        unlinkSync(lock);
+      } catch {
+        /* already broken as stale; the work is done either way */
+      }
+    }
+  }
 }
+
+/** How long to wait for the artifact lock, and when to call one stale. */
+const LOCK_TIMEOUT_MS = 5_000;
 
 /** JSON-Schema tool definition, the shape a function-calling agent expects. */
 export interface ToolDefinition {

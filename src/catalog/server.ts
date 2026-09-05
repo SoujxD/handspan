@@ -154,7 +154,7 @@ export async function startCatalog(port = runtimeConfig().catalogPort): Promise<
         operatorBaseUrl: operatorBaseUrl(),
       });
 
-      store.recordRun(cap, result);
+      await store.recordRun(cap, result);
       evidence.saveJson('result', result);
     } finally {
       // Escalated runs keep the session alive for the operator; everything

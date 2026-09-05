@@ -258,7 +258,7 @@ program
 
       evidence.saveJson('result', result);
       results.push(result);
-      store.recordRun(cap, result);
+      await store.recordRun(cap, result);
 
       console.log(`\n  ${repeat > 1 ? `[run ${i + 1}/${repeat}] ` : ''}${summarize(result)}`);
       printResult(result);
