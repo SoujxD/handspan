@@ -25,7 +25,93 @@ export interface RedactionPattern {
   name: string;
   regex: string;
   replacement: string;
+  /**
+   * Optional checksum gate on whatever the regex matched.
+   *
+   * A pattern that recognises a *format* will fire on anything shaped like it,
+   * and for card numbers the format is "13 to 19 digits" — which is also the
+   * shape of a timestamp, an order reference, and this system's own run ids.
+   * Every persisted evidence file was reporting its own `runId` as
+   * `replay-[REDACTED:PAN]-8e3d7a`, so a result could not be correlated back to
+   * the run that produced it. An audit trail that redacts its own correlation
+   * key is not doing redaction, it is losing evidence.
+   *
+   * This does not soften the file's "fail toward over-matching" doctrine. The
+   * gate tests properties of the thing being detected, not a confidence
+   * threshold: every issued card number satisfies both of them, so nothing that
+   * is a PAN stops being matched. It removes a class of false positive without
+   * giving up recall, which is why production DLP engines gate the same rule
+   * the same way.
+   */
+  validate?: 'card';
 }
+
+/**
+ * Checksum validators, keyed by the name a pattern declares.
+ *
+ * Separate from the patterns themselves so policy stays data. A rule that
+ * names a validator this map does not have is a policy error, not a silent
+ * downgrade to "match everything" — see the constructor.
+ */
+/**
+ * Issuer Identification Number ranges actually in circulation (ISO/IEC 7812).
+ *
+ * The check-digit test alone is not enough. It rejects nine out of ten
+ * arbitrary numbers, which sounds decisive and is not: one run id in ten still
+ * satisfies it by chance, and `20260905015133` — a real timestamp from this
+ * project's evidence — is one of them. A number is only a card if it is *also*
+ * issued from an assigned range, so both tests are applied.
+ */
+const IIN_RANGES: Array<{ lo: number; hi: number; digits: number }> = [
+  { lo: 4, hi: 4, digits: 1 }, // Visa
+  { lo: 34, hi: 34, digits: 2 }, // American Express
+  { lo: 37, hi: 37, digits: 2 }, // American Express
+  { lo: 36, hi: 36, digits: 2 }, // Diners Club International
+  { lo: 38, hi: 39, digits: 2 }, // Diners Club / carte blanche
+  { lo: 51, hi: 55, digits: 2 }, // Mastercard
+  { lo: 62, hi: 62, digits: 2 }, // UnionPay
+  { lo: 65, hi: 65, digits: 2 }, // Discover
+  { lo: 300, hi: 305, digits: 3 }, // Diners Club
+  { lo: 644, hi: 649, digits: 3 }, // Discover
+  { lo: 2221, hi: 2720, digits: 4 }, // Mastercard 2-series
+  { lo: 3528, hi: 3589, digits: 4 }, // JCB
+  { lo: 6011, hi: 6011, digits: 4 }, // Discover
+];
+
+const VALIDATORS: Record<string, (match: string) => boolean> = {
+  /**
+   * Is this actually a payment card number?
+   *
+   * Two independent tests, both of which every issued card satisfies:
+   * an assigned issuer range, and the ISO/IEC 7812 check digit. Separators are
+   * stripped first because the pattern deliberately tolerates the spaces and
+   * hyphens a card is printed with. Length is re-checked here as well as in the
+   * regex, so the validator stays correct if the pattern is ever loosened.
+   */
+  card(match: string): boolean {
+    const digits = match.replace(/\D/g, '');
+    if (digits.length < 13 || digits.length > 19) return false;
+
+    const issued = IIN_RANGES.some((r) => {
+      const prefix = Number(digits.slice(0, r.digits));
+      return prefix >= r.lo && prefix <= r.hi;
+    });
+    if (!issued) return false;
+
+    let sum = 0;
+    let double = false;
+    for (let i = digits.length - 1; i >= 0; i -= 1) {
+      let d = digits.charCodeAt(i) - 48;
+      if (double) {
+        d *= 2;
+        if (d > 9) d -= 9;
+      }
+      sum += d;
+      double = !double;
+    }
+    return sum % 10 === 0;
+  },
+};
 
 export interface RedactionStats {
   /** How many times each rule fired. Surfaced in the run summary so a spike in
@@ -34,7 +120,12 @@ export interface RedactionStats {
 }
 
 export class Redactor {
-  private readonly compiled: Array<{ name: string; re: RegExp; replacement: string }>;
+  private readonly compiled: Array<{
+    name: string;
+    re: RegExp;
+    replacement: string;
+    validate?: (match: string) => boolean;
+  }>;
   /** Exact values registered at runtime. Never itself logged. */
   private readonly secrets = new Set<string>();
   private readonly stats: RedactionStats = { hits: {} };
@@ -48,8 +139,24 @@ export class Redactor {
     // same secret, and a pattern that only catches one of them is worse than
     // no pattern, because it looks like it is working.
     this.compiled = patterns.map((p) => {
+      // An unknown validator name is refused rather than ignored. Ignoring it
+      // would leave the rule matching everything it matched before, which is
+      // the safe direction for redaction and the wrong one for trust: the
+      // policy would claim a checksum gate it does not have.
+      if (p.validate !== undefined && VALIDATORS[p.validate] === undefined) {
+        throw new Error(
+          `policy.yaml: redaction pattern "${p.name}" declares unknown validator "${p.validate}". ` +
+            `Known validators: ${Object.keys(VALIDATORS).join(', ')}.`,
+        );
+      }
+      const validate = p.validate ? VALIDATORS[p.validate] : undefined;
       try {
-        return { name: p.name, re: new RegExp(p.regex, 'gi'), replacement: p.replacement };
+        return {
+          name: p.name,
+          re: new RegExp(p.regex, 'gi'),
+          replacement: p.replacement,
+          ...(validate ? { validate } : {}),
+        };
       } catch (e) {
         throw new Error(
           `policy.yaml: invalid redaction pattern "${p.name}": /${p.regex}/ — ${(e as Error).message}. ` +
@@ -94,11 +201,25 @@ export class Redactor {
 
     for (const p of this.compiled) {
       p.re.lastIndex = 0;
-      if (p.re.test(out)) {
-        p.re.lastIndex = 0;
+      if (!p.re.test(out)) continue;
+      p.re.lastIndex = 0;
+
+      if (!p.validate) {
         out = out.replace(p.re, p.replacement);
         this.bump(p.name);
+        continue;
       }
+
+      // A validated rule may match and still decline, so the hit is counted
+      // from what was actually replaced rather than from what matched.
+      const check = p.validate;
+      let fired = false;
+      out = out.replace(p.re, (match) => {
+        if (!check(match)) return match;
+        fired = true;
+        return p.replacement;
+      });
+      if (fired) this.bump(p.name);
     }
 
     return out;

@@ -197,6 +197,19 @@ redaction:
     - name: pan
       regex: "(?<!\\d)(?:\\d[ -]*?){13,19}(?!\\d)"
       replacement: "[REDACTED:PAN]"
+      # "13 to 19 digits" is also the shape of a timestamp, and of this
+      # system's own run ids: every evidence file was reporting its runId as
+      # replay-[REDACTED:PAN]-8e3d7a. An audit trail cannot redact the key it
+      # is correlated by, so the match is gated on two things every issued card
+      # satisfies — an assigned issuer range, and the ISO/IEC 7812 check digit.
+      #
+      # Both, not just the check digit: Luhn alone clears nine numbers in ten,
+      # and the timestamp 20260905015133 is one of the tenth that passes.
+      #
+      # This is a property of the thing being detected, not a confidence
+      # threshold, so it does not soften the over-matching doctrine above. No
+      # real PAN stops being caught.
+      validate: card
     - name: email
       regex: "[\\w.%+-]+@[\\w.-]+\\.[A-Za-z]{2,}"
       replacement: "[REDACTED:EMAIL]"

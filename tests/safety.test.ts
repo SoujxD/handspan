@@ -232,4 +232,78 @@ describe('redaction', () => {
     expect(out.durationMs).toBe(5220);
     expect(out.steps).toBe(6);
   });
+
+  /**
+   * The PAN rule recognises a format, and "13 to 19 digits" is also the shape
+   * of a timestamp. Left ungated it redacted this system's own run ids, so
+   * every persisted result named itself `replay-[REDACTED:PAN]-8e3d7a` and
+   * could not be correlated to the run that produced it.
+   *
+   * Recall first, in every test below: the gate is only defensible if no real
+   * card slips through it.
+   */
+  describe('card number detection', () => {
+    const r = (): Redactor => new Redactor(policy.file.redaction.patterns);
+
+    it.each([
+      ['Visa', '4111111111111111'],
+      ['Visa, spaced as printed', '4111 1111 1111 1111'],
+      ['Visa, hyphenated', '4111-1111-1111-1111'],
+      ['Visa 13-digit', '4222222222222'],
+      ['Amex', '378282246310005'],
+      ['Mastercard', '5555555555554444'],
+      ['Mastercard 2-series', '2223003122003222'],
+      ['Discover', '6011111111111117'],
+      ['JCB', '3530111333300000'],
+      ['Diners Club', '30569309025904'],
+    ])('still redacts a real %s number', (_brand, pan) => {
+      const out = r().text(`card on file ${pan} exp 04/29`);
+      expect(out).not.toContain(pan);
+      expect(out).toContain('[REDACTED:PAN]');
+    });
+
+    it.each([
+      // The original defect: a run id, whose digits happen to satisfy Luhn.
+      ['a run id', 'replay-20260905-015133-8e3d7a'],
+      ['a bare timestamp', 'posted at 20260905015133'],
+      ['a confirmation reference', 'confirmation CN480251 for 20260904161227'],
+      ['a member and share id', 'member 100234 share 100234-S0001'],
+      ['a content hash', 'contentHash cc19ae9132fdd8745e6bdd03f87a3773'],
+    ])('does not redact %s', (_what, text) => {
+      expect(r().text(text)).toBe(text);
+    });
+
+    it('rejects a number that passes Luhn but is from no issued range', () => {
+      // 20260905015133 sums to 40 under Luhn — a clean pass. Nine numbers in
+      // ten fail the check digit, which sounds decisive until the tenth is a
+      // timestamp. The issuer range is what actually separates the two.
+      expect(r().text('20260905015133')).toBe('20260905015133');
+    });
+
+    it('rejects a number in an issued range that fails the check digit', () => {
+      // A Visa-shaped number with the last digit changed. Both gates are load
+      // bearing; neither alone would keep this test and the one above passing.
+      expect(r().text('4111111111111112')).toBe('4111111111111112');
+    });
+
+    it('refuses a policy that names a validator it does not have', () => {
+      // Ignoring it would leave the rule matching exactly as much as before —
+      // the safe direction for redaction, and the wrong one for trust, since
+      // the policy would claim a checksum gate that was never applied.
+      expect(
+        () =>
+          new Redactor([
+            { name: 'pan', regex: '\\d+', replacement: 'x', validate: 'sha256' as 'card' },
+          ]),
+      ).toThrow(/unknown validator/i);
+    });
+
+    it('counts a hit only when a match was actually replaced', () => {
+      const red = r();
+      red.text('run 20260905015133 is not a card');
+      expect(red.redactionStats.hits['pan']).toBeUndefined();
+      red.text('but 4111111111111111 is');
+      expect(red.redactionStats.hits['pan']).toBe(1);
+    });
+  });
 });
