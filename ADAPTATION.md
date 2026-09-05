@@ -1,10 +1,10 @@
 # Adaptation write-up — pointing Handspan at MERIDIAN CORE
 
-> Adapting to a legacy console this system had never seen took **330 lines of
-> configuration** and **292 lines of core change — all of it generic, none of it
-> specific to this target** — plus **$10.30** across 9 discovery runs and 7
+> Adapting to a legacy console this system had never seen took **405 lines of
+> configuration** and **503 lines of core change — all of it generic, none of it
+> specific to this target** — plus **$10.30** across 10 discovery runs and 7
 > capabilities. Replay costs zero tokens, by construction: **0 model calls
-> across 53 replays**.
+> across 80 replays**.
 
 Those numbers are computed, not asserted. `npx tsx scripts/adaptation-report.ts`
 regenerates them from the git diff since the `pre-meridian` tag, the token usage
@@ -17,6 +17,13 @@ worth defending is *N generic core edits, zero target-specific ones*, because
 generic edits amortise across every app and target-specific ones never do. Every
 core line is listed individually in the report so the claim can be checked
 rather than accepted.
+
+Most of that core figure arrived late and deliberately: §5 records six defects
+that only surfaced once the system was measured and re-read against the brief,
+and their fixes are generic to a fault — a card-number validator, a lock around
+a governance counter, a timeout on a speculative match, and recording the
+arguments a run was invoked with. Every one of them makes app number 2,001
+cheaper too, which is the only test of "generic" that means anything.
 
 ---
 
