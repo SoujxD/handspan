@@ -52,9 +52,10 @@ discovery run and replaying with **zero model calls**.
 - What the target actually renders, measured before anything was recorded:
   **[evidence/recon/SURFACE-NOTES.md](./evidence/recon/SURFACE-NOTES.md)**.
 
-> 405 lines of configuration, 589 lines of core change — all generic, none
-> target-specific — $10.30 across ten discovery runs, and 0 model calls across
-> 124 replays. `npx tsx scripts/adaptation-report.ts` recomputes it.
+> 428 lines of configuration, 589 lines of core change — all generic, none
+> target-specific — $10.30 across ten discovery runs, and **0 model calls in any
+> replay, ever** — asserted in code before a result is returned, not merely
+> reported. `npx tsx scripts/adaptation-report.ts` recomputes all of it.
 
 **Two applications are called "Meridian Core" here and it is a coincidence.**
 The hosted target is Cornerstone Financial Systems' Meridian Core 4.2.1; the

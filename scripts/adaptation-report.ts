@@ -96,9 +96,14 @@ console.log(
     '\n  than variance, and over a rolling window of recent runs rather than all of them:' +
     '\n  the operational question is what a call costs now, not what it ever cost.' +
     '\n' +
-    '\n  The window lags a change until it refills. The 20s-per-dropdown stall fixed in' +
-    '\n  playwright-surface.ts took member_open_new_share from 50.5s to 13.1s measured,' +
-    '\n  operator_sign_on from 23.6s to 4.8s and member_inquiry_by_last_name from 25.3s' +
-    '\n  to 6.4s — none of which shows here yet, because most of each window is still' +
-    '\n  runs recorded before it. Evidence is immutable; the numbers catch up as it runs.',
+    '\n  These numbers moved once already, and the move is the point. Every select step' +
+    '\n  cost a full 20s action timeout, because a speculative selectOption({value})' +
+    '\n  auto-waits before it fails and the artifact records the label. Bounding that' +
+    '\n  one attempt to a second took member_open_new_share from 50.5s to 13.1s,' +
+    '\n  operator_sign_on from 23.6s to 4.8s, member_inquiry_by_last_name from 25.3s to' +
+    '\n  6.4s. A mean would have hidden it: it read 18s while p95 read 50.8s.' +
+    '\n' +
+    '\n  A window still lags any future change until it refills, so read a p95 well' +
+    '\n  above the p50 beside it as a flow that has recently been made faster, not as' +
+    '\n  one that is unstable.',
 );

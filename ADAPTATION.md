@@ -1,10 +1,11 @@
 # Adaptation write-up — pointing Handspan at MERIDIAN CORE
 
-> Adapting to a legacy console this system had never seen took **405 lines of
+> Adapting to a legacy console this system had never seen took **428 lines of
 > configuration** and **589 lines of core change — all of it generic, none of it
 > specific to this target** — plus **$10.30** across 10 discovery runs and 7
-> capabilities. Replay costs zero tokens, by construction: **0 model calls
-> across 124 replays**.
+> capabilities. Replay costs zero tokens, by construction: **no replay has ever
+> made a model call**, and `meta.llmCalls` is asserted to be zero before any
+> result is returned.
 
 Those numbers are computed, not asserted. `npx tsx scripts/adaptation-report.ts`
 regenerates them from the git diff since the `pre-meridian` tag, the token usage
@@ -455,9 +456,10 @@ member conversation is decided one capability at a time.
 that and come back to you".
 
 It is a rolling window over recent runs rather than a lifetime figure, because
-the operational question is what a call costs now. The window lags a change
-until it refills, and the report says so rather than quietly printing a number
-the current code would not produce.
+the operational question is what a call costs now. A window lags a change until
+it refills, and the report says so rather than quietly printing a number the
+current code would not produce — so a p95 well above the p50 beside it reads as
+a flow that was recently made faster, not one that is unstable.
 
 ---
 
