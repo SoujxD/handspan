@@ -47,7 +47,8 @@ discovery run and replaying with **zero model calls**.
 
 - Write-up: **[ADAPTATION.md](./ADAPTATION.md)** — what it cost, what had to
   change, and what I cut.
-- Live demo path: **[DEMO-SCRIPT.md](./DEMO-SCRIPT.md)**.
+- Live demo path: the commands are below, under
+  **[Invoking a capability against the live target](#invoking-a-capability-against-the-live-target)**.
 - What the target actually renders, measured before anything was recorded:
   **[evidence/recon/SURFACE-NOTES.md](./evidence/recon/SURFACE-NOTES.md)**.
 

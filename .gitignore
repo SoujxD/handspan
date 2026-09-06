@@ -16,6 +16,12 @@ evidence/scratch/
 # submission. Kept locally, never published.
 Assignment*.pdf
 
-# Personal demo-prep notes, not part of the submission.
+# Personal prep and explanation material, not part of the submission.
+# Kept locally - the demo script is needed on the day - but never published:
+# it carries the running order and the lines to say, which is preparation,
+# not a deliverable. The brief asks for the demo path in the README, and
+# the README carries it.
 docs/DEMO-PREP.md
 docs/ADAPTATION-EXPLAINER.md
+docs/SYSTEM-DESIGN.html
+DEMO-SCRIPT.md
