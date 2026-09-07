@@ -132,10 +132,11 @@ npx tsx src/cli.ts replay -c member_share_balance_lookup -t meridian-demo --head
 
 npx tsx src/cli.ts replay -c member_funds_transfer_between_shares -t meridian-demo --headless   -i memberNumber=100234 -i fromShareOption=100234-S0001-6   -i toShareOption=100234-MMKT-11 -i amount=1.00 -i memo="demo"
 
-# The staging capability that escalates: this deployment is a teller
-npx tsx src/cli.ts replay -c place_account_hold_request -t meridian-demo   -i memberNumber=100987 -i shareId=100987-S0001   -i "reasonCode=FRAUD - Suspected fraud" -i notes="pending review"
+# The staging capability that escalates: this deployment is a teller.
+# `npm run demo:hold` is the same command, short enough to paste in one line.
+npx tsx src/cli.ts replay -c place_account_hold_request -t meridian-demo   -i memberNumber=100987 -i shareId=100987-S0001   -i "reasonCode=FRAUD - Suspected fraud" -i "notes=pending review"
 
-# Which of a member's shares can actually be debited right now
+# Which of a member's shares can actually be debited right now  (npm run demo:shares)
 npx tsx scripts/open-shares.ts 100234
 
 # Rehearse the escalation: park, hand a human the live session, hand back

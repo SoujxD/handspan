@@ -1,0 +1,46 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-20260907-013756-2049d0",
+    "capabilityId": "place_account_hold_request",
+    "capabilityVersion": 9,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-07T01:37:58.471Z",
+    "finishedAt": "2026-09-07T01:37:58.472Z",
+    "durationMs": 1,
+    "stepsAttempted": 0,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-20260907-013756-2049d0",
+    "llmCalls": 0,
+    "inputs": {
+      "operatorId": {
+        "value": "teller1",
+        "sensitivity": "internal",
+        "redacted": false
+      },
+      "operatorPassword": {
+        "value": null,
+        "sensitivity": "secret",
+        "redacted": true
+      }
+    }
+  },
+  "failure": {
+    "kind": "invalid_input",
+    "message": "Missing required input(s): memberNumber, shareId, reasonCode",
+    "atStepId": null,
+    "stepIntent": null,
+    "expected": null,
+    "observed": null,
+    "remediation": "Supply them, e.g. --input memberNumber=<value>"
+  },
+  "partialOutputs": {},
+  "trace": [],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-20260907-013756-2049d0/run.jsonl",
+      "capturedAt": "2026-09-07T01:37:56.746Z"
+    }
+  ]
+}
