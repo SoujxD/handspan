@@ -205,9 +205,11 @@ npx tsx tests/smoke-perception.ts     # see exactly what the model would see
 npm run replay -- ...                 # deterministic replay: zero model calls
 ```
 
-The two committed artifacts in [`/artifacts`](./artifacts) — both produced by
-real Opus 5 runs against the live app — mean you can exercise the entire replay
-path, including every error class, without spending a token.
+The two mock-app capabilities recorded in [`/artifacts`](./artifacts) —
+`member_savings_balance` and `member_open_sub_account`, both produced by real
+Opus 5 runs against this app — mean you can exercise the entire replay path,
+including every error class, without spending a token. The other seven are
+bound to the hosted MERIDIAN CORE target.
 
 ---
 
