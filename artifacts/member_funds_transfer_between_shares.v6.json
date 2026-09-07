@@ -721,7 +721,7 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 6,
+      "runs": 7,
       "successes": 4
     },
     "reviewedBy": "s.chavan",
@@ -732,7 +732,7 @@
     "model": "claude-opus-5",
     "effort": "high",
     "discoveryRunId": "disc-20260904-163212-68eb6c",
-    "contentHash": "e099f88a00e9d918b31978113dedcd91",
+    "contentHash": "eb6ce882e31dfda60880a15e39954cf5",
     "generator": "handspan"
   }
 }
