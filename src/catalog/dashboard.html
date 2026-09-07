@@ -288,12 +288,17 @@ async function showEvidence(runId, file) {
   let body = text;
   if (file.endsWith('.jsonl')) {
     // One JSON object per line; pretty-print each so a step is readable.
-    body = text.split('
-').filter(Boolean).map((l) => {
-      try { return JSON.stringify(JSON.parse(l), null, 2); } catch { return l; }
-    }).join('
-
-');
+    body = text
+      .split('\n')
+      .filter(Boolean)
+      .map((l) => {
+        try {
+          return JSON.stringify(JSON.parse(l), null, 2);
+        } catch {
+          return l;
+        }
+      })
+      .join('\n\n');
   } else if (file.endsWith('.json')) {
     try { body = JSON.stringify(JSON.parse(text), null, 2); } catch { /* show it raw */ }
   }

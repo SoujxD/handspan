@@ -433,8 +433,8 @@
   "governance": {
     "approval": "approved",
     "stability": {
-      "runs": 7,
-      "successes": 7
+      "runs": 9,
+      "successes": 9
     },
     "reviewedBy": "s.chavan",
     "notes": "Adds the maintenance interstitial as a recoverable outcome. Detector, resolution and dismissal verified against the live host by scripts/verify-interstitial.ts; three clean runs on this version."
@@ -444,7 +444,7 @@
     "model": "claude-opus-5",
     "effort": "high",
     "discoveryRunId": "disc-20260904-161707-5c5064",
-    "contentHash": "bed6a74230c7d142f5a61817ec039897",
+    "contentHash": "39e6cf13147d2fca904f989378eeb830",
     "generator": "handspan"
   }
 }
