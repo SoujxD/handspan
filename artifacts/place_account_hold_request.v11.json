@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "place_account_hold_request",
-  "version": 9,
+  "version": 11,
   "name": "Place Account Hold Request (to confirmation screen)",
   "description": "Signs on to the Meridian Core servicing console with the deployment's operator credentials, looks up a member by member number, opens the Place Account Hold action, fills in share, reason code and notes, and submits to reach the CONFIRM ACCOUNT HOLD review screen (banner: IRREVERSIBLE ACTION). It stops there without applying the hold, and returns the reviewed member, share, reason and notes for human approval. Applying the hold is supervisor-only and is refused by policy in every mode, so a teller deployment escalates to a person at that point. Returns a business outcome if no member matches the number supplied.",
   "surface": {
@@ -130,7 +130,7 @@
   "steps": [
     {
       "id": "s01",
-      "intent": "Enter the supervisor operator ID in the Operator ID box on the sign-on screen.",
+      "intent": "Enter the operator ID on the sign-on screen.",
       "act": {
         "action": "type",
         "target": {
@@ -190,7 +190,7 @@
     },
     {
       "id": "s03",
-      "intent": "Sign on to the servicing console as the supervisor operator.",
+      "intent": "Sign on to the servicing console with the deployment's operator credentials.",
       "act": {
         "action": "click",
         "target": {
@@ -632,17 +632,17 @@
   "governance": {
     "approval": "draft",
     "stability": {
-      "runs": 4,
-      "successes": 1
+      "runs": 1,
+      "successes": 0
     },
-    "notes": "[reviewer] signon_failed: hard -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] input shareId: Recorded example carried the dropdown's descriptive suffix rather than the share id a caller has.\n[reviewer] checkpoint on s03: The recorded checkpoint asserted 'Signed on as S.' because this capability was discovered while signed on as a supervisor. That checks WHO signed on rather than THAT anyone did, and it made the artifact unusable by any other operator - which is the whole point of the escalation path, where a teller attempts the action and is refused. Replaced with an assertion of what the step actually guarantees.\n[reviewer] supervisor_override_denied: escalate -> escalate. The recorded guidance said to re-run with a supervisor operator id. That stopped being possible when operator identity became a deployment property rather than a request parameter - and it is the first thing an on-call human reads. Replaced with what someone can actually do: take the parked session and finish it by hand.\n[reviewer] description: Said 'as a supervisor operator', which is wrong and misleading in two ways: operatorId is bound to the deployment so the caller cannot choose an identity, and this deployment is a teller - which is exactly what makes the escalation structural rather than arranged. This is the tool description a routing model reads.\n[reviewer] input operatorId: Example said super1, implying the caller picks the identity. operatorId is bound to the deployment via HANDSPAN_BOUND_INPUTS and is stripped from the schema the chatbot sees, so the example must show what this deployment actually acts as."
+    "notes": "[reviewer] signon_failed: hard -> hard. A rejected sign-on is not an answer this capability was asked for - the caller wanted a balance, a transfer or a search. It means the automation cannot proceed and a human must fix the credential configuration, which is a hard failure. Only operator_sign_on, whose whole job is to sign on, reports it as a business outcome.\n[reviewer] input shareId: Recorded example carried the dropdown's descriptive suffix rather than the share id a caller has.\n[reviewer] checkpoint on s03: The recorded checkpoint asserted 'Signed on as S.' because this capability was discovered while signed on as a supervisor. That checks WHO signed on rather than THAT anyone did, and it made the artifact unusable by any other operator - which is the whole point of the escalation path, where a teller attempts the action and is refused. Replaced with an assertion of what the step actually guarantees.\n[reviewer] supervisor_override_denied: escalate -> escalate. The recorded guidance said to re-run with a supervisor operator id. That stopped being possible when operator identity became a deployment property rather than a request parameter - and it is the first thing an on-call human reads. Replaced with what someone can actually do: take the parked session and finish it by hand.\n[reviewer] description: Said 'as a supervisor operator', which is wrong and misleading in two ways: operatorId is bound to the deployment so the caller cannot choose an identity, and this deployment is a teller - which is exactly what makes the escalation structural rather than arranged. This is the tool description a routing model reads.\n[reviewer] input operatorId: Example said super1, implying the caller picks the identity. operatorId is bound to the deployment via HANDSPAN_BOUND_INPUTS and is stripped from the schema the chatbot sees, so the example must show what this deployment actually acts as.\n[reviewer] intent s01: Said 'supervisor operator ID', left over from recording against super1. This deployment signs on as a teller — which is what makes the escalation structural — and the intent is printed in the terminal during that run.\n[reviewer] intent s03: Same: said 'as the supervisor operator' while signing on as a teller."
   },
   "provenance": {
     "discoveredAt": "2026-09-04T17:03:50.415Z",
     "model": "claude-opus-5",
     "effort": "medium",
     "discoveryRunId": "disc-20260904-170119-511808",
-    "contentHash": "52f104c6904f5fbc06dcce6dfe01db60",
+    "contentHash": "8eac85704188db7c42dd11aa8305a1f1",
     "generator": "handspan"
   }
 }

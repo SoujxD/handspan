@@ -1123,6 +1123,48 @@ program
   });
 
 program
+  .command('revise-intent')
+  .description("Correct a step's intent — the human-readable line printed in logs and evidence.")
+  .requiredOption('-c, --capability <id>', 'Capability id.')
+  .requiredOption('--step <id>', 'Step id, e.g. s01.')
+  .requiredOption('--intent <text>', 'Replacement intent.')
+  .requiredOption('--why <text>', 'Why. Recorded in governance notes.')
+  .action((o: Record<string, unknown>) => {
+    /**
+     * An intent is never read by the resolver — it is the sentence a person
+     * sees in the terminal, the run log and the evidence trail. Which makes a
+     * stale one quietly expensive: this capability's steps still said "sign on
+     * as the supervisor operator" from when it was recorded against super1,
+     * while the deployment signs on as a teller. That contradiction is printed
+     * on screen every run, and the teller/supervisor distinction is the whole
+     * reason the escalation is structural rather than arranged.
+     */
+    const store = new CapabilityStore(PATHS.artifacts);
+    const cap = store.loadForEdit(String(o['capability']));
+    const stepId = String(o['step']);
+    const step = cap.steps.find((s) => s.id === stepId);
+    if (!step) {
+      console.error(`No step "${stepId}" on ${cap.id}. Steps: ${cap.steps.map((s) => s.id).join(', ')}`);
+      process.exit(2);
+      return;
+    }
+    const before = step.intent;
+    const next = String(o['intent']);
+    if (before === next) {
+      console.error('That is the intent it already has. Nothing to do.');
+      process.exit(2);
+      return;
+    }
+    step.intent = next;
+    startNewVersion(cap, `[reviewer] intent ${stepId}: ${String(o['why'])}`);
+    store.save(cap);
+    console.log(`  ${cap.id} ${stepId}: intent revised.`);
+    console.log(`    was: ${before}`);
+    console.log(`    now: ${next}`);
+    console.log(`  Now v${cap.version}, approval reset to draft.`);
+  });
+
+program
   .command('approve')
   .description('Mark a capability approved for unattended execution.')
   .requiredOption('-c, --capability <id>', 'Capability id.')

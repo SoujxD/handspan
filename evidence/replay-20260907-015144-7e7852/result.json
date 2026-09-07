@@ -1,0 +1,361 @@
+{
+  "status": "failure",
+  "meta": {
+    "runId": "replay-20260907-015144-7e7852",
+    "capabilityId": "place_account_hold_request",
+    "capabilityVersion": 11,
+    "tenantId": "meridian-demo",
+    "mode": "replay",
+    "startedAt": "2026-09-07T01:52:19.843Z",
+    "finishedAt": "2026-09-07T01:52:19.843Z",
+    "durationMs": 0,
+    "stepsAttempted": 11,
+    "evidenceDir": "D:\\project\\interface-assessment\\evidence\\replay-20260907-015144-7e7852",
+    "llmCalls": 0,
+    "inputs": {
+      "operatorId": {
+        "value": "teller1",
+        "sensitivity": "internal",
+        "redacted": false
+      },
+      "operatorPassword": {
+        "value": null,
+        "sensitivity": "secret",
+        "redacted": true
+      },
+      "memberNumber": {
+        "value": "[REDACTED:SECRET]",
+        "sensitivity": "pii",
+        "redacted": true
+      },
+      "shareId": {
+        "value": "[REDACTED:SECRET]-S0001",
+        "sensitivity": "pii",
+        "redacted": true
+      },
+      "reasonCode": {
+        "value": "FRAUD - Suspected fraud",
+        "sensitivity": "internal",
+        "redacted": false
+      },
+      "notes": {
+        "value": "suspected fraud - pending review",
+        "sensitivity": "internal",
+        "redacted": false
+      }
+    }
+  },
+  "failure": {
+    "kind": "recovery_exhausted",
+    "message": "Outcome \"supervisor_override_denied\" requires a human, but escalation is disabled for this run.",
+    "atStepId": "s12",
+    "stepIntent": "Submit the hold request details to reach the Confirm Account Hold review screen.",
+    "expected": "a state the automation can handle",
+    "observed": "Operator lacks supervisor rights for the hold function",
+    "remediation": "Re-run with escalation enabled, or handle this state in the artifact.",
+    "outcomeCode": "supervisor_override_denied"
+  },
+  "partialOutputs": {},
+  "trace": [
+    {
+      "stepId": "s01",
+      "intent": "Enter the operator ID on the sign-on screen.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:49.001Z",
+      "durationMs": 490,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Operator ID:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s02",
+      "intent": "Enter the operator [REDACTED:SECRET] in the Password box.",
+      "action": "type",
+      "risk": "sensitive",
+      "startedAt": "2026-09-07T01:51:49.492Z",
+      "durationMs": 442,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "textbox",
+          "label": "Password:",
+          "name": "",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s03",
+      "intent": "Sign on to the servicing console with the deployment's operator credentials.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:49.941Z",
+      "durationMs": 1126,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": -10,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 11,
+        "observed": {
+          "role": "button",
+          "label": "Sign On",
+          "name": "Sign On",
+          "container": "OPERATOR SIGN ON"
+        }
+      }
+    },
+    {
+      "stepId": "s04",
+      "intent": "Open Member Inquiry / Selection to look up the member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:51.068Z",
+      "durationMs": 1108,
+      "status": "ok",
+      "resolution": {
+        "score": 60,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "name"
+        ],
+        "missedSignals": [
+          "container"
+        ],
+        "candidateCount": 31,
+        "observed": {
+          "role": "link",
+          "label": "Member Inquiry / Selection",
+          "name": "Member Inquiry / Selection",
+          "container": "Signed on as J. TELLER (TELLER)"
+        }
+      }
+    },
+    {
+      "stepId": "s05",
+      "intent": "Enter the target member number in the Value box of Member Inquiry.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:52.177Z",
+      "durationMs": 476,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "textbox",
+          "label": "Value:",
+          "name": "",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s06",
+      "intent": "Search for the member record by member number.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:52.654Z",
+      "durationMs": 1029,
+      "status": "ok",
+      "resolution": {
+        "score": 80,
+        "runnerUpScore": 20,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 14,
+        "observed": {
+          "role": "button",
+          "label": "Search",
+          "name": "Search",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s07",
+      "intent": "Select the matched member to open their record.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:53.684Z",
+      "durationMs": 1153,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 22,
+        "observed": {
+          "role": "link",
+          "label": "Select",
+          "name": "Select",
+          "container": "MEMBER INQUIRY / SELECTION"
+        }
+      }
+    },
+    {
+      "stepId": "s08",
+      "intent": "Open the Place Account Hold action for this member.",
+      "action": "click",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:54.838Z",
+      "durationMs": 1148,
+      "status": "ok",
+      "resolution": {
+        "score": 75,
+        "runnerUpScore": 30,
+        "matchedSignals": [
+          "role",
+          "name",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 104,
+        "observed": {
+          "role": "link",
+          "label": "Place Account Hold",
+          "name": "Place Account Hold",
+          "container": "Update Member Information"
+        }
+      }
+    },
+    {
+      "stepId": "s09",
+      "intent": "Select the share to be placed on hold.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:55.987Z",
+      "durationMs": 299,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 17,
+        "observed": {
+          "role": "combobox",
+          "label": "Share:",
+          "name": "",
+          "container": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED"
+        }
+      }
+    },
+    {
+      "stepId": "s10",
+      "intent": "Select the hold reason code.",
+      "action": "select",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:56.287Z",
+      "durationMs": 1307,
+      "status": "ok",
+      "resolution": {
+        "score": 85,
+        "runnerUpScore": 45,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container"
+        ],
+        "missedSignals": [],
+        "candidateCount": 17,
+        "observed": {
+          "role": "combobox",
+          "label": "Reason Code:",
+          "name": "",
+          "container": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED"
+        }
+      }
+    },
+    {
+      "stepId": "s11",
+      "intent": "Enter the justification notes for the hold request.",
+      "action": "type",
+      "risk": "safe",
+      "startedAt": "2026-09-07T01:51:57.595Z",
+      "durationMs": 938,
+      "status": "ok",
+      "resolution": {
+        "score": 90,
+        "runnerUpScore": 35,
+        "matchedSignals": [
+          "role",
+          "label",
+          "container",
+          "inputType"
+        ],
+        "missedSignals": [],
+        "candidateCount": 17,
+        "observed": {
+          "role": "textbox",
+          "label": "Notes:",
+          "name": "",
+          "container": "RESTRICTED FUNCTION - SUPERVISOR OVERRIDE REQUIRED"
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "log",
+      "path": "D:/project/interface-assessment/evidence/replay-20260907-015144-7e7852/run.jsonl",
+      "capturedAt": "2026-09-07T01:51:44.956Z"
+    }
+  ]
+}

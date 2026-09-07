@@ -1,0 +1,212 @@
+{
+  "capturedAt": "2026-09-07T01:45:25.978Z",
+  "url": "https://web-sample.interface-hiring.com/members/[REDACTED:SECRET]/hold/review",
+  "frameUrls": [
+    "https://web-sample.interface-hiring.com/members/[REDACTED:SECRET]/hold/review"
+  ],
+  "title": "Authorization Required - Meridian Core",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "link",
+      "name": "Main Menu",
+      "label": "Main Menu",
+      "labelSource": "accessible-name",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 306.8000183105469,
+        "y": 42.400001525878906,
+        "width": 66.5374984741211,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "link",
+      "name": "Member Inquiry",
+      "label": "Member Inquiry",
+      "labelSource": "accessible-name",
+      "container": "Main Menu",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 392.8125,
+        "y": 42.400001525878906,
+        "width": 88.125,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "link",
+      "name": "System Settings",
+      "label": "System Settings",
+      "labelSource": "accessible-name",
+      "container": "Member Inquiry",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/settings",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 500.4125061035156,
+        "y": 42.400001525878906,
+        "width": 90.36250305175781,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "link",
+      "name": "Sign Off",
+      "label": "Sign Off",
+      "labelSource": "accessible-name",
+      "container": "System Settings",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/signoff",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 610.25,
+        "y": 42.400001525878906,
+        "width": 44.61249923706055,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "link",
+      "name": "Return to previous screen",
+      "label": "Return to previous screen",
+      "labelSource": "accessible-name",
+      "container": "teller1",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "https://web-sample.interface-hiring.com/members/[REDACTED:SECRET]/hold",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 332.3999938964844,
+        "y": 142,
+        "width": 142.72500610351562,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 14.800000190734863,
+        "width": 758.4000244140625,
+        "height": 25.600000381469727
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "table-cell",
+      "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 40.400001525878906,
+        "width": 758.4000244140625,
+        "height": 17.600000381469727
+      }
+    },
+    {
+      "handle": "e8",
+      "role": "cell",
+      "name": "",
+      "label": "SUPERVISOR OVERRIDE REQUIRED Operator profile teller1 is not authorized to perform this function. A supervisor must sign on to complete this request. Return to previous screen",
+      "labelSource": "table-cell",
+      "value": "OPR TELLER1 | BR MAIN-001 | 09/07/2026 01:43:21 | SID 1A6AC85A",
+      "rowKey": "OPR TELLER1 | BR MAIN-001 | 09/07/2026 01:43:21 | SID 1A6AC85A",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 185.1999969482422,
+        "width": 758.4000244140625,
+        "height": 20.399999618530273
+      }
+    },
+    {
+      "handle": "e9",
+      "role": "cell",
+      "name": "",
+      "label": "OPR TELLER1 | BR MAIN-001 | 09/07/2026 01:43:21 | SID 1A6AC85A",
+      "labelSource": "table-cell",
+      "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 205.60000610351562,
+        "width": 758.4000244140625,
+        "height": 19.600000381469727
+      }
+    }
+  ],
+  "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nSUPERVISOR OVERRIDE REQUIRED\nOperator profile teller1 is not authorized to perform this function. A supervisor must sign on to complete this request.\nReturn to previous screen\nOPR TELLER1 | BR MAIN-001 | 09/07/2026 01:43:21 | SID 1A6AC85A\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+  "lastStatus": 403
+}
