@@ -21,9 +21,9 @@ Assignment*.pdf
 # it carries the running order and the lines to say, which is preparation,
 # not a deliverable. The brief asks for the demo path in the README, and
 # the README carries it.
-docs/DEMO-PREP.md
-docs/ADAPTATION-EXPLAINER.md
-docs/PRESENTATION-SCRIPT.md
-docs/SYSTEM-DESIGN.html
-docs/SYSTEM-WALKTHROUGH.html
+# The whole directory, not a list of filenames: a new prep file or a screen
+# recording dropped in here must not need a .gitignore edit to stay private.
+# Nothing the submission links to lives in docs/ - the write-ups are at the
+# repo root and the recon notes are under evidence/.
+docs/
 DEMO-SCRIPT.md
