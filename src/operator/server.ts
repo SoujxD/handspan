@@ -314,7 +314,7 @@ function detailHtml(i: ReturnType<typeof broker.get> & object): string {
     <div class="col">
       <div class="card">
         <b>Live session</b>
-        <div class="muted" style="margin-bottom:8px">Polled screenshot (~1 fps). Drive the session in the headed browser window.</div>
+        <div class="muted" style="margin-bottom:8px" id="livenote">Polled screenshot (~1 fps). Drive the session in the headed browser window.</div>
         <img class="live" id="live" src="/i/${esc(i.id)}/frame.png" alt="live session">
       </div>
     </div>
@@ -323,7 +323,36 @@ function detailHtml(i: ReturnType<typeof broker.get> & object): string {
 <script>
   const id = ${JSON.stringify(i.id)};
   const live = document.getElementById('live');
-  setInterval(() => { live.src = '/i/' + id + '/frame.png?t=' + Date.now(); }, 1000);
+  const livenote = document.getElementById('livenote');
+
+  /*
+   * The live view is a polled screenshot, and polling has two costs that both
+   * show up as flicker.
+   *
+   * Assigning img.src directly blanks the element while the new PNG loads,
+   * so at one frame a second the panel visibly blinks. Loading into a detached
+   * Image first and swapping only once it has decoded means the visible frame
+   * is never empty.
+   *
+   * The second cost is on the other screen. Capturing a screenshot of a HEADED
+   * browser makes that window repaint, and the operator is looking at exactly
+   * that window - so once they take control, polling flickers the thing they
+   * are trying to type into. So it stops. They are driving the real browser at
+   * that point; a picture of it a second later is worth nothing.
+   */
+  let holder = 'automation';
+  let inflight = false;
+
+  function refreshFrame() {
+    if (inflight || document.hidden || holder === 'operator') return;
+    inflight = true;
+    const next = new Image();
+    next.onload = () => { live.src = next.src; inflight = false; };
+    next.onerror = () => { inflight = false; };
+    next.src = '/i/' + id + '/frame.png?t=' + Date.now();
+  }
+  setInterval(refreshFrame, 1200);
+  document.addEventListener('visibilitychange', refreshFrame);
 
   async function post(path, body) {
     const r = await fetch('/i/' + id + path, {
@@ -342,6 +371,19 @@ function detailHtml(i: ReturnType<typeof broker.get> & object): string {
     if (!r.ok) return;
     const s = await r.json();
     document.getElementById('holder').textContent = s.holder;
+
+    const wasOperator = holder === 'operator';
+    holder = s.holder;
+    if (holder === 'operator') {
+      live.style.opacity = '0.45';
+      livenote.textContent =
+        'You are driving the live browser window. This view is paused while you hold it, ' +
+        'so capturing it cannot flicker the window you are typing into.';
+    } else {
+      live.style.opacity = '1';
+      livenote.textContent = 'Polled screenshot (~1 fps). Drive the session in the headed browser window.';
+      if (wasOperator) refreshFrame();
+    }
   }, 1500);
 </script>
 </body></html>`;

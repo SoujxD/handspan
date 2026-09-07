@@ -1,0 +1,420 @@
+{
+  "capturedAt": "2026-09-07T01:58:20.328Z",
+  "url": "https://web-sample.interface-hiring.com/members/[REDACTED:SECRET]/hold/post",
+  "frameUrls": [
+    "https://web-sample.interface-hiring.com/members/[REDACTED:SECRET]/hold/post"
+  ],
+  "title": "Hold Applied - Meridian Core",
+  "nodes": [
+    {
+      "handle": "e1",
+      "role": "link",
+      "name": "Main Menu",
+      "label": "Main Menu",
+      "labelSource": "accessible-name",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 306.8000183105469,
+        "y": 42.400001525878906,
+        "width": 66.5374984741211,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e2",
+      "role": "link",
+      "name": "Member Inquiry",
+      "label": "Member Inquiry",
+      "labelSource": "accessible-name",
+      "container": "Main Menu",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 392.8125,
+        "y": 42.400001525878906,
+        "width": 88.125,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e3",
+      "role": "link",
+      "name": "System Settings",
+      "label": "System Settings",
+      "labelSource": "accessible-name",
+      "container": "Member Inquiry",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/settings",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 500.4125061035156,
+        "y": 42.400001525878906,
+        "width": 90.36250305175781,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e4",
+      "role": "link",
+      "name": "Sign Off",
+      "label": "Sign Off",
+      "labelSource": "accessible-name",
+      "container": "System Settings",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/signoff",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 610.25,
+        "y": 42.400001525878906,
+        "width": 44.61249923706055,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e5",
+      "role": "link",
+      "name": "Return to Member Record",
+      "label": "Return to Member Record",
+      "labelSource": "accessible-name",
+      "container": "ACCOUNT HOLD APPLIED",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/members/[REDACTED:SECRET]",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 314.8000183105469,
+        "y": 225.60000610351562,
+        "width": 142.0124969482422,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e6",
+      "role": "link",
+      "name": "Main Menu",
+      "label": "Main Menu",
+      "labelSource": "accessible-name",
+      "container": "Return to Member Record",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "href": "/menu",
+        "tag": "a"
+      },
+      "bounds": {
+        "x": 476.2875061035156,
+        "y": 225.60000610351562,
+        "width": 59.47500228881836,
+        "height": 13.600000381469727
+      }
+    },
+    {
+      "handle": "e7",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "rowKey": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 14.800000190734863,
+        "width": 758.4000244140625,
+        "height": 25.600000381469727
+      }
+    },
+    {
+      "handle": "e8",
+      "role": "cell",
+      "name": "",
+      "label": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "labelSource": "table-cell",
+      "value": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "rowKey": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 40.400001525878906,
+        "width": 758.4000244140625,
+        "height": 17.600000381469727
+      }
+    },
+    {
+      "handle": "e9",
+      "role": "cell",
+      "name": "",
+      "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "labelSource": "table-cell",
+      "value": "ACCOUNT HOLD APPLIED HOLD RECORDED Return to Member Record · Main Menu",
+      "rowKey": "ACCOUNT HOLD APPLIED HOLD RECORDED Return to Member Record · Main Menu",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 58,
+        "width": 758.4000244140625,
+        "height": 193.1999969482422
+      }
+    },
+    {
+      "handle": "e10",
+      "role": "heading",
+      "name": "",
+      "label": "Main Menu · Member Inquiry · System Settings · Sign Off",
+      "labelSource": "table-cell",
+      "value": "ACCOUNT HOLD APPLIED",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "h1"
+      },
+      "bounds": {
+        "x": 314.8000183105469,
+        "y": 70,
+        "width": 730.4000244140625,
+        "height": 15.199999809265137
+      }
+    },
+    {
+      "handle": "e11",
+      "role": "cell",
+      "name": "",
+      "label": "",
+      "labelSource": "none",
+      "value": "Confirmation:",
+      "rowKey": "Confirmation:",
+      "container": "HOLD RECORDED",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 328.3999938964844,
+        "y": 139.60000610351562,
+        "width": 90.80000305175781,
+        "height": 19.600000381469727
+      }
+    },
+    {
+      "handle": "e12",
+      "role": "cell",
+      "name": "",
+      "label": "Confirmation:",
+      "labelSource": "table-cell",
+      "value": "CN480399",
+      "rowKey": "Confirmation:",
+      "container": "HOLD RECORDED",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 419.20001220703125,
+        "y": 139.60000610351562,
+        "width": 166.0500030517578,
+        "height": 19.600000381469727
+      }
+    },
+    {
+      "handle": "e13",
+      "role": "cell",
+      "name": "",
+      "label": "Confirmation:",
+      "labelSource": "table-cell",
+      "value": "Share:",
+      "rowKey": "Share:",
+      "columnHeader": "Confirmation:",
+      "container": "HOLD RECORDED",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 328.3999938964844,
+        "y": 159.1999969482422,
+        "width": 90.80000305175781,
+        "height": 19.600000381469727
+      }
+    },
+    {
+      "handle": "e14",
+      "role": "cell",
+      "name": "",
+      "label": "Share:",
+      "labelSource": "table-cell",
+      "value": "[REDACTED:SECRET]-S0001 is now HOLD",
+      "rowKey": "Share:",
+      "columnHeader": "CN480399",
+      "container": "HOLD RECORDED",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 419.20001220703125,
+        "y": 159.1999969482422,
+        "width": 166.0500030517578,
+        "height": 19.600000381469727
+      }
+    },
+    {
+      "handle": "e15",
+      "role": "cell",
+      "name": "",
+      "label": "Share:",
+      "labelSource": "table-cell",
+      "value": "Applied:",
+      "rowKey": "Applied:",
+      "columnHeader": "Confirmation:",
+      "container": "HOLD RECORDED",
+      "framePath": [],
+      "ordinal": 1,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 328.3999938964844,
+        "y": 178.8000030517578,
+        "width": 90.80000305175781,
+        "height": 19.600000381469727
+      }
+    },
+    {
+      "handle": "e16",
+      "role": "cell",
+      "name": "",
+      "label": "Applied:",
+      "labelSource": "table-cell",
+      "value": "09/07/2026 01:56:16",
+      "rowKey": "Applied:",
+      "columnHeader": "CN480399",
+      "container": "HOLD RECORDED",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 419.20001220703125,
+        "y": 178.8000030517578,
+        "width": 166.0500030517578,
+        "height": 19.600000381469727
+      }
+    },
+    {
+      "handle": "e17",
+      "role": "cell",
+      "name": "",
+      "label": "ACCOUNT HOLD APPLIED HOLD RECORDED Return to Member Record · Main Menu",
+      "labelSource": "table-cell",
+      "value": "OPR SUPER1 | BR MAIN-001 | 09/07/2026 01:56:16 | SID E328ACE3",
+      "rowKey": "OPR SUPER1 | BR MAIN-001 | 09/07/2026 01:56:16 | SID E328ACE3",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 251.1999969482422,
+        "width": 758.4000244140625,
+        "height": 20.399999618530273
+      }
+    },
+    {
+      "handle": "e18",
+      "role": "cell",
+      "name": "",
+      "label": "OPR SUPER1 | BR MAIN-001 | 09/07/2026 01:56:16 | SID E328ACE3",
+      "labelSource": "table-cell",
+      "value": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "rowKey": "F3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+      "columnHeader": "MERIDIAN CORE Member Services Platform v4.2.1 Cornerstone Financial Systems™",
+      "framePath": [],
+      "ordinal": 0,
+      "visible": true,
+      "enabled": true,
+      "hints": {
+        "tag": "td"
+      },
+      "bounds": {
+        "x": 300.8000183105469,
+        "y": 271.6000061035156,
+        "width": 758.4000244140625,
+        "height": 19.600000381469727
+      }
+    }
+  ],
+  "text": "MERIDIAN CORE Member Services Platform v4.2.1\nCornerstone Financial Systems™\nMain Menu · Member Inquiry · System Settings · Sign Off\nACCOUNT HOLD APPLIED\nHOLD RECORDED\nConfirmation: CN480399\nShare: [REDACTED:SECRET]-S0001 is now HOLD\nApplied: 09/07/2026 01:56:16\nReturn to Member Record · Main Menu\nOPR SUPER1 | BR MAIN-001 | 09/07/2026 01:56:16 | SID E328ACE3\nF3=Sign Off F5=Main Menu F7=Member Inquiry F12=Cancel",
+  "lastStatus": 200
+}

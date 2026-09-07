@@ -319,7 +319,18 @@ export class PlaywrightSurface implements Surface {
         .catch(() => undefined);
     }
 
-    const buf = await this.page.screenshot({ fullPage: opts.fullPage ?? false });
+    /**
+     * `animations` and `caret` are pinned because this is polled about once a
+     * second while a run is parked, and the browser is HEADED — a person is
+     * watching it, and about to type into it. Left to default, every capture
+     * re-renders a blinking caret and whatever the page is animating, which
+     * reads as a flicker to whoever is looking at the window.
+     */
+    const buf = await this.page.screenshot({
+      fullPage: opts.fullPage ?? false,
+      animations: 'disabled',
+      caret: 'initial',
+    });
 
     if (opts.maskBounds?.length) {
       await this.page
